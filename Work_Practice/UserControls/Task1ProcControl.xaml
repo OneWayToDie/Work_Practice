@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="Work_Practice.UserControls.Task1ProcControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5">
+            <TextBox Text="{Binding CurrentNumberInput, UpdateSourceTrigger=PropertyChanged}" 
+                     Width="200" Margin="0,0,10,0" ToolTip="Введите целое число"/>
+            <Button Content="Добавить" Width="100" Command="{Binding AddNumberCommand}"/>
+        </StackPanel>
+
+        <ListBox ItemsSource="{Binding Numbers}" Grid.Row="1" Height="120" Margin="0,10"/>
+
+        <Button Content="Обработать" Width="150" Height="35" Margin="0,10"
+                Grid.Row="2" Command="{Binding ProcessCommand}"/>
+
+        <DataGrid ItemsSource="{Binding Results}" Grid.Row="3" AutoGenerateColumns="False" 
+                  Height="200" Margin="0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Число" Binding="{Binding Number}"/>
+                <DataGridTextColumn Header="Количество цифр" Binding="{Binding DigitCount}"/>
+                <DataGridTextColumn Header="Наименьшая цифра" Binding="{Binding MinDigit}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBox Grid.Row="4" TextWrapping="Wrap" IsReadOnly="True" 
+                 FontFamily="Consolas" FontSize="12"
+                 VerticalScrollBarVisibility="Auto" Height="150"
+                 Text="void GetDigitsInfoProc(int number, out int count, out int minDigit)&#x0a;{&#x0a;    int temp = number;&#x0a;    count = 0;&#x0a;    minDigit = 9;&#x0a;    while (temp &gt; 0)&#x0a;    {&#x0a;        int digit = temp % 10;&#x0a;        if (digit &lt; minDigit) minDigit = digit;&#x0a;        count++;&#x0a;        temp /= 10;&#x0a;    }&#x0a;}"/>
+    </Grid>
+</UserControl>
