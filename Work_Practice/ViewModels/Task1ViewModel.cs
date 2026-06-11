@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Work_Practice.Models;
+using Work_Practice.Commands;
 
 namespace Work_Practice.ViewModels
 {
@@ -13,6 +14,9 @@ namespace Work_Practice.ViewModels
 		private string _currentNumberInput = "";
 		private ObservableCollection<int> _numbers = new ObservableCollection<int>();
 		private ObservableCollection<NumberInfo> _results = new ObservableCollection<NumberInfo>();
+		private bool _isProcSelected = true;
+		private string _selectedVariant = "Proc";
+		private string _codeExampleText = "// Код процедуры будет здесь";
 
 		public string CurrentNumberInput
 		{
@@ -32,6 +36,39 @@ namespace Work_Practice.ViewModels
 			set { _results = value; OnPropertyChanged(); }
 		}
 
+		public bool IsProcSelected
+		{
+			get => _isProcSelected;
+			set
+			{
+				if (_isProcSelected == value) return;
+				_isProcSelected = value;
+				OnPropertyChanged();
+				if (value) SelectedVariant = "Proc";
+				UpdateCodeExample();
+			}
+		}
+
+		private bool _isFuncSelected;
+		public bool IsFuncSelected
+		{
+			get => _isFuncSelected;
+			set
+			{
+				if (_isFuncSelected == value) return;
+				_isFuncSelected = value;
+				OnPropertyChanged();
+				if (value) SelectedVariant = "Func";
+				UpdateCodeExample();
+			}
+		}
+
+		public string SelectedVariant
+		{
+			get => _selectedVariant;
+			private set { _selectedVariant = value; OnPropertyChanged(); }
+		}
+
 		public ICommand AddNumberCommand { get; }
 		public ICommand ProcessCommand { get; }
 		public ICommand ClearNumbersCommand { get; }
@@ -41,6 +78,7 @@ namespace Work_Practice.ViewModels
 			AddNumberCommand = new DelegateCommand(AddNumber);
 			ProcessCommand = new DelegateCommand(Process);
 			ClearNumbersCommand = new DelegateCommand(ClearNumbers);
+			UpdateCodeExample();
 		}
 
 		private void AddNumber()
@@ -78,12 +116,20 @@ namespace Work_Practice.ViewModels
 			Results.Clear();
 			foreach (int n in Numbers)
 			{
-				GetDigitsInfoProc(n, out int count, out int minDigit);
-				Results.Add(new NumberInfo { Number = n, DigitCount = count, MinDigit = minDigit });
+				if (SelectedVariant == "Proc")
+				{
+					GetDigitsInfoProc(n, out int count, out int minDigit);
+					Results.Add(new NumberInfo { Number = n, DigitCount = count, MinDigit = minDigit });
+				}
+				else
+				{
+					var (count, minDigit) = GetDigitsInfoFunc(n);
+					Results.Add(new NumberInfo { Number = n, DigitCount = count, MinDigit = minDigit });
+				}
 			}
 		}
 
-		// Реальная процедура
+		// Процедура
 		private void GetDigitsInfoProc(int number, out int count, out int minDigit)
 		{
 			if (number <= 0)
@@ -92,11 +138,9 @@ namespace Work_Practice.ViewModels
 				minDigit = -1;
 				return;
 			}
-
 			int temp = number;
 			count = 0;
 			minDigit = 9;
-
 			while (temp > 0)
 			{
 				int digit = temp % 10;
@@ -106,10 +150,57 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
+		// Функция, возвращающая кортеж
+		private (int count, int minDigit) GetDigitsInfoFunc(int number)
+		{
+			if (number <= 0) return (0, -1);
+			int temp = number;
+			int count = 0;
+			int minDigit = 9;
+			while (temp > 0)
+			{
+				int digit = temp % 10;
+				if (digit < minDigit) minDigit = digit;
+				count++;
+				temp /= 10;
+			}
+			return (count, minDigit);
+		}
+
 		public event PropertyChangedEventHandler PropertyChanged;
 		protected void OnPropertyChanged([CallerMemberName] string name = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+		}
+
+		public string CodeExampleText
+		{
+			get => _codeExampleText;
+			set { _codeExampleText = value; OnPropertyChanged(); }
+		}
+
+		private void UpdateCodeExample()
+		{
+			if (SelectedVariant == "Proc")
+			{
+				CodeExampleText = "void GetDigitsInfoProc(int number, out int count, out int minDigit)\n" +
+					"{\n    int temp = number;" +
+					"\n    count = 0;" +
+					"\n    minDigit = 9;" +
+					"\n    while (temp > 0)\n    " +
+					"{\n        int digit = temp % 10;\n        if (digit < minDigit) minDigit = digit;" +
+					"\n        count++;\n        temp /= 10;\n    }\n}";
+			}
+			else
+			{
+				CodeExampleText = "(int count, int minDigit) GetDigitsInfoFunc(int number)\n" +
+					"{\n    int temp = number;\n    int count = 0;" +
+					"\n    int minDigit = 9;\n    while (temp > 0)" +
+					"\n    {\n        int digit = temp % 10;" +
+					"\n        if (digit < minDigit) minDigit = digit;" +
+					"\n        count++;\n        temp /= 10;\n    }" +
+					"\n    return (count, minDigit);\n}";
+			}
 		}
 	}
 }

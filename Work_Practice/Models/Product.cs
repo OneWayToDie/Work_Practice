@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Work_Practice.Models
+﻿namespace Work_Practice.Models
 {
-	internal class Product
+	public class Product
 	{
+		public string Name { get; set; }
+		public string Manufacturer { get; set; }
+		public int ShelfLife { get; set; }      // срок хранения (дни)
+		public decimal Price { get; set; }
+		public int StockQuantity { get; set; }   // количество на складе
 	}
 }

@@ -7,37 +7,15 @@
         Style="{StaticResource KasperskyWindowStyle}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
-        Height="600" Width="800">
+        Height="900" Width="800">
     <Window.DataContext>
         <vm:Task1ViewModel/>
     </Window.DataContext>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
-            <RadioButton x:Name="ProcRadio" Content="Процедура" 
-                         IsChecked="True" Margin="10,5" Foreground="White"/>
-            <RadioButton x:Name="FuncRadio" Content="Функция" 
-                         Margin="10,5" Foreground="White"/>
+            <RadioButton Content="Процедура" IsChecked="{Binding IsProcSelected}" Margin="10,5" Foreground="White"/>
+            <RadioButton Content="Функция" IsChecked="{Binding IsFuncSelected}" Margin="10,5" Foreground="White"/>
         </StackPanel>
-
-        <ContentControl Margin="10">
-            <ContentControl.Style>
-                <Style TargetType="ContentControl">
-                    <Setter Property="Content">
-                        <Setter.Value>
-                            <uc:Task1ProcControl/>
-                        </Setter.Value>
-                    </Setter>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked, ElementName=FuncRadio}" Value="True">
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <uc:Task1FuncControl/>
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ContentControl.Style>
-        </ContentControl>
+        <uc:Task1ProcControl Margin="10"/>
     </DockPanel>
 </Window>

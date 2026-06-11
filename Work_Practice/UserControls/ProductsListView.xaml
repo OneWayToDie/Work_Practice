@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="Work_Practice.UserControls.ProductsListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <Button Content="Сохранить в файл" Command="{Binding SaveToFileCommand}" Margin="5" Padding="8,5"/>
+            <Button Content="Загрузить из файла" Command="{Binding LoadFromFileCommand}" Margin="5" Padding="8,5"/>
+            <Button Content="Очистить БД" Command="{Binding ClearDatabaseCommand}" Margin="5" Padding="8,5"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Кол-во на складе не менее:" VerticalAlignment="Center" Margin="5" Foreground="White"/>
+            <TextBox Text="{Binding MinStockQuantity, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="5"/>
+            <Button Content="Применить (фильтр + сортировка)" Command="{Binding SortAndFilterCommand}" Margin="5" Padding="8,5"/>
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding FilteredProducts}" AutoGenerateColumns="False" Grid.Row="2">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Фирма" Binding="{Binding Manufacturer}" Width="*"/>
+                <DataGridTextColumn Header="Срок хранения (дни)" Binding="{Binding ShelfLife}" Width="*"/>
+                <DataGridTextColumn Header="Цена" Binding="{Binding Price, StringFormat={}{0:N2} руб.}" Width="*"/>
+                <DataGridTextColumn Header="Количество на складе" Binding="{Binding StockQuantity}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

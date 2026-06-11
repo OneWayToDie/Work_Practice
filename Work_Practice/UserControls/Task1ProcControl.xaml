@@ -7,7 +7,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -31,9 +31,11 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <TextBox Grid.Row="4" TextWrapping="Wrap" IsReadOnly="True" 
+        <!-- TextBox с кодом – без скролла, фиксированная высота -->
+        <TextBox Text="{Binding CodeExampleText}" Grid.Row="4" 
+                 TextWrapping="Wrap" IsReadOnly="True" 
                  FontFamily="Consolas" FontSize="12"
-                 VerticalScrollBarVisibility="Auto" Height="150"
-                 Text="void GetDigitsInfoProc(int number, out int count, out int minDigit)&#x0a;{&#x0a;    int temp = number;&#x0a;    count = 0;&#x0a;    minDigit = 9;&#x0a;    while (temp &gt; 0)&#x0a;    {&#x0a;        int digit = temp % 10;&#x0a;        if (digit &lt; minDigit) minDigit = digit;&#x0a;        count++;&#x0a;        temp /= 10;&#x0a;    }&#x0a;}"/>
+                 Height="250" Margin="0,10,0,0"
+                 VerticalScrollBarVisibility="Disabled"/>
     </Grid>
 </UserControl>

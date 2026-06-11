@@ -1,6 +1,6 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Work_Practice.Views;
+using Work_Practice.Commands;
 
 namespace Work_Practice.ViewModels
 {
@@ -20,25 +20,5 @@ namespace Work_Practice.ViewModels
 		private void OpenTask1() => new Task1Window().ShowDialog();
 		private void OpenTask2() => new Task2Window().ShowDialog();
 		private void OpenTask3() => new Task3Window().ShowDialog();
-	}
-
-	public class DelegateCommand : ICommand
-	{
-		private readonly Action _execute;
-		private readonly Func<bool> _canExecute;
-
-		public DelegateCommand(Action execute, Func<bool> canExecute = null)
-		{
-			_execute = execute;
-			_canExecute = canExecute;
-		}
-
-		public bool CanExecute(object parameter) => _canExecute == null || _canExecute();
-		public void Execute(object parameter) => _execute();
-		public event EventHandler CanExecuteChanged
-		{
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
-		}
 	}
 }

@@ -80,14 +80,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\DelegateCommand.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\StringToBoolConverter.cs" />
     <Compile Include="Models\LinkedListModels.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Models\NumberInfo.cs" />
     <Compile Include="Models\Product.cs" />
-    <Compile Include="Services\DataService.cs" />
+    <Compile Include="Services\ProductDataService.cs" />
     <Compile Include="Services\LinkedListService.cs" />
-    <Compile Include="UserControls\Task1FuncControl.xaml.cs">
-      <DependentUpon>Task1FuncControl.xaml</DependentUpon>
+    <Compile Include="Services\SinglyLinkedList.cs" />
+    <Compile Include="UserControls\AddProductView.xaml.cs">
+      <DependentUpon>AddProductView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\BuiltInListView.xaml.cs">
+      <DependentUpon>BuiltInListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\CustomListView.xaml.cs">
+      <DependentUpon>CustomListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ProductsListView.xaml.cs">
+      <DependentUpon>ProductsListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\Task1ProcControl.xaml.cs">
       <DependentUpon>Task1ProcControl.xaml</DependentUpon>
@@ -109,7 +122,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\Task1FuncControl.xaml">
+    <Page Include="UserControls\AddProductView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\BuiltInListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CustomListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ProductsListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

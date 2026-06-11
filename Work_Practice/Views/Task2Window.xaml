@@ -1,12 +1,40 @@
 ﻿<Window x:Class="Work_Practice.Views.Task2Window"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Work_Practice.Views"
-        mc:Ignorable="d"
-        Title="Task2Window" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        xmlns:vm="clr-namespace:Work_Practice.ViewModels"
+        xmlns:uc="clr-namespace:Work_Practice.UserControls"
+        Title="Задание 2 – товары, файл, сортировка"
+        Style="{StaticResource KasperskyWindowStyle}"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Height="700" Width="950">
+    <Window.DataContext>
+        <vm:Task2ViewModel/>
+    </Window.DataContext>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
+            <RadioButton x:Name="ListViewRadio" Content="Список товаров" IsChecked="True" Margin="5" Foreground="White"/>
+            <RadioButton x:Name="AddViewRadio" Content="Добавить товар" Margin="5" Foreground="White"/>
+        </StackPanel>
+        <ContentControl Margin="10">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <uc:ProductsListView/>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked, ElementName=AddViewRadio}" Value="True">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <uc:AddProductView/>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </DockPanel>
 </Window>
