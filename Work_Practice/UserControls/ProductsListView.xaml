@@ -9,15 +9,19 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
-            <Button Content="Сохранить в файл" Command="{Binding SaveToFileCommand}" Margin="5" Padding="8,5"/>
-            <Button Content="Загрузить из файла" Command="{Binding LoadFromFileCommand}" Margin="5" Padding="8,5"/>
-            <Button Content="Очистить БД" Command="{Binding ClearDatabaseCommand}" Margin="5" Padding="8,5"/>
+            <Button Content="Сохранить в файл" Width="140" Command="{Binding SaveToFileCommand}" 
+            Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
+            <Button Content="Загрузить из файла" Width="140" Command="{Binding LoadFromFileCommand}" 
+            Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
+            <Button Content="Очистить БД" Width="100" Command="{Binding ClearDatabaseCommand}" 
+            Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10">
             <TextBlock Text="Кол-во на складе не менее:" VerticalAlignment="Center" Margin="5" Foreground="White"/>
             <TextBox Text="{Binding MinStockQuantity, UpdateSourceTrigger=PropertyChanged}" Width="80" Margin="5"/>
-            <Button Content="Применить (фильтр + сортировка)" Command="{Binding SortAndFilterCommand}" Margin="5" Padding="8,5"/>
+            <Button Content="Применить (фильтр + сортировка)" Width="250" Command="{Binding SortAndFilterCommand}" 
+            Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding FilteredProducts}" AutoGenerateColumns="False" Grid.Row="2">

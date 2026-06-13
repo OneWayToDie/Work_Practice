@@ -4,9 +4,8 @@
         xmlns:vm="clr-namespace:Work_Practice.ViewModels"
         Title="Учебная практика (вариант 26)"
         Style="{StaticResource KasperskyWindowStyle}"
-        Height="450" Width="650"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResizeWithGrip">
+        Height="600" Width="800">
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
@@ -14,8 +13,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Верхняя надпись -->
         <StackPanel Grid.Row="0" Margin="0,20,0,20">
             <TextBlock Text="Учебная практика" FontSize="28" FontWeight="Bold" 
                        Foreground="{StaticResource TextPrimaryBrush}"
@@ -25,17 +26,31 @@
                        HorizontalAlignment="Center" Margin="0,5,0,0"/>
         </StackPanel>
 
-        <WrapPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Content="Задание 1" Style="{StaticResource KasperskyButton}" 
-                    Width="160" Height="60" Margin="15" Command="{Binding OpenTask1Command}"/>
-            <Button Content="Задание 2" Style="{StaticResource KasperskyButton}" 
-                    Width="160" Height="60" Margin="15" Command="{Binding OpenTask2Command}"/>
-            <Button Content="Задание 3" Style="{StaticResource KasperskyButton}" 
-                    Width="160" Height="60" Margin="15" Command="{Binding OpenTask3Command}"/>
+        <!-- Кнопки заданий с иконками -->
+        <WrapPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+            <Button Style="{StaticResource MainTaskButton}" Command="{Binding OpenTask1Command}" Margin="15">
+                <StackPanel>
+                    <Image Source="/Resources/Images/calculator.png" Width="48" Height="48" Margin="0,0,0,10"/>
+                    <TextBlock TextAlignment="Center" FontSize="16" FontWeight="SemiBold">Задание 1</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource MainTaskButton}" Command="{Binding OpenTask2Command}" Margin="15">
+                <StackPanel>
+                    <Image Source="/Resources/Images/Boxes.png" Width="48" Height="48" Margin="0,0,0,10"/>
+                    <TextBlock TextAlignment="Center" FontSize="16" FontWeight="SemiBold">Задание 2</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource MainTaskButton}" Command="{Binding OpenTask3Command}" Margin="15">
+                <StackPanel>
+                    <Image Source="/Resources/Images/list.png" Width="48" Height="48" Margin="0,0,0,10"/>
+                    <TextBlock TextAlignment="Center" FontSize="16" FontWeight="SemiBold">Задание 3</TextBlock>
+                </StackPanel>
+            </Button>
         </WrapPanel>
 
+        <!-- Нижняя строка -->
         <TextBlock Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
-                   Margin="0,0,0,15" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"
+                   Margin="0,0,0,25" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11"
                    Text="Тульский государственный университет | Кафедра информационной безопасности"/>
     </Grid>
 </Window>

@@ -13,14 +13,16 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5">
             <TextBox Text="{Binding CurrentNumberInput, UpdateSourceTrigger=PropertyChanged}" 
-                     Width="200" Margin="0,0,10,0" ToolTip="Введите целое число"/>
-            <Button Content="Добавить" Width="100" Command="{Binding AddNumberCommand}"/>
+             Width="200" Margin="0,0,10,0" ToolTip="Введите целое число"/>
+            <Button Content="Добавить" Width="100" Command="{Binding AddNumberCommand}" 
+            Style="{StaticResource TaskButton}"/>
         </StackPanel>
 
         <ListBox ItemsSource="{Binding Numbers}" Grid.Row="1" Height="120" Margin="0,10"/>
 
         <Button Content="Обработать" Width="150" Height="35" Margin="0,10"
-                Grid.Row="2" Command="{Binding ProcessCommand}"/>
+        Grid.Row="2" Command="{Binding ProcessCommand}" 
+        Style="{StaticResource TaskButton}"/>
 
         <DataGrid ItemsSource="{Binding Results}" Grid.Row="3" AutoGenerateColumns="False" 
                   Height="200" Margin="0,10">
@@ -33,9 +35,10 @@
 
         <!-- TextBox с кодом – без скролла, фиксированная высота -->
         <TextBox Text="{Binding CodeExampleText}" Grid.Row="4" 
-                 TextWrapping="Wrap" IsReadOnly="True" 
-                 FontFamily="Consolas" FontSize="12"
-                 Height="250" Margin="0,10,0,0"
-                 VerticalScrollBarVisibility="Disabled"/>
+         IsReadOnly="True" 
+         FontFamily="Consolas" FontSize="12"
+         Height="250" Margin="0,10,0,0"
+         TextWrapping="NoWrap"
+         HorizontalScrollBarVisibility="Auto"/>
     </Grid>
 </UserControl>

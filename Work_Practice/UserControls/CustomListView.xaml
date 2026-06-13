@@ -5,13 +5,21 @@
         <StackPanel Orientation="Horizontal" Margin="0,2">
             <TextBlock Text="Количество чисел N:" VerticalAlignment="Center" Margin="3" Foreground="White"/>
             <TextBox Text="{Binding NValue, UpdateSourceTrigger=PropertyChanged}" Width="60" Margin="3"/>
-            <Button Content="Создать случайный список" Command="{Binding CreateRandomListCommand}" Margin="3" Padding="6,3"/>
+            <Button Content="Создать случайный список" Width="200" Command="{Binding CreateRandomListCommand}" 
+                    Margin="3" Padding="6,3" Style="{StaticResource TaskButton}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Тип чисел:" VerticalAlignment="Center" Margin="3" Foreground="White"/>
+            <RadioButton Content="Целые (1-100)" IsChecked="{Binding IsIntegerMode}" Margin="5,0" Foreground="White" GroupName="NumberType"/>
+            <RadioButton Content="Действительные (0-100)" IsChecked="{Binding IsDoubleMode}" Margin="5,0" Foreground="White" GroupName="NumberType"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Margin="0,2">
             <TextBlock Text="Числа через запятую (или пробел):" VerticalAlignment="Center" Margin="3" Foreground="White"/>
             <TextBox Text="{Binding NumbersInput, UpdateSourceTrigger=PropertyChanged}" Width="300" Margin="3"/>
-            <Button Content="Загрузить из строки" Command="{Binding LoadFromStringCommand}" Margin="3" Padding="6,3"/>
+            <Button Content="Загрузить из строки" Width="150" Command="{Binding LoadFromStringCommand}" 
+                    Margin="3" Padding="6,3" Style="{StaticResource TaskButton}"/>
         </StackPanel>
 
         <TextBlock Text="Исходный список (односвязный список):" Margin="3,5" Foreground="White" FontWeight="Bold"/>
@@ -20,8 +28,8 @@
         <TextBlock Text="Результат после переноса:" Margin="3,5" Foreground="White" FontWeight="Bold"/>
         <ListBox ItemsSource="{Binding CustomListItems}" Height="100" Margin="3"/>
 
-        <Button Content="Перенести 3-й элемент в начало" 
-                Command="{Binding MoveThirdToFrontCommand}" 
-                Margin="3,8" Padding="10,4" Width="220" HorizontalAlignment="Left"/>
+        <Button Content="Перенести 3-й элемент в начало" Command="{Binding MoveThirdToFrontCommand}" 
+                Margin="3,8" Padding="10,4" Width="240" HorizontalAlignment="Left" 
+                Style="{StaticResource TaskButton}"/>
     </StackPanel>
 </UserControl>

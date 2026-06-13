@@ -82,10 +82,13 @@
     </ApplicationDefinition>
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\EnumToBooleanConverter.cs" />
     <Compile Include="Converters\StringToBoolConverter.cs" />
+    <Compile Include="Helpers\WindowButtonHelper.cs" />
     <Compile Include="Models\LinkedListModels.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\NumberInfo.cs" />
+    <Compile Include="Models\NumberType.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Services\ProductDataService.cs" />
     <Compile Include="Services\LinkedListService.cs" />
@@ -193,6 +196,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Boxes.png" />
+    <Resource Include="Resources\Images\calculator.png" />
+    <Resource Include="Resources\Images\list.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Boxes.ico" />
+    <Resource Include="Resources\Images\calculator.ico" />
+    <Resource Include="Resources\Images\list.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

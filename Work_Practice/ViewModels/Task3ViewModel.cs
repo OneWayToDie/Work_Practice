@@ -7,25 +7,35 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Work_Practice.Commands;
+using Work_Practice.Models;
 using Work_Practice.Services;
 
 namespace Work_Practice.ViewModels
 {
 	public class Task3ViewModel : INotifyPropertyChanged
 	{
+		// --- Режимы отображения ---
 		private bool _isCustomViewSelected = true;
 		public bool IsCustomViewSelected
 		{
 			get => _isCustomViewSelected;
 			set { _isCustomViewSelected = value; OnPropertyChanged(); }
 		}
-
 		public bool IsBuiltInViewSelected
 		{
 			get => !_isCustomViewSelected;
 			set { _isCustomViewSelected = !value; OnPropertyChanged(); }
 		}
 
+		// --- Тип генерируемых чисел (теперь просто TypeOfNumber) ---
+		private TypeOfNumber _selectedNumberType = TypeOfNumber.Integer;
+		public TypeOfNumber SelectedNumberType
+		{
+			get => _selectedNumberType;
+			set { _selectedNumberType = value; OnPropertyChanged(); }
+		}
+
+		// --- Собственная реализация списка ---
 		private SinglyLinkedList<double> _customList = new SinglyLinkedList<double>();
 		private ObservableCollection<double> _customListItems = new ObservableCollection<double>();
 		public ObservableCollection<double> CustomListItems
@@ -34,6 +44,7 @@ namespace Work_Practice.ViewModels
 			set { _customListItems = value; OnPropertyChanged(); }
 		}
 
+		// --- Реализация через LinkedList<T> ---
 		private LinkedList<double> _builtInList = new LinkedList<double>();
 		private ObservableCollection<double> _builtInListItems = new ObservableCollection<double>();
 		public ObservableCollection<double> BuiltInListItems
@@ -42,6 +53,7 @@ namespace Work_Practice.ViewModels
 			set { _builtInListItems = value; OnPropertyChanged(); }
 		}
 
+		// --- Общие свойства UI ---
 		private string _numbersInput = "";
 		public string NumbersInput
 		{
@@ -56,6 +68,7 @@ namespace Work_Practice.ViewModels
 			set { _nValue = value; OnPropertyChanged(); }
 		}
 
+		// --- Команды ---
 		public ICommand CreateRandomListCommand { get; }
 		public ICommand LoadFromStringCommand { get; }
 		public ICommand MoveThirdToFrontCommand { get; }
@@ -80,11 +93,21 @@ namespace Work_Practice.ViewModels
 				return;
 			}
 			var rand = new Random();
-			double[] randomNumbers = Enumerable.Range(0, n).Select(_ => Math.Round(rand.NextDouble() * 100, 2)).ToArray();
+			double[] randomNumbers;
+
+			if (SelectedNumberType == TypeOfNumber.Integer)
+			{
+				randomNumbers = Enumerable.Range(0, n).Select(_ => (double)rand.Next(1, 101)).ToArray();
+			}
+			else
+			{
+				randomNumbers = Enumerable.Range(0, n).Select(_ => Math.Round(rand.NextDouble() * 100, 2)).ToArray();
+			}
+
+			string typeName = SelectedNumberType == TypeOfNumber.Integer ? "целых" : "действительных";
 
 			if (IsCustomViewSelected)
 			{
-				// Для собственной реализации
 				_customList.Clear();
 				CustomListItems.Clear();
 				foreach (var num in randomNumbers)
@@ -92,12 +115,10 @@ namespace Work_Practice.ViewModels
 					_customList.Add(num);
 					CustomListItems.Add(num);
 				}
-				OnPropertyChanged(nameof(CustomListItems));
-				MessageBox.Show($"Создан случайный список (собственная реализация) из {n} элементов.");
+				MessageBox.Show($"Создан случайный список (собственная реализация) из {n} {typeName} чисел.");
 			}
-			else // IsBuiltInViewSelected
+			else
 			{
-				// Для встроенной реализации
 				_builtInList.Clear();
 				BuiltInListItems.Clear();
 				foreach (var num in randomNumbers)
@@ -105,8 +126,7 @@ namespace Work_Practice.ViewModels
 					_builtInList.AddLast(num);
 					BuiltInListItems.Add(num);
 				}
-				OnPropertyChanged(nameof(BuiltInListItems));
-				MessageBox.Show($"Создан случайный список (LinkedList<T>) из {n} элементов.");
+				MessageBox.Show($"Создан случайный список (LinkedList<T>) из {n} {typeName} чисел.");
 			}
 		}
 
@@ -171,22 +191,16 @@ namespace Work_Practice.ViewModels
 					{
 						CustomListItems.Clear();
 						foreach (var item in _customList.ToList())
-						{
 							CustomListItems.Add(item);
-						}
 						MessageBox.Show("Собственная реализация: третий элемент перенесён в начало.");
 					}
 					else
-					{
 						MessageBox.Show("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
-					}
 				}
 				else
-				{
 					MessageBox.Show("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
-				}
 			}
-			else // IsBuiltInViewSelected
+			else
 			{
 				if (_builtInList.Count >= 3)
 				{
@@ -196,30 +210,21 @@ namespace Work_Practice.ViewModels
 						var value = thirdNode.Value;
 						_builtInList.Remove(thirdNode);
 						_builtInList.AddFirst(value);
-
 						BuiltInListItems.Clear();
 						foreach (var item in _builtInList)
-						{
 							BuiltInListItems.Add(item);
-						}
 						MessageBox.Show("LinkedList<T>: третий элемент перенесён в начало.");
 					}
 					else
-					{
 						MessageBox.Show("LinkedList<T>: не удалось найти третий элемент.");
-					}
 				}
 				else
-				{
 					MessageBox.Show($"LinkedList<T>: в списке {_builtInList.Count} элементов. Операция требует минимум 3 элемента.");
-				}
 			}
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
-		protected void OnPropertyChanged([CallerMemberName] string name = null)
-		{
+		protected void OnPropertyChanged([CallerMemberName] string name = null) =>
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
 	}
 }

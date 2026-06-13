@@ -184,22 +184,32 @@ namespace Work_Practice.ViewModels
 			if (SelectedVariant == "Proc")
 			{
 				CodeExampleText = "void GetDigitsInfoProc(int number, out int count, out int minDigit)\n" +
-					"{\n    int temp = number;" +
+					"{\n    " +
+					"int temp = number;" +
 					"\n    count = 0;" +
 					"\n    minDigit = 9;" +
 					"\n    while (temp > 0)\n    " +
-					"{\n        int digit = temp % 10;\n        if (digit < minDigit) minDigit = digit;" +
-					"\n        count++;\n        temp /= 10;\n    }\n}";
+					"{\n        int digit = temp % 10;\n        " +
+					"if (digit < minDigit) minDigit = " +
+					"digit; \n        count++;\n        temp /= 10;\n    }\n}";
 			}
 			else
 			{
-				CodeExampleText = "(int count, int minDigit) GetDigitsInfoFunc(int number)\n" +
-					"{\n    int temp = number;\n    int count = 0;" +
-					"\n    int minDigit = 9;\n    while (temp > 0)" +
-					"\n    {\n        int digit = temp % 10;" +
-					"\n        if (digit < minDigit) minDigit = digit;" +
-					"\n        count++;\n        temp /= 10;\n    }" +
-					"\n    return (count, minDigit);\n}";
+				CodeExampleText =
+				"(int count, int minDigit) GetDigitsInfoFunc(int number)\n" +
+				"{\n" +
+				"    int temp = number;\n" +
+				"    int count = 0;\n" +
+				"    int minDigit = 9;\n" +
+				"    while (temp > 0)\n" +
+				"    {\n" +
+				"        int digit = temp % 10;\n" +
+				"        if (digit < minDigit) minDigit = digit;\n" +
+				"        count++;\n" +
+				"        temp /= 10;\n" +
+				"    }\n" +
+				"    return (count, minDigit);\n" +
+				"}";
 			}
 		}
 	}
