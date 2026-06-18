@@ -124,20 +124,41 @@ namespace Work_Practice.ViewModels
 
 		private void AddProduct()
 		{
-			if (string.IsNullOrWhiteSpace(NewName) || string.IsNullOrWhiteSpace(NewManufacturer))
+			// Проверка наименования
+			if (string.IsNullOrWhiteSpace(NewName))
 			{
-				MessageBox.Show("Заполните наименование и фирму.");
+				MessageBox.Show("Наименование товара не может быть пустым.", "Ошибка ввода");
 				return;
 			}
-			if (NewPrice <= 0 || NewShelfLife < 0 || NewStockQuantity < 0)
+			// Проверка фирмы
+			if (string.IsNullOrWhiteSpace(NewManufacturer))
 			{
-				MessageBox.Show("Цена должна быть >0, срок хранения и количество >=0.");
+				MessageBox.Show("Фирма-изготовитель не может быть пустой.", "Ошибка ввода");
 				return;
 			}
+			// Проверка цены
+			if (NewPrice <= 0)
+			{
+				MessageBox.Show("Цена должна быть больше 0.", "Ошибка ввода");
+				return;
+			}
+			// Проверка срока хранения
+			if (NewShelfLife <= 0)
+			{
+				MessageBox.Show("Срок хранения должен быть больше 0 дней.", "Ошибка ввода");
+				return;
+			}
+			// Проверка количества на складе
+			if (NewStockQuantity < 0)
+			{
+				MessageBox.Show("Количество на складе не может быть отрицательным.", "Ошибка ввода");
+				return;
+			}
+
 			var newProduct = new Product
 			{
-				Name = NewName,
-				Manufacturer = NewManufacturer,
+				Name = NewName.Trim(),
+				Manufacturer = NewManufacturer.Trim(),
 				ShelfLife = NewShelfLife,
 				Price = NewPrice,
 				StockQuantity = NewStockQuantity
@@ -152,7 +173,7 @@ namespace Work_Practice.ViewModels
 			NewPrice = 0;
 			NewStockQuantity = 0;
 
-			MessageBox.Show("Товар добавлен.");
+			MessageBox.Show("Товар добавлен.", "Успешно");
 		}
 
 		private void ClearDatabase()

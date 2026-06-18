@@ -24,7 +24,9 @@
             Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
         </StackPanel>
 
-        <DataGrid ItemsSource="{Binding FilteredProducts}" AutoGenerateColumns="False" Grid.Row="2">
+        <DataGrid ItemsSource="{Binding FilteredProducts}" AutoGenerateColumns="False" Grid.Row="2"
+          CanUserAddRows="False" CanUserDeleteRows="False"
+          SelectionUnit="Cell" SelectionMode="Extended">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn Header="Фирма" Binding="{Binding Manufacturer}" Width="*"/>
