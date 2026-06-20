@@ -21,12 +21,21 @@ namespace WorkPracticeLauncher.Models
 
 		public bool MoveThirdToFront()
 		{
-			if (Head?.Next?.Next == null) return false;
+			// Необходимо минимум 3 элемента
+			if (Head?.Next?.Next == null)
+				return false;
+
 			var first = Head;
+			var second = Head.Next;
 			var third = Head.Next.Next;
-			first.Next = third.Next;
-			third.Next = Head;
-			Head = third;
+			var fourth = third.Next; // может быть null
+
+			// Переставляем ссылки
+			first.Next = second;      // 1 -> 2
+			second.Next = fourth;     // 2 -> 4 (или null)
+			third.Next = first;       // 3 -> 1
+			Head = third;             // голова теперь 3
+
 			return true;
 		}
 
@@ -40,6 +49,11 @@ namespace WorkPracticeLauncher.Models
 				current = current.Next;
 			}
 			return result;
+		}
+
+		public void Clear()
+		{
+			Head = null;
 		}
 	}
 }

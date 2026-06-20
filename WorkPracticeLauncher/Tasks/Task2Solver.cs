@@ -34,14 +34,13 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine("  0 – Назад в меню заданий");
 				Console.WriteLine();
 
-				// Подсказка в закруглённой рамке
 				Console.ForegroundColor = ConsoleColor.Cyan;
 				string[] tipLines = {
-			"💡 Для удаления товаров из конкретного файла:",
-			"   1) Загрузите его (пункт 6)",
-			"   2) Удалите товары (пункт 3 или 4)",
-			"   3) Сохраните обратно (пункт 5, выберите перезапись)"
-		};
+					"💡 Для удаления товаров из конкретного файла:",
+					"   1) Загрузите его (пункт 6)",
+					"   2) Удалите товары (пункт 3 или 4)",
+					"   3) Сохраните обратно (пункт 5, выберите перезапись)"
+				};
 				int maxWidth = tipLines.Max(line => line.Length) + 2;
 				string topLeft = "╭";
 				string topRight = "╮";
@@ -50,19 +49,15 @@ namespace WorkPracticeLauncher.Tasks
 				string horizontal = "─";
 				string vertical = "│";
 
-				// Верхняя граница
 				Console.WriteLine(topLeft + new string(horizontal[0], maxWidth) + topRight);
 				foreach (var line in tipLines)
 				{
 					Console.WriteLine(vertical + " " + line.PadRight(maxWidth - 2) + " " + vertical);
 				}
-				// Нижняя граница
 				Console.WriteLine(bottomLeft + new string(horizontal[0], maxWidth) + bottomRight);
 				Console.ResetColor();
 
-				Console.Write("Ваш выбор: ");
-
-				string input = Console.ReadLine();
+				string input = InputHelper.ReadLine("Ваш выбор: ");
 				if (!int.TryParse(input, out int choice))
 				{
 					Console.WriteLine("Некорректный ввод. Нажмите любую клавишу...");
@@ -101,39 +96,6 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
-		// -------------------- Вспомогательные методы --------------------
-		private static string ReadLineOrEscape(string prompt = "")
-		{
-			Console.ForegroundColor = ConsoleColor.Blue;
-			Console.Write(prompt);
-			Console.ResetColor();
-			string input = "";
-			while (true)
-			{
-				var key = Console.ReadKey(true);
-				if (key.Key == ConsoleKey.Escape)
-				{
-					Console.WriteLine();
-					return null;
-				}
-				if (key.Key == ConsoleKey.Enter)
-				{
-					Console.WriteLine();
-					return input;
-				}
-				if (key.Key == ConsoleKey.Backspace && input.Length > 0)
-				{
-					input = input.Remove(input.Length - 1);
-					Console.Write("\b \b");
-				}
-				else if (!char.IsControl(key.KeyChar))
-				{
-					input += key.KeyChar;
-					Console.Write(key.KeyChar);
-				}
-			}
-		}
-
 		private static void ShowProduct(Product p)
 		{
 			Console.WriteLine($"  Наименование: {p.Name}");
@@ -158,7 +120,7 @@ namespace WorkPracticeLauncher.Tasks
 			int added = 0;
 			while (true)
 			{
-				string name = ReadLineOrEscape("Наименование: ");
+				string name = InputHelper.ReadLine("Наименование: ", allowEscape: true);
 				if (name == null) break;
 				if (string.IsNullOrWhiteSpace(name))
 				{
@@ -168,13 +130,13 @@ namespace WorkPracticeLauncher.Tasks
 					continue;
 				}
 
-				string manufacturer = ReadLineOrEscape("Фирма: ");
+				string manufacturer = InputHelper.ReadLine("Фирма: ", allowEscape: true);
 				if (manufacturer == null) break;
 
 				int shelfLife;
 				while (true)
 				{
-					string input = ReadLineOrEscape("Срок хранения (дни): ");
+					string input = InputHelper.ReadLine("Срок хранения (дни): ", allowEscape: true);
 					if (input == null) return;
 					if (int.TryParse(input, out shelfLife) && shelfLife > 0)
 						break;
@@ -186,7 +148,7 @@ namespace WorkPracticeLauncher.Tasks
 				decimal price;
 				while (true)
 				{
-					string input = ReadLineOrEscape("Цена: ");
+					string input = InputHelper.ReadLine("Цена: ", allowEscape: true);
 					if (input == null) return;
 					if (decimal.TryParse(input, out price) && price > 0)
 						break;
@@ -198,7 +160,7 @@ namespace WorkPracticeLauncher.Tasks
 				int stock;
 				while (true)
 				{
-					string input = ReadLineOrEscape("Количество на складе: ");
+					string input = InputHelper.ReadLine("Количество на складе: ", allowEscape: true);
 					if (input == null) return;
 					if (int.TryParse(input, out stock) && stock >= 0)
 						break;
@@ -269,7 +231,7 @@ namespace WorkPracticeLauncher.Tasks
 							switch (fieldKey)
 							{
 								case ConsoleKey.D1:
-									string newName = ReadLineOrEscape("Новое наименование: ");
+									string newName = InputHelper.ReadLine("Новое наименование: ", allowEscape: true);
 									if (newName != null && !string.IsNullOrWhiteSpace(newName))
 									{
 										lastProduct.Name = newName;
@@ -277,7 +239,7 @@ namespace WorkPracticeLauncher.Tasks
 									}
 									break;
 								case ConsoleKey.D2:
-									string newManufacturer = ReadLineOrEscape("Новая фирма: ");
+									string newManufacturer = InputHelper.ReadLine("Новая фирма: ", allowEscape: true);
 									if (newManufacturer != null)
 									{
 										lastProduct.Manufacturer = newManufacturer;
@@ -285,7 +247,7 @@ namespace WorkPracticeLauncher.Tasks
 									}
 									break;
 								case ConsoleKey.D3:
-									string newShelf = ReadLineOrEscape("Новый срок хранения (дни): ");
+									string newShelf = InputHelper.ReadLine("Новый срок хранения (дни): ", allowEscape: true);
 									if (newShelf != null && int.TryParse(newShelf, out int newShelfLife) && newShelfLife > 0)
 									{
 										lastProduct.ShelfLife = newShelfLife;
@@ -299,7 +261,7 @@ namespace WorkPracticeLauncher.Tasks
 									}
 									break;
 								case ConsoleKey.D4:
-									string newPrice = ReadLineOrEscape("Новая цена: ");
+									string newPrice = InputHelper.ReadLine("Новая цена: ", allowEscape: true);
 									if (newPrice != null && decimal.TryParse(newPrice, out decimal newPriceValue) && newPriceValue > 0)
 									{
 										lastProduct.Price = newPriceValue;
@@ -313,7 +275,7 @@ namespace WorkPracticeLauncher.Tasks
 									}
 									break;
 								case ConsoleKey.D5:
-									string newStock = ReadLineOrEscape("Новое количество на складе: ");
+									string newStock = InputHelper.ReadLine("Новое количество на складе: ", allowEscape: true);
 									if (newStock != null && int.TryParse(newStock, out int newStockValue) && newStockValue >= 0)
 									{
 										lastProduct.StockQuantity = newStockValue;
@@ -380,9 +342,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("  2 – По цене (по возрастанию)");
 			Console.WriteLine("  3 – По наименованию (по алфавиту)");
 			Console.WriteLine("  4 – Без сортировки (в порядке добавления)");
-			Console.Write("Ваш выбор: ");
-
-			string input = Console.ReadLine();
+			string input = InputHelper.ReadLine("Ваш выбор: ");
 			int sortMode = 0;
 			if (!int.TryParse(input, out sortMode) || sortMode < 1 || sortMode > 4)
 			{
@@ -451,8 +411,8 @@ namespace WorkPracticeLauncher.Tasks
 			}
 			Console.WriteLine();
 
-			Console.Write($"Введите индекс товара (1..{products.Count}) для удаления: ");
-			if (!int.TryParse(Console.ReadLine(), out int idx) || idx < 1 || idx > products.Count)
+			string idxStr = InputHelper.ReadLine($"Введите индекс товара (1..{products.Count}) для удаления: ");
+			if (!int.TryParse(idxStr, out int idx) || idx < 1 || idx > products.Count)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("Некорректный индекс.");
@@ -488,8 +448,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("=== УДАЛЕНИЕ ВСЕЙ БАЗЫ ДАННЫХ ===");
 			Console.ResetColor();
 			Console.WriteLine($"Внимание! Вы собираетесь удалить все {products.Count} товаров из памяти.");
-			Console.Write("Подтвердите удаление (введите 'ДА'): ");
-			string confirm = Console.ReadLine();
+			string confirm = InputHelper.ReadLine("Подтвердите удаление (введите 'ДА'): ");
 			if (confirm != "ДА")
 			{
 				Console.ForegroundColor = ConsoleColor.Yellow;
@@ -505,12 +464,10 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("База данных в памяти полностью очищена.");
 			Console.ResetColor();
 
-			// Предложение удалить файл
 			string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, currentFileName);
 			if (File.Exists(fullPath))
 			{
-				Console.Write("Удалить файл с диска тоже? (y/n): ");
-				string deleteFile = Console.ReadLine();
+				string deleteFile = InputHelper.ReadLine("Удалить файл с диска тоже? (y/n): ");
 				if (deleteFile?.ToLower() == "y")
 				{
 					try
@@ -571,10 +528,8 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine("  3 – Перезаписать существующий файл");
 			}
 			Console.WriteLine("  0 – Отмена");
-			Console.Write("Ваш выбор: ");
-
-			string input = Console.ReadLine();
-			if (!int.TryParse(input, out int choice))
+			string choiceStr = InputHelper.ReadLine("Ваш выбор: ");
+			if (!int.TryParse(choiceStr, out int choice))
 			{
 				Console.WriteLine("Некорректный ввод.");
 				Console.ReadKey();
@@ -585,14 +540,12 @@ namespace WorkPracticeLauncher.Tasks
 
 			if (choice == 1)
 			{
-				// Новый файл: выбор формата, затем имя
 				Console.ForegroundColor = ConsoleColor.Cyan;
 				Console.WriteLine("Выберите формат файла:");
 				Console.WriteLine("  1 – XML (совместим с WPF-приложением)");
 				Console.WriteLine("  2 – TXT (текстовый, для ручного просмотра)");
 				Console.ResetColor();
-				Console.Write("Ваш выбор: ");
-				string formatChoice = Console.ReadLine();
+				string formatChoice = InputHelper.ReadLine("Ваш выбор: ");
 				FileFormat format;
 				if (formatChoice == "1")
 					format = FileFormat.Xml;
@@ -605,8 +558,7 @@ namespace WorkPracticeLauncher.Tasks
 					return;
 				}
 
-				Console.Write("Введите имя файла (без расширения): ");
-				string fileName = Console.ReadLine();
+				string fileName = InputHelper.ReadLine("Введите имя файла (без расширения): ");
 				if (string.IsNullOrWhiteSpace(fileName))
 				{
 					Console.WriteLine("Имя не может быть пустым.");
@@ -630,14 +582,13 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			// Выбор существующего файла
 			Console.WriteLine("Доступные файлы:");
 			for (int i = 0; i < allFiles.Count; i++)
 			{
 				Console.WriteLine($"  {i + 1} – {allFiles[i]}");
 			}
-			Console.Write("Введите номер файла: ");
-			if (!int.TryParse(Console.ReadLine(), out int fileIdx) || fileIdx < 1 || fileIdx > allFiles.Count)
+			string fileIdxStr = InputHelper.ReadLine("Введите номер файла: ");
+			if (!int.TryParse(fileIdxStr, out int fileIdx) || fileIdx < 1 || fileIdx > allFiles.Count)
 			{
 				Console.WriteLine("Некорректный выбор.");
 				Console.ReadKey();
@@ -669,7 +620,7 @@ namespace WorkPracticeLauncher.Tasks
 			else if (fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
 				return FileFormat.Txt;
 			else
-				return FileFormat.Xml; // fallback
+				return FileFormat.Xml;
 		}
 
 		private static void SaveToFile(string path, FileFormat format, bool append)
@@ -689,7 +640,7 @@ namespace WorkPracticeLauncher.Tasks
 								existing = (List<Product>)serializer.Deserialize(reader);
 							}
 						}
-						else // TXT
+						else
 						{
 							existing = LoadFromTxtInternal(path);
 						}
@@ -797,9 +748,8 @@ namespace WorkPracticeLauncher.Tasks
 			{
 				Console.WriteLine($"  {i + 1} – {files[i]}");
 			}
-			Console.Write("Выберите номер файла для загрузки (0 – отмена): ");
-
-			if (!int.TryParse(Console.ReadLine(), out int idx) || idx < 0 || idx > files.Count)
+			string idxStr = InputHelper.ReadLine("Выберите номер файла для загрузки (0 – отмена): ");
+			if (!int.TryParse(idxStr, out int idx) || idx < 0 || idx > files.Count)
 			{
 				Console.WriteLine("Некорректный выбор.");
 				Console.ReadKey();

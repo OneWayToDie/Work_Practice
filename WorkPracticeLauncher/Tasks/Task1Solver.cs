@@ -9,15 +9,14 @@ namespace WorkPracticeLauncher.Tasks
 		{
 			Console.Clear();
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("=== ЗАДАНИЕ 1: ЧИСЛА, ПРОЦЕДУРА/ФУНКЦИЯ ===");
+			Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ, ПРОЦЕДУРА/ФУНКЦИЯ ===");
 			Console.ResetColor();
-			Console.WriteLine("Вводите целые числа (до 25 цифр), 0 – конец последовательности.");
+			Console.WriteLine("Вводите целые числа (до 25 цифр), 0 – Выход из цикла программы.");
 
 			List<string> numbers = new List<string>();
 			while (true)
 			{
-				Console.Write("Число: ");
-				string input = Console.ReadLine();
+				string input = InputHelper.ReadLine("Число: ");
 				if (input == "0") break;
 				if (string.IsNullOrWhiteSpace(input))
 				{
@@ -66,8 +65,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("\nВыберите вариант:");
 			Console.WriteLine("  1 – Процедура");
 			Console.WriteLine("  2 – Функция");
-			Console.Write("Ваш выбор: ");
-			string varChoice = Console.ReadLine();
+			string varChoice = InputHelper.ReadLine("Ваш выбор: ");
 			bool useProc = (varChoice == "1");
 
 			int maxLength = 0;
@@ -96,7 +94,6 @@ namespace WorkPracticeLauncher.Tasks
 				}
 			}
 
-			// Вывод минимального числа отдельной строкой
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine($"\nМинимальное число из всех введённых: {minNumber}");
 			Console.ResetColor();

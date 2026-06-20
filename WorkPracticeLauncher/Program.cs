@@ -14,23 +14,26 @@ namespace WorkPracticeLauncher
 		private static string inputBuffer = "";
 		private static bool cancelAnimation = false;
 
+		private static bool showCursorState = true;
+		private static DateTime lastCursorToggle = DateTime.Now;
+		private static readonly int cursorBlinkInterval = 500;
+
 		static void Main()
 		{
 			Console.OutputEncoding = Encoding.UTF8;
-			Console.CursorVisible = false;
 			Console.Clear();
 
 			var cat = new CatAnimation();
 
 			RedrawScreen(cat);
-			SetCursorToInput();
+			ResetCursorState();
 
 			bool running = true;
 
 			while (running)
 			{
 				cat.UpdateSleep();
-				SetCursorToInput();
+				DrawCursor();
 
 				if (Console.KeyAvailable)
 				{
@@ -38,11 +41,26 @@ namespace WorkPracticeLauncher
 					var key = keyInfo.Key;
 					char keyChar = keyInfo.KeyChar;
 
-					if (key >= ConsoleKey.D0 && key <= ConsoleKey.D4 && inputBuffer.Length == 0)
+					bool isValidKey = (key >= ConsoleKey.D0 && key <= ConsoleKey.D4) ||
+									  (key == ConsoleKey.Enter) ||
+									  (key == ConsoleKey.Backspace) ||
+									  (key == ConsoleKey.Escape);
+
+					if (!isValidKey) continue;
+
+					if (key >= ConsoleKey.D0 && key <= ConsoleKey.D4)
 					{
+						if (inputBuffer.Length > 0)
+						{
+							Console.SetCursorPosition(inputCol, inputRow);
+							Console.Write(new string(' ', inputBuffer.Length + 1));
+							inputBuffer = "";
+							SetCursorToInput();
+						}
+
 						inputBuffer = keyChar.ToString();
+						DrawCursor();
 						SetCursorToInput();
-						Console.Write(keyChar);
 
 						cancelAnimation = false;
 						Thread animThread = new Thread(() =>
@@ -51,6 +69,7 @@ namespace WorkPracticeLauncher
 						});
 						animThread.Start();
 
+						bool cancelled = false;
 						while (animThread.IsAlive)
 						{
 							if (Console.KeyAvailable)
@@ -61,22 +80,37 @@ namespace WorkPracticeLauncher
 									cancelAnimation = true;
 									break;
 								}
+								else if (checkKey == ConsoleKey.Backspace || checkKey == ConsoleKey.Escape)
+								{
+									cancelAnimation = true;
+									cancelled = true;
+									break;
+								}
 							}
 							Thread.Sleep(10);
 						}
 						animThread.Join(100);
 
+						while (Console.KeyAvailable) Console.ReadKey(true);
+
+						if (cancelled)
+						{
+							Console.SetCursorPosition(inputCol, inputRow);
+							Console.Write(new string(' ', inputBuffer.Length + 1));
+							inputBuffer = "";
+							SetCursorToInput();
+							RedrawScreen(cat);
+							ResetCursorState();
+							continue;
+						}
+
 						if (cancelAnimation)
 						{
-							while (Console.KeyAvailable) Console.ReadKey(true);
-
 							int choice = int.Parse(inputBuffer);
 							inputBuffer = "";
-
 							Console.SetCursorPosition(inputCol, inputRow);
-							Console.Write(" ");
+							Console.Write(new string(' ', 2));
 							SetCursorToInput();
-
 							Console.Clear();
 							ExecuteChoice(choice);
 							if (choice == 0)
@@ -84,26 +118,31 @@ namespace WorkPracticeLauncher
 							else
 							{
 								RedrawScreen(cat);
-								SetCursorToInput();
+								ResetCursorState();
 							}
 							continue;
 						}
 						else
 						{
+							string digit = inputBuffer;
+							inputBuffer = "";
+							RedrawScreen(cat);
 							SetCursorToInput();
+							if (!string.IsNullOrEmpty(digit))
+							{
+								inputBuffer = digit;
+							}
+							ResetCursorState();
 						}
 					}
 					else if (key == ConsoleKey.Enter && !string.IsNullOrEmpty(inputBuffer))
 					{
 						int choice = int.Parse(inputBuffer);
 						inputBuffer = "";
-
 						Console.SetCursorPosition(inputCol, inputRow);
-						Console.Write(" ");
+						Console.Write(new string(' ', 2));
 						SetCursorToInput();
-
 						while (Console.KeyAvailable) Console.ReadKey(true);
-
 						Console.Clear();
 						ExecuteChoice(choice);
 						if (choice == 0)
@@ -111,20 +150,22 @@ namespace WorkPracticeLauncher
 						else
 						{
 							RedrawScreen(cat);
-							SetCursorToInput();
+							ResetCursorState();
 						}
+					}
+					else if (key == ConsoleKey.Backspace && !string.IsNullOrEmpty(inputBuffer))
+					{
+						inputBuffer = "";
+						Console.SetCursorPosition(inputCol, inputRow);
+						Console.Write(new string(' ', 2));
+						SetCursorToInput();
+						while (Console.KeyAvailable) Console.ReadKey(true);
 					}
 					else if (key == ConsoleKey.Escape && !string.IsNullOrEmpty(inputBuffer))
 					{
 						inputBuffer = "";
 						Console.SetCursorPosition(inputCol, inputRow);
-						Console.Write(" ");
-						SetCursorToInput();
-						while (Console.KeyAvailable) Console.ReadKey(true);
-					}
-					else
-					{
-						cat.WakeUpWithCancel(() => false);
+						Console.Write(new string(' ', 2));
 						SetCursorToInput();
 						while (Console.KeyAvailable) Console.ReadKey(true);
 					}
@@ -137,6 +178,40 @@ namespace WorkPracticeLauncher
 			Console.SetCursorPosition(0, Console.WindowHeight - 2);
 			Console.WriteLine("До свидания!");
 			Console.ReadKey();
+		}
+
+		private static void DrawCursor()
+		{
+			Console.SetCursorPosition(inputCol, inputRow);
+			Console.Write(new string(' ', inputBuffer.Length + 1));
+			Console.SetCursorPosition(inputCol, inputRow);
+			if (!string.IsNullOrEmpty(inputBuffer))
+				Console.Write(inputBuffer);
+			if ((DateTime.Now - lastCursorToggle).TotalMilliseconds >= cursorBlinkInterval)
+			{
+				showCursorState = !showCursorState;
+				lastCursorToggle = DateTime.Now;
+			}
+			Console.Write(showCursorState ? '_' : ' ');
+		}
+
+		private static void SetCursorToInput()
+		{
+			int offset = inputBuffer.Length;
+			int col = inputCol + offset;
+			int row = inputRow;
+			if (col >= Console.WindowWidth) col = Console.WindowWidth - 1;
+			if (row >= Console.WindowHeight) row = Console.WindowHeight - 1;
+			Console.SetCursorPosition(col, row);
+		}
+
+		private static void ResetCursorState()
+		{
+			Console.CursorVisible = false;
+			showCursorState = true;
+			lastCursorToggle = DateTime.Now;
+			SetCursorToInput();
+			DrawCursor();
 		}
 
 		static void RedrawScreen(CatAnimation cat)
@@ -165,15 +240,6 @@ namespace WorkPracticeLauncher
 			Console.WriteLine("  4 – Связь с автором");
 			Console.WriteLine("  0 – Выход");
 			Console.Write("Ваш выбор: ");
-		}
-
-		static void SetCursorToInput()
-		{
-			int row = inputRow;
-			int col = inputCol;
-			if (row >= Console.WindowHeight) row = Console.WindowHeight - 1;
-			if (col >= Console.WindowWidth) col = Console.WindowWidth - 1;
-			Console.SetCursorPosition(col, row);
 		}
 
 		static void ExecuteChoice(int choice)
@@ -215,22 +281,36 @@ namespace WorkPracticeLauncher
 			while (true)
 			{
 				Console.Clear();
-				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.WriteLine("========================================");
-				Console.WriteLine("   ИНТЕРАКТИВНЫЙ ПРОСМОТР РЕШЕНИЙ");
-				Console.WriteLine("========================================");
-				Console.ResetColor();
-				Console.WriteLine("Выберите задание:");
-				Console.WriteLine("  1 – Задание 1 (числа, процедура/функция)");
-				Console.WriteLine("  2 – Задание 2 (товары, сортировка)");
-				Console.WriteLine("  3 – Задание 3 (односвязный список)");
-				Console.WriteLine("  0 – Назад в главное меню");
-				Console.Write("Ваш выбор: ");
 
-				string input = Console.ReadLine();
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				string title = " ИНТЕРАКТИВНЫЙ ПРОСМОТР РЕШЕНИЙ ";
+				int width = title.Length;
+				string top = "╔" + new string('═', width) + "╗";
+				string middle = "║" + title + "║";
+				string bottom = "╚" + new string('═', width) + "╝";
+				Console.WriteLine(top);
+				Console.WriteLine(middle);
+				Console.WriteLine(bottom);
+				Console.ResetColor();
+				Console.WriteLine();
+
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.WriteLine("  1 – 🔢 Задание 1 (последовательность чисел, процедура/функция)");
+				Console.ForegroundColor = ConsoleColor.Blue;
+				Console.WriteLine("  2 – 📦 Задание 2 (товары, сортировка)");
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("  3 – 🔗 Задание 3 (односвязный список)");
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine("  0 – ← Назад в главное меню");
+				Console.ResetColor();
+				Console.WriteLine();
+
+				string input = InputHelper.ReadLine("Ваш выбор: ");
 				if (!int.TryParse(input, out int choice))
 				{
+					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("Некорректный ввод. Нажмите любую клавишу...");
+					Console.ResetColor();
 					Console.ReadKey();
 					continue;
 				}
@@ -249,7 +329,9 @@ namespace WorkPracticeLauncher
 					case 0:
 						return;
 					default:
+						Console.ForegroundColor = ConsoleColor.Red;
 						Console.WriteLine("Некорректный выбор. Нажмите любую клавишу...");
+						Console.ResetColor();
 						Console.ReadKey();
 						break;
 				}
@@ -288,7 +370,7 @@ namespace WorkPracticeLauncher
 
 		static void DownloadLatestVersion()
 		{
-			string repoUrl = "https://github.com/ваш-логин/SummerPractice";
+			string repoUrl = "https://github.com/OneWayToDie/Work_Practice";
 			try
 			{
 				Process.Start(new ProcessStartInfo(repoUrl) { UseShellExecute = true });
