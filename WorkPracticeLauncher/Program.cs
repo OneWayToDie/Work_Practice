@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -433,15 +433,12 @@ namespace WorkPracticeLauncher
 
 			// 1. Затираем всю строку пробелами
 			Console.SetCursorPosition(0, top);
-			Console.Write(new string(' ', width));
+			Console.Write(new string(' ', width - 1));
 			// 2. Возвращаемся в начало строки
 			Console.SetCursorPosition(0, top);
 			// 3. Выводим текст
 			Console.Write(text);
-			// 4. Добиваем пробелами до конца (если нужно)
-			if (text.Length < width)
-				Console.Write(new string(' ', width - text.Length));
-			// 5. Переходим на новую строку
+			// 4. Переходим на новую строку
 			Console.WriteLine();
 		}
 		// ---- Остальные методы (ExecuteChoice, RunInteractiveMode, LaunchWpfApp, DownloadLatestVersion, DownloadFromDrive, ShowContacts) остаются без изменений ----
