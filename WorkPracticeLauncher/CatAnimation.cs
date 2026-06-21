@@ -26,10 +26,17 @@ namespace WorkPracticeLauncher
 		private void RecalculatePosition()
 		{
 			int windowHeight = Console.WindowHeight;
-			int frameHeight = 20;
-			int menuHeight = 12;
+			int frameHeight = 9; // реальная высота кадра (кот + коробка)
+
+			// Высота меню – примерно 13-14 строк, но для надёжности возьмём 15
+			int menuHeight = 15;
+
+			// Вычисляем доступное пространство под меню
 			int availableHeight = windowHeight - menuHeight;
+			// Центрируем анимацию в доступном пространстве
 			topPad = menuHeight + (availableHeight - frameHeight) / 2;
+
+			// Проверка границ
 			if (topPad < menuHeight) topPad = menuHeight;
 			if (topPad + frameHeight > windowHeight)
 				topPad = windowHeight - frameHeight - 1;

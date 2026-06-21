@@ -2,17 +2,17 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
-using System.IO.Compression;
 using WorkPracticeLauncher.Tasks;
 
 namespace WorkPracticeLauncher
 {
 	class Program
 	{
-		private static int inputRow = 10;
-		private static int inputCol = "Ваш выбор: ".Length;
+		private static int inputRow;
+		private static int inputCol;
 		private static string inputBuffer = "";
 		private static bool cancelAnimation = false;
 
@@ -22,13 +22,17 @@ namespace WorkPracticeLauncher
 
 		private static int lastWidth;
 		private static int lastHeight;
+		private static bool isWindowsTerminal;
+
+		public static bool IsWindowsTerminal { get; private set; }
 
 		static void Main()
 		{
 			Console.OutputEncoding = Encoding.UTF8;
 			Console.Clear();
 
-			SetConsoleSize();
+			isWindowsTerminal = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WT_SESSION"));
+			IsWindowsTerminal = isWindowsTerminal;
 
 			lastWidth = Console.WindowWidth;
 			lastHeight = Console.WindowHeight;
@@ -40,6 +44,15 @@ namespace WorkPracticeLauncher
 			RedrawScreen(cat);
 			ResetCursorState();
 
+			if (isWindowsTerminal)
+			{
+				Thread.Sleep(150);
+				lastWidth = Console.WindowWidth;
+				lastHeight = Console.WindowHeight;
+				RedrawScreen(cat);
+				ResetCursorState();
+			}
+
 			bool running = true;
 
 			while (running)
@@ -50,6 +63,12 @@ namespace WorkPracticeLauncher
 					lastHeight = Console.WindowHeight;
 					RedrawScreen(cat);
 					ResetCursorState();
+					if (isWindowsTerminal)
+					{
+						Thread.Sleep(50);
+						RedrawScreen(cat);
+						ResetCursorState();
+					}
 				}
 
 				cat.UpdateSleep();
@@ -80,7 +99,7 @@ namespace WorkPracticeLauncher
 
 						inputBuffer = keyChar.ToString();
 						SetCursorToInput();
-						Console.Write(keyChar);
+						DrawCursor();
 
 						cancelAnimation = false;
 						Thread animThread = new Thread(() =>
@@ -151,7 +170,7 @@ namespace WorkPracticeLauncher
 							if (!string.IsNullOrEmpty(digit))
 							{
 								inputBuffer = digit;
-								Console.Write(digit);
+								DrawCursor();
 							}
 							ResetCursorState();
 						}
@@ -196,73 +215,63 @@ namespace WorkPracticeLauncher
 			}
 
 			Console.CursorVisible = true;
-			Console.SetCursorPosition(0, Console.WindowHeight - 2);
-			Console.WriteLine("До свидания!");
-			Console.ReadKey();
 		}
 
-		// ---- Вспомогательные методы для адаптации ----
-
-		private static void SetConsoleSize()
-		{
-			try
-			{
-				int width = 120;
-				int height = 40;
-				if (Console.LargestWindowWidth >= width && Console.LargestWindowHeight >= height)
-				{
-					Console.SetBufferSize(width, height);
-					Console.SetWindowSize(width, height);
-				}
-				else
-				{
-					int maxW = Math.Min(Console.LargestWindowWidth, 120);
-					int maxH = Math.Min(Console.LargestWindowHeight, 40);
-					if (maxW >= 80 && maxH >= 25)
-					{
-						Console.SetBufferSize(maxW, maxH);
-						Console.SetWindowSize(maxW, maxH);
-					}
-				}
-			}
-			catch { /* Игнорируем ошибки */ }
-		}
+		// ---- Вспомогательные методы ----
 
 		private static void ShowTerminalRecommendation()
 		{
-			int w = Console.WindowWidth;
-			string msg = "Рекомендуемый размер окна: 120x40. При изменении размера содержимое будет перерисовано автоматически.";
-			if (msg.Length > w - 4) msg = msg.Substring(0, w - 4);
-			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine(AlignCenter(msg, w));
-			Console.ResetColor();
-			Console.WriteLine();
+			if (!isWindowsTerminal)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("Для лучшего отображения рекомендуется использовать Windows Terminal.");
+				Console.ResetColor();
+				Console.WriteLine("Нажмите любую клавишу для продолжения...");
+				Console.ReadKey(true);
+				Console.Clear();
+			}
+			else
+			{
+				int w = Console.WindowWidth;
+				string msg = "Рекомендуемый размер окна: 120x40. При изменении размера содержимое будет перерисовано автоматически.";
+				if (msg.Length > w - 4) msg = msg.Substring(0, w - 4);
+				Console.ForegroundColor = ConsoleColor.Cyan;
+				Console.WriteLine(AlignCenter(msg, w));
+				Console.ResetColor();
+				Console.WriteLine();
+			}
 		}
 
 		private static void PrintFooter()
 		{
-			int w = Console.WindowWidth;
-			string msg = "⚠️ Для корректной работы рекомендуется использовать Windows Terminal!";
-			if (msg.Length > w - 2) msg = msg.Substring(0, w - 2);
-			int row = Console.WindowHeight - 1;
-			if (row < 0) row = 0;
-			// Выравниваем вправо
-			int left = w - msg.Length - 1;
-			if (left < 0) left = 0;
-			Console.SetCursorPosition(left, row);
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.Write(msg);
-			Console.ResetColor();
+			if (isWindowsTerminal)
+			{
+				int w = Console.WindowWidth;
+				string msg = "⚠️ Для корректной работы рекомендуется использовать Windows Terminal!";
+				if (msg.Length > w - 2) msg = msg.Substring(0, w - 2);
+				int row = Console.WindowHeight - 1;
+				if (row < 0) row = 0;
+				int left = w - msg.Length - 1;
+				if (left < 0) left = 0;
+				Console.SetCursorPosition(left, row);
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.Write(msg);
+				int remaining = w - left - msg.Length;
+				if (remaining > 0)
+					Console.Write(new string(' ', remaining));
+				Console.ResetColor();
+			}
 		}
 
 		private static string AlignCenter(string text, int width)
 		{
+			if (width <= 0) return text;
 			if (text.Length >= width) return text;
 			int pad = (width - text.Length) / 2;
 			return new string(' ', pad) + text + new string(' ', width - text.Length - pad);
 		}
 
-		// ---- Методы работы с курсором и анимацией ----
+		// ---- Курсор и анимация ----
 
 		private static void DrawCursor()
 		{
@@ -271,6 +280,8 @@ namespace WorkPracticeLauncher
 			int len = inputBuffer.Length;
 			if (row >= Console.WindowHeight) row = Console.WindowHeight - 1;
 			if (col + len >= Console.WindowWidth) len = Console.WindowWidth - col - 1;
+			if (col < 0) col = 0;
+			if (row < 0) row = 0;
 
 			Console.SetCursorPosition(col, row);
 			Console.Write(new string(' ', len + 1));
@@ -313,6 +324,7 @@ namespace WorkPracticeLauncher
 		static void RedrawScreen(CatAnimation cat)
 		{
 			Console.Clear();
+			Console.SetCursorPosition(0, 0);
 			PrintMenu();
 			cat.ShowSleepFrame();
 			PrintFooter();
@@ -321,32 +333,98 @@ namespace WorkPracticeLauncher
 		static void PrintMenu()
 		{
 			int w = Console.WindowWidth;
-			string line = new string('=', w);
-			Console.SetCursorPosition(0, 0);
-			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine(line);
-			Console.WriteLine(AlignCenter("Учебная практика – Прикладная информатика", w));
-			Console.WriteLine(AlignCenter("Версия 1.0 (лаунчер)", w));
-			Console.WriteLine(line);
-			Console.ResetColor();
+			if (w < 10)
+			{
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine("Окно слишком узкое. Разверните его для корректного отображения.");
+				Console.ResetColor();
+				return;
+			}
 
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("Выберите действие:");
-			Console.ResetColor();
-			Console.WriteLine("1 – Запустить WPF приложение");
-			Console.WriteLine("2 – Просмотр решения в консоли (интерактивно)");
-			Console.WriteLine("3 – Скачать актуальную версию (GitHub)");
-			Console.WriteLine("4 – Связь с автором");
-			Console.WriteLine("0 – Выход");
+			Console.SetCursorPosition(0, 0);
+
+			if (isWindowsTerminal)
+			{
+				int lineWidth = Math.Max(w - 2, 2);
+				string topLine = "╔" + new string('═', lineWidth) + "╗";
+				string bottomLine = "╚" + new string('═', lineWidth) + "╝";
+
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine(topLine.PadRight(w));
+				Console.WriteLine(("║" + AlignCenter("Учебная практика – Прикладная информатика", lineWidth) + "║").PadRight(w));
+				Console.WriteLine(("║" + AlignCenter("Версия 1.0 (лаунчер)", lineWidth) + "║").PadRight(w));
+				Console.WriteLine(bottomLine.PadRight(w));
+				Console.ResetColor();
+
+				// Пустая строка после рамки – оставляем ОДНУ
+				Console.WriteLine();
+
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine(("▶ Выберите действие:").PadRight(w));
+				Console.ResetColor();
+
+				// Убираем лишнюю пустую строку, которая была после заголовка
+				// (здесь никогда не было Console.WriteLine())
+
+				string[] lines = {
+			"  ⚡ 1 – Запустить WPF приложение",
+			"  💻 2 – Просмотр решения в консоли (интерактивно)",
+			"  📦 3 – Скачать актуальную версию (GitHub / Google Drive)",
+			"  📧 4 – Связь с автором",
+			"  🚪 0 – Выход"
+		};
+				ConsoleColor[] colors = { ConsoleColor.Cyan, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Magenta, ConsoleColor.Red };
+				for (int i = 0; i < lines.Length; i++)
+				{
+					Console.ForegroundColor = colors[i % colors.Length];
+					Console.WriteLine(lines[i].PadRight(w));
+				}
+				Console.ResetColor();
+			}
+			else
+			{
+				// упрощённый вариант без рамок
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("=============================================".PadRight(w));
+				Console.WriteLine("   Учебная практика – Прикладная информатика".PadRight(w));
+				Console.WriteLine("   Версия 1.0 (лаунчер)".PadRight(w));
+				Console.WriteLine("=============================================".PadRight(w));
+				Console.ResetColor();
+
+				// Пустая строка после рамки – оставляем ОДНУ
+				Console.WriteLine();
+
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine("Выберите действие:".PadRight(w));
+				Console.ResetColor();
+
+				Console.WriteLine("  1 – Запустить WPF приложение".PadRight(w));
+				Console.WriteLine("  2 – Просмотр решения в консоли (интерактивно)".PadRight(w));
+				Console.WriteLine("  3 – Скачать актуальную версию (GitHub / Google Drive)".PadRight(w));
+				Console.WriteLine("  4 – Связь с автором".PadRight(w));
+				Console.WriteLine("  0 – Выход".PadRight(w));
+			}
+
+			// Пустая строка перед приглашением
+			Console.WriteLine();
 			Console.Write("Ваш выбор: ");
+			inputCol = Console.CursorLeft;
+			inputRow = Console.CursorTop;
+			if (inputCol >= w) inputCol = w - 1;
+			if (inputRow >= Console.WindowHeight) inputRow = Console.WindowHeight - 1;
 		}
+		// ---- Остальные методы (ExecuteChoice, RunInteractiveMode, LaunchWpfApp, DownloadLatestVersion, DownloadFromDrive, ShowContacts) остаются без изменений ----
 
 		static void ExecuteChoice(int choice)
 		{
 			Console.Clear();
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("Вы выбрали пункт " + choice);
-			Console.ResetColor();
+
+			if (choice != 0)
+			{
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine("Вы выбрали пункт " + choice);
+				Console.ResetColor();
+			}
 
 			switch (choice)
 			{
@@ -357,7 +435,7 @@ namespace WorkPracticeLauncher
 					RunInteractiveMode();
 					break;
 				case 3:
-					DownloadLatestVersion(); // вместо DownloadLatestVersion()
+					DownloadLatestVersion();
 					break;
 				case 4:
 					ShowContacts();
@@ -366,7 +444,7 @@ namespace WorkPracticeLauncher
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.WriteLine("Выход...");
 					Console.ResetColor();
-					break;
+					return;
 				default:
 					break;
 			}
@@ -381,30 +459,45 @@ namespace WorkPracticeLauncher
 			{
 				Console.Clear();
 
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				string title = " ИНТЕРАКТИВНЫЙ ПРОСМОТР РЕШЕНИЙ ";
-				int width = title.Length;
-				string top = "╔" + new string('═', width) + "╗";
-				string middle = "║" + title + "║";
-				string bottom = "╚" + new string('═', width) + "╝";
-				Console.WriteLine(top);
-				Console.WriteLine(middle);
-				Console.WriteLine(bottom);
-				Console.ResetColor();
-				Console.WriteLine();
+				if (isWindowsTerminal)
+				{
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					string title = " ИНТЕРАКТИВНЫЙ ПРОСМОТР РЕШЕНИЙ ";
+					int width = title.Length;
+					string top = "╔" + new string('═', width) + "╗";
+					string middle = "║" + title + "║";
+					string bottom = "╚" + new string('═', width) + "╝";
+					Console.WriteLine(top);
+					Console.WriteLine(middle);
+					Console.WriteLine(bottom);
+					Console.ResetColor();
+					Console.WriteLine();
 
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine(" 1 – 🔢 Задание 1 (последовательность чисел, процедура/функция)");
-				Console.ForegroundColor = ConsoleColor.Blue;
-				Console.WriteLine(" 2 – 📦 Задание 2 (товары, сортировка)");
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(" 3 – 🔗 Задание 3 (односвязный список)");
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine(" 0 – ← Назад в главное меню");
-				Console.ResetColor();
-				Console.WriteLine();
+					Console.ForegroundColor = ConsoleColor.White;
+					Console.WriteLine("  🔢 1 – Задание 1 (последовательность чисел, процедура/функция)");
+					Console.ForegroundColor = ConsoleColor.Blue;
+					Console.WriteLine("  📦 2 – Задание 2 (товары, сортировка)");
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("  🔗 3 – Задание 3 (односвязный список)");
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.WriteLine("  ◀️ 0 – Назад в главное меню");
+					Console.ResetColor();
+				}
+				else
+				{
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.WriteLine("=== ИНТЕРАКТИВНЫЙ ПРОСМОТР РЕШЕНИЙ ===");
+					Console.ResetColor();
+					Console.WriteLine();
+					Console.WriteLine("  1 – Задание 1 (последовательность чисел, процедура/функция)");
+					Console.WriteLine("  2 – Задание 2 (товары, сортировка)");
+					Console.WriteLine("  3 – Задание 3 (односвязный список)");
+					Console.WriteLine("  0 – Назад в главное меню");
+				}
 
-				string input = InputHelper.ReadLine("Ваш выбор: ");
+				Console.WriteLine();
+				Console.Write("Ваш выбор: ");
+				string input = Console.ReadLine();
 				if (!int.TryParse(input, out int choice))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
@@ -467,6 +560,10 @@ namespace WorkPracticeLauncher
 			}
 		}
 
+		// --------------------------------------------
+		// Пункт 3 – Скачать актуальную версию
+		// --------------------------------------------
+
 		static void DownloadLatestVersion()
 		{
 			while (true)
@@ -478,14 +575,12 @@ namespace WorkPracticeLauncher
 				Console.WriteLine("  1 – Перейти на GitHub (релизы)");
 				Console.WriteLine("  2 – Скачать с Google Drive (автоматически)");
 				Console.WriteLine("  0 – Назад");
-				Console.Write("Ваш выбор (или Esc для отмены): ");
-
-				string choice = InputHelper.ReadLine("", allowEscape: true);
-				if (choice == null) return;
+				Console.Write("Ваш выбор (или 0 для отмены): ");
+				string choice = Console.ReadLine();
+				if (choice == "0") return;
 
 				if (choice == "1")
 				{
-					// Открываем репозиторий в браузере
 					string repoUrl = "https://github.com/OneWayToDie/Work_Practice";
 					try
 					{
@@ -509,10 +604,6 @@ namespace WorkPracticeLauncher
 					DownloadFromDrive();
 					continue;
 				}
-				else if (choice == "0")
-				{
-					return;
-				}
 				else
 				{
 					Console.WriteLine("Некорректный выбор.");
@@ -521,40 +612,9 @@ namespace WorkPracticeLauncher
 			}
 		}
 
-		static void ShowContacts()
-		{
-			Console.ForegroundColor = ConsoleColor.Magenta;
-			Console.WriteLine("=== Контакты ===");
-			Console.WriteLine("Telegram: https://t.me/ваш_ник");
-			Console.WriteLine("Email: ваша_почта@example.com");
-			Console.ResetColor();
-
-			Console.WriteLine("Открыть Telegram? (y/n)");
-			if (Console.ReadKey().KeyChar == 'y')
-			{
-				try
-				{
-					Process.Start(new ProcessStartInfo("https://t.me/ваш_ник") { UseShellExecute = true });
-				}
-				catch { }
-			}
-			Console.WriteLine();
-			Console.WriteLine("Открыть почтовый клиент? (y/n)");
-			if (Console.ReadKey().KeyChar == 'y')
-			{
-				try
-				{
-					Process.Start(new ProcessStartInfo("mailto:ваша_почта@example.com") { UseShellExecute = true });
-				}
-				catch { }
-			}
-			Console.WriteLine();
-		}
-
-
 		static void DownloadFromDrive()
 		{
-			string fileId = "18mXjs8BIOmtAF1VyQer-e5B2r8fy6TGJ";
+			string fileId = "18mXjs8BIOmtAF1VyQer-e5B2r8fy6TGJ"; // замените на свой ID
 			string downloadUrl = $"https://drive.google.com/uc?export=download&id={fileId}";
 			string zipPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SummerPractice_latest.zip");
 
@@ -614,7 +674,6 @@ namespace WorkPracticeLauncher
 					Console.WriteLine("Распаковка архива...");
 					Console.ResetColor();
 
-					// Ручная распаковка с перезаписью
 					try
 					{
 						using (ZipArchive archive = ZipFile.OpenRead(zipPath))
@@ -622,17 +681,14 @@ namespace WorkPracticeLauncher
 							foreach (ZipArchiveEntry entry in archive.Entries)
 							{
 								string destinationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, entry.FullName);
-								// Если это папка
 								if (string.IsNullOrEmpty(entry.Name))
 								{
 									Directory.CreateDirectory(destinationPath);
 									continue;
 								}
-								// Создаём папку для файла, если её нет
 								string directory = Path.GetDirectoryName(destinationPath);
 								if (!string.IsNullOrEmpty(directory))
 									Directory.CreateDirectory(directory);
-								// Извлекаем файл с перезаписью
 								entry.ExtractToFile(destinationPath, true);
 							}
 						}
@@ -641,7 +697,6 @@ namespace WorkPracticeLauncher
 						Console.WriteLine("Архив успешно распакован. Все файлы обновлены.");
 						Console.ResetColor();
 
-						// Удаляем архив
 						File.Delete(zipPath);
 						Console.WriteLine("Временный архив удалён.");
 					}
@@ -663,6 +718,36 @@ namespace WorkPracticeLauncher
 
 			Console.WriteLine("\nНажмите любую клавишу для возврата...");
 			Console.ReadKey();
+		}
+
+		static void ShowContacts()
+		{
+			Console.ForegroundColor = ConsoleColor.Magenta;
+			Console.WriteLine("=== Контакты ===");
+			Console.WriteLine("Telegram: https://t.me/TulskiyGhoul");
+			Console.WriteLine("Email: danila.nikiforov.2000@bk.ru");
+			Console.ResetColor();
+
+			Console.WriteLine("(нужен VPN) Открыть Telegram? (y/n)");
+			if (Console.ReadKey().KeyChar == 'y')
+			{
+				try
+				{
+					Process.Start(new ProcessStartInfo("https://t.me/TulskiyGhoul") { UseShellExecute = true });
+				}
+				catch { }
+			}
+			Console.WriteLine();
+			Console.WriteLine("Открыть почтовый клиент? (y/n)");
+			if (Console.ReadKey().KeyChar == 'y')
+			{
+				try
+				{
+					Process.Start(new ProcessStartInfo("mailto:danila.nikiforov.2000@bk.ru") { UseShellExecute = true });
+				}
+				catch { }
+			}
+			Console.WriteLine();
 		}
 	}
 }

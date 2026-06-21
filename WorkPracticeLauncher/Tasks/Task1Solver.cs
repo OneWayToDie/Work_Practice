@@ -6,17 +6,24 @@ namespace WorkPracticeLauncher.Tasks
 {
 	public static class Task1Solver
 	{
+		private static List<string> numbers = new List<string>();
+		private static int lastWidth;
+		private static int lastHeight;
+
 		public static void Run()
 		{
-			Console.Clear();
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ, ПРОЦЕДУРА/ФУНКЦИЯ ===");
-			Console.ResetColor();
+			lastWidth = Console.WindowWidth;
+			lastHeight = Console.WindowHeight;
 
+			RedrawScreen();
+
+			// Ввод количества чисел
 			int count = 0;
 			while (true)
 			{
-				string input = InputHelper.ReadLine("Введите количество чисел (N) от 1 до 50 (или 0 для выхода): ");
+				CheckResizeAndRedraw();
+				Console.Write("Введите количество чисел (N) от 1 до 50 (или 0 для выхода): ");
+				string input = Console.ReadLine();
 				if (input == "0")
 				{
 					Console.WriteLine("Ввод отменён.");
@@ -40,13 +47,15 @@ namespace WorkPracticeLauncher.Tasks
 				break;
 			}
 
-			List<string> numbers = new List<string>();
+			numbers.Clear();
 			Console.WriteLine($"\nВведите {count} чисел (каждое до 25 цифр). Для досрочного завершения введите 0:");
 			for (int i = 0; i < count; i++)
 			{
 				while (true)
 				{
-					string input = InputHelper.ReadLine($"Число {i + 1}: ");
+					CheckResizeAndRedraw();
+					Console.Write($"Число {i + 1}: ");
+					string input = Console.ReadLine();
 					if (input == "0")
 					{
 						Console.WriteLine($"Ввод прерван (введено 0). Обработано {i} чисел.");
@@ -62,13 +71,7 @@ namespace WorkPracticeLauncher.Tasks
 
 					bool isValid = true;
 					foreach (char c in input)
-					{
-						if (!char.IsDigit(c))
-						{
-							isValid = false;
-							break;
-						}
-					}
+						if (!char.IsDigit(c)) { isValid = false; break; }
 					if (!isValid)
 					{
 						Console.ForegroundColor = ConsoleColor.Red;
@@ -77,11 +80,8 @@ namespace WorkPracticeLauncher.Tasks
 						continue;
 					}
 
-					// Убираем ведущие нули
 					string trimmed = input.TrimStart('0');
-					if (string.IsNullOrEmpty(trimmed))
-						trimmed = "0";
-
+					if (string.IsNullOrEmpty(trimmed)) trimmed = "0";
 					if (trimmed.Length > 25)
 					{
 						Console.ForegroundColor = ConsoleColor.Red;
@@ -103,7 +103,18 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			// Минимум и максимум по числовому значению с помощью BigInteger
+			// Выбор варианта
+			CheckResizeAndRedraw();
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Выберите вариант:");
+			Console.ResetColor();
+			Console.WriteLine("  1 – Процедура");
+			Console.WriteLine("  2 – Функция");
+			Console.Write("Ваш выбор: ");
+			string varChoice = Console.ReadLine();
+			bool useProc = (varChoice == "1");
+
+			// Вычисление результатов
 			BigInteger minVal = BigInteger.Parse(numbers[0]);
 			BigInteger maxVal = BigInteger.Parse(numbers[0]);
 			string minNumber = numbers[0];
@@ -114,15 +125,6 @@ namespace WorkPracticeLauncher.Tasks
 				if (val < minVal) { minVal = val; minNumber = n; }
 				if (val > maxVal) { maxVal = val; maxNumber = n; }
 			}
-
-			// Микро-заголовок – зелёный с префиксом ▶
-			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine("▶ Выберите вариант:");
-			Console.ResetColor();
-			Console.WriteLine("  1 – Процедура");
-			Console.WriteLine("  2 – Функция");
-			string varChoice = InputHelper.ReadLine("Ваш выбор: ");
-			bool useProc = (varChoice == "1");
 
 			int maxLength = 0;
 			foreach (var n in numbers)
@@ -157,6 +159,32 @@ namespace WorkPracticeLauncher.Tasks
 
 			Console.WriteLine("\nНажмите любую клавишу для возврата...");
 			Console.ReadKey();
+		}
+
+		private static void RedrawScreen()
+		{
+			Console.Clear();
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			if (Program.IsWindowsTerminal)
+				Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ, ПРОЦЕДУРА/ФУНКЦИЯ ===");
+			else
+				Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ ===");
+			Console.ResetColor();
+			if (numbers.Count > 0)
+			{
+				Console.Write("Введено чисел: " + numbers.Count + " (");
+				Console.WriteLine(string.Join(", ", numbers) + ")");
+			}
+		}
+
+		private static void CheckResizeAndRedraw()
+		{
+			if (Console.WindowWidth != lastWidth || Console.WindowHeight != lastHeight)
+			{
+				lastWidth = Console.WindowWidth;
+				lastHeight = Console.WindowHeight;
+				RedrawScreen();
+			}
 		}
 
 		private static void GetDigitsInfoProc(string number, out int count, out int minDigit)
