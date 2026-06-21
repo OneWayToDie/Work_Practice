@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,17 +14,18 @@ namespace Work_Practice.ViewModels
 {
 	public class Task3ViewModel : INotifyPropertyChanged
 	{
+		private static readonly Random _rand = new Random();
 		// --- Режимы отображения ---
 		private bool _isCustomViewSelected = true;
 		public bool IsCustomViewSelected
 		{
 			get => _isCustomViewSelected;
-			set { _isCustomViewSelected = value; OnPropertyChanged(); }
+			set { _isCustomViewSelected = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsBuiltInViewSelected)); }
 		}
 		public bool IsBuiltInViewSelected
 		{
 			get => !_isCustomViewSelected;
-			set { _isCustomViewSelected = !value; OnPropertyChanged(); }
+			set { _isCustomViewSelected = !value; OnPropertyChanged(); OnPropertyChanged(nameof(IsCustomViewSelected)); }
 		}
 
 		// --- Тип генерируемых чисел (теперь просто TypeOfNumber) ---
@@ -43,6 +44,12 @@ namespace Work_Practice.ViewModels
 			get => _customListItems;
 			set { _customListItems = value; OnPropertyChanged(); }
 		}
+		private ObservableCollection<double> _customListResultItems = new ObservableCollection<double>();
+		public ObservableCollection<double> CustomListResultItems
+		{
+			get => _customListResultItems;
+			set { _customListResultItems = value; OnPropertyChanged(); }
+		}
 
 		// --- Реализация через LinkedList<T> ---
 		private LinkedList<double> _builtInList = new LinkedList<double>();
@@ -51,6 +58,12 @@ namespace Work_Practice.ViewModels
 		{
 			get => _builtInListItems;
 			set { _builtInListItems = value; OnPropertyChanged(); }
+		}
+		private ObservableCollection<double> _builtInListResultItems = new ObservableCollection<double>();
+		public ObservableCollection<double> BuiltInListResultItems
+		{
+			get => _builtInListResultItems;
+			set { _builtInListResultItems = value; OnPropertyChanged(); }
 		}
 
 		// --- Общие свойства UI ---
@@ -92,7 +105,7 @@ namespace Work_Practice.ViewModels
 				MessageBox.Show("Количество чисел не должно превышать 500.");
 				return;
 			}
-			var rand = new Random();
+			var rand = _rand;
 			double[] randomNumbers;
 
 			if (SelectedNumberType == TypeOfNumber.Integer)
@@ -110,6 +123,7 @@ namespace Work_Practice.ViewModels
 			{
 				_customList.Clear();
 				CustomListItems.Clear();
+				CustomListResultItems.Clear();
 				foreach (var num in randomNumbers)
 				{
 					_customList.Add(num);
@@ -121,6 +135,7 @@ namespace Work_Practice.ViewModels
 			{
 				_builtInList.Clear();
 				BuiltInListItems.Clear();
+				BuiltInListResultItems.Clear();
 				foreach (var num in randomNumbers)
 				{
 					_builtInList.AddLast(num);
@@ -160,6 +175,7 @@ namespace Work_Practice.ViewModels
 			{
 				_customList.Clear();
 				CustomListItems.Clear();
+				CustomListResultItems.Clear();
 				foreach (var num in parsedNumbers)
 				{
 					_customList.Add(num);
@@ -171,6 +187,7 @@ namespace Work_Practice.ViewModels
 			{
 				_builtInList.Clear();
 				BuiltInListItems.Clear();
+				BuiltInListResultItems.Clear();
 				foreach (var num in parsedNumbers)
 				{
 					_builtInList.AddLast(num);
@@ -186,6 +203,10 @@ namespace Work_Practice.ViewModels
 			{
 				if (_customList.Head?.Next?.Next != null)
 				{
+					CustomListResultItems.Clear();
+					foreach (var item in CustomListItems)
+						CustomListResultItems.Add(item);
+
 					bool success = _customList.MoveThirdToFront();
 					if (success)
 					{
@@ -195,7 +216,10 @@ namespace Work_Practice.ViewModels
 						MessageBox.Show("Собственная реализация: третий элемент перенесён в начало.");
 					}
 					else
+					{
+						CustomListResultItems.Clear();
 						MessageBox.Show("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
+					}
 				}
 				else
 					MessageBox.Show("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
@@ -207,6 +231,10 @@ namespace Work_Practice.ViewModels
 					var thirdNode = _builtInList.First?.Next?.Next;
 					if (thirdNode != null)
 					{
+						BuiltInListResultItems.Clear();
+						foreach (var item in BuiltInListItems)
+							BuiltInListResultItems.Add(item);
+
 						var value = thirdNode.Value;
 						_builtInList.Remove(thirdNode);
 						_builtInList.AddFirst(value);

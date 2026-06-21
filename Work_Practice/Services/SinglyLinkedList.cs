@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Work_Practice.Models;
 
@@ -32,8 +32,8 @@ namespace Work_Practice.Services
 			var second = Head.Next;
 			var third = Head.Next.Next;
 
-			// Переподвязка: первый указывает на четвёртый (если есть)
-			first.Next = third.Next;
+			// Переподвязка: второй указывает на четвёртый (если есть)
+			second.Next = third.Next;
 			// Третий становится головой, его следующий – первый
 			third.Next = first;
 			Head = third;

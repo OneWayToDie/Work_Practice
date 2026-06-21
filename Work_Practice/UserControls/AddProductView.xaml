@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Work_Practice.UserControls.AddProductView"
+<UserControl x:Class="Work_Practice.UserControls.AddProductView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <GroupBox Header="Добавление нового товара" Margin="5" Foreground="White">
@@ -17,19 +17,19 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Наименование:" Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-            <TextBox Text="{Binding NewName}" Grid.Row="0" Grid.Column="1" Margin="5"/>
+            <TextBox Text="{Binding NewName, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="5"/>
 
             <TextBlock Text="Фирма изготовитель:" Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-            <TextBox Text="{Binding NewManufacturer}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+            <TextBox Text="{Binding NewManufacturer, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Margin="5"/>
 
             <TextBlock Text="Срок хранения (дни):" Grid.Row="2" Grid.Column="0" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-            <TextBox Text="{Binding NewShelfLife}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+            <TextBox Text="{Binding NewShelfLife, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.Column="1" Margin="5"/>
 
             <TextBlock Text="Цена:" Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-            <TextBox Text="{Binding NewPrice}" Grid.Row="3" Grid.Column="1" Margin="5"/>
+            <TextBox Text="{Binding NewPrice, UpdateSourceTrigger=PropertyChanged}" Grid.Row="3" Grid.Column="1" Margin="5"/>
 
             <TextBlock Text="Количество на складе:" Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center" Foreground="White"/>
-            <TextBox Text="{Binding NewStockQuantity}" Grid.Row="4" Grid.Column="1" Margin="5"/>
+            <TextBox Text="{Binding NewStockQuantity, UpdateSourceTrigger=PropertyChanged}" Grid.Row="4" Grid.Column="1" Margin="5"/>
 
             <Button Content="Добавить товар" Command="{Binding AddProductCommand}" 
                     Grid.Row="5" Grid.ColumnSpan="2" Margin="5" Padding="10,5" 

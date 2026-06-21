@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
@@ -26,7 +27,10 @@ namespace Work_Practice.Helpers
 				titleBar.MouseLeftButtonDown += (s, e) =>
 				{
 					if (e.ButtonState == MouseButtonState.Pressed)
-						window.DragMove();
+					{
+						try { window.DragMove(); }
+						catch (InvalidOperationException) { }
+					}
 				};
 			}
 		}

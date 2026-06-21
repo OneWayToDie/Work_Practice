@@ -83,15 +83,12 @@
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\EnumToBooleanConverter.cs" />
-    <Compile Include="Converters\StringToBoolConverter.cs" />
     <Compile Include="Helpers\WindowButtonHelper.cs" />
-    <Compile Include="Models\LinkedListModels.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\NumberInfo.cs" />
     <Compile Include="Models\NumberType.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Services\ProductDataService.cs" />
-    <Compile Include="Services\LinkedListService.cs" />
     <Compile Include="Services\SinglyLinkedList.cs" />
     <Compile Include="UserControls\AddProductView.xaml.cs">
       <DependentUpon>AddProductView.xaml</DependentUpon>

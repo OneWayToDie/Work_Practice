@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using Work_Practice.Models;
@@ -14,12 +14,20 @@ namespace Work_Practice.Services
 			_filePath = filePath;
 		}
 
-		public void SaveToXml(List<Product> products)
+		public bool SaveToXml(List<Product> products)
 		{
-			var serializer = new XmlSerializer(typeof(List<Product>));
-			using (var writer = new StreamWriter(_filePath))
+			try
 			{
-				serializer.Serialize(writer, products);
+				var serializer = new XmlSerializer(typeof(List<Product>));
+				using (var writer = new StreamWriter(_filePath))
+				{
+					serializer.Serialize(writer, products);
+				}
+				return true;
+			}
+			catch
+			{
+				return false;
 			}
 		}
 
@@ -28,10 +36,17 @@ namespace Work_Practice.Services
 			if (!File.Exists(_filePath))
 				return null;
 
-			var serializer = new XmlSerializer(typeof(List<Product>));
-			using (var reader = new StreamReader(_filePath))
+			try
 			{
-				return (List<Product>)serializer.Deserialize(reader);
+				var serializer = new XmlSerializer(typeof(List<Product>));
+				using (var reader = new StreamReader(_filePath))
+				{
+					return (List<Product>)serializer.Deserialize(reader);
+				}
+			}
+			catch
+			{
+				return null;
 			}
 		}
 	}

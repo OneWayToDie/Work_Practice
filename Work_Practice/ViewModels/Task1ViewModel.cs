@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -44,7 +44,12 @@ namespace Work_Practice.ViewModels
 				if (_isProcSelected == value) return;
 				_isProcSelected = value;
 				OnPropertyChanged();
-				if (value) SelectedVariant = "Proc";
+				if (value)
+				{
+					_isFuncSelected = false;
+					OnPropertyChanged(nameof(IsFuncSelected));
+					SelectedVariant = "Proc";
+				}
 				UpdateCodeExample();
 			}
 		}
@@ -58,7 +63,12 @@ namespace Work_Practice.ViewModels
 				if (_isFuncSelected == value) return;
 				_isFuncSelected = value;
 				OnPropertyChanged();
-				if (value) SelectedVariant = "Func";
+				if (value)
+				{
+					_isProcSelected = false;
+					OnPropertyChanged(nameof(IsProcSelected));
+					SelectedVariant = "Func";
+				}
 				UpdateCodeExample();
 			}
 		}
@@ -90,6 +100,11 @@ namespace Work_Practice.ViewModels
 					MessageBox.Show("Последовательность завершена (0 не добавляется). Нажмите 'Обработать'.");
 					return;
 				}
+				if (num < 0)
+				{
+					MessageBox.Show("Введите положительное число.");
+					return;
+				}
 				Numbers.Add(num);
 				CurrentNumberInput = "";
 			}
@@ -118,7 +133,7 @@ namespace Work_Practice.ViewModels
 			{
 				if (SelectedVariant == "Proc")
 				{
-					GetDigitsInfoProc(n, out int count, out int minDigit);
+					GetDigitsInfoProc(n, out int count, out int? minDigit);
 					Results.Add(new NumberInfo { Number = n, DigitCount = count, MinDigit = minDigit });
 				}
 				else
@@ -130,12 +145,12 @@ namespace Work_Practice.ViewModels
 		}
 
 		// Процедура
-		private void GetDigitsInfoProc(int number, out int count, out int minDigit)
+		private void GetDigitsInfoProc(int number, out int count, out int? minDigit)
 		{
 			if (number <= 0)
 			{
 				count = 0;
-				minDigit = -1;
+				minDigit = null;
 				return;
 			}
 			int temp = number;
@@ -151,12 +166,12 @@ namespace Work_Practice.ViewModels
 		}
 
 		// Функция, возвращающая кортеж
-		private (int count, int minDigit) GetDigitsInfoFunc(int number)
+		private (int count, int? minDigit) GetDigitsInfoFunc(int number)
 		{
-			if (number <= 0) return (0, -1);
+			if (number <= 0) return (0, null);
 			int temp = number;
 			int count = 0;
-			int minDigit = 9;
+			int? minDigit = 9;
 			while (temp > 0)
 			{
 				int digit = temp % 10;
@@ -184,14 +199,24 @@ namespace Work_Practice.ViewModels
 			if (SelectedVariant == "Proc")
 			{
 				CodeExampleText = "void GetDigitsInfoProc(int number, out int count, out int minDigit)\n" +
-					"{\n    " +
-					"int temp = number;" +
-					"\n    count = 0;" +
-					"\n    minDigit = 9;" +
-					"\n    while (temp > 0)\n    " +
-					"{\n        int digit = temp % 10;\n        " +
-					"if (digit < minDigit) minDigit = " +
-					"digit; \n        count++;\n        temp /= 10;\n    }\n}";
+					"{\n" +
+					"    if (number <= 0)\n" +
+					"    {\n" +
+					"        count = 0;\n" +
+					"        minDigit = -1;\n" +
+					"        return;\n" +
+					"    }\n" +
+					"    int temp = number;\n" +
+					"    count = 0;\n" +
+					"    minDigit = 9;\n" +
+					"    while (temp > 0)\n" +
+					"    {\n" +
+					"        int digit = temp % 10;\n" +
+					"        if (digit < minDigit) minDigit = digit;\n" +
+					"        count++;\n" +
+					"        temp /= 10;\n" +
+					"    }\n" +
+					"}";
 			}
 			else
 			{

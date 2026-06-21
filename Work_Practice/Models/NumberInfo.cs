@@ -4,6 +4,6 @@
 	{
 		public int Number { get; set; }
 		public int DigitCount { get; set; }
-		public int MinDigit { get; set; }
+		public int? MinDigit { get; set; }
 	}
 }

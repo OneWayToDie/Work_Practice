@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -63,7 +63,7 @@ namespace Work_Practice.ViewModels
 			_dataService = new ProductDataService();
 
 			var loaded = _dataService.LoadFromXml();
-			if (loaded != null && loaded.Count > 0)
+			if (loaded != null)
 			{
 				Products = new ObservableCollection<Product>(loaded);
 			}
@@ -101,8 +101,11 @@ namespace Work_Practice.ViewModels
 
 		private void SaveToFile()
 		{
-			_dataService.SaveToXml(new List<Product>(Products));
-			MessageBox.Show("Данные сохранены в файл products.xml");
+			bool success = _dataService.SaveToXml(new List<Product>(Products));
+			if (success)
+				MessageBox.Show("Данные сохранены в файл products.xml");
+			else
+				MessageBox.Show("Ошибка при сохранении. Проверьте, что файл не заблокирован.");
 		}
 
 		private void LoadFromFile()
@@ -116,9 +119,13 @@ namespace Work_Practice.ViewModels
 				FilterProductsAndSort();
 				MessageBox.Show("Данные загружены из файла");
 			}
+			else if (loaded != null)
+			{
+				MessageBox.Show("Файл пуст. Данные не загружены.");
+			}
 			else
 			{
-				MessageBox.Show("Файл не найден или пуст");
+				MessageBox.Show("Файл не найден или повреждён.");
 			}
 		}
 
@@ -180,8 +187,11 @@ namespace Work_Practice.ViewModels
 		{
 			Products.Clear();
 			FilteredProducts.Clear();
-			_dataService.SaveToXml(new List<Product>());
-			MessageBox.Show("База данных очищена.");
+			bool success = _dataService.SaveToXml(new List<Product>());
+			if (success)
+				MessageBox.Show("База данных очищена.");
+			else
+				MessageBox.Show("БД очищена из памяти, но не удалось сохранить в файл.");
 		}
 
 		private void SortAndFilter()
@@ -210,7 +220,16 @@ namespace Work_Practice.ViewModels
 
 			FilteredProducts.Clear();
 			foreach (var p in filtered)
-				FilteredProducts.Add(p);
+			{
+				FilteredProducts.Add(new Product
+				{
+					Name = p.Name,
+					Manufacturer = p.Manufacturer,
+					ShelfLife = p.ShelfLife,
+					Price = p.Price,
+					StockQuantity = p.StockQuantity
+				});
+			}
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
