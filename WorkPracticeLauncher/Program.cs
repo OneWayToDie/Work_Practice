@@ -61,11 +61,13 @@ namespace WorkPracticeLauncher
 				{
 					lastWidth = Console.WindowWidth;
 					lastHeight = Console.WindowHeight;
+					// Полная перерисовка без изменения буфера
 					RedrawScreen(cat);
 					ResetCursorState();
+					// Для Windows Terminal дополнительная перерисовка для затирания артефактов
 					if (isWindowsTerminal)
 					{
-						Thread.Sleep(50);
+						Thread.Sleep(30);
 						RedrawScreen(cat);
 						ResetCursorState();
 					}
@@ -350,21 +352,18 @@ namespace WorkPracticeLauncher
 				string bottomLine = "╚" + new string('═', lineWidth) + "╝";
 
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine(topLine.PadRight(w));
-				Console.WriteLine(("║" + AlignCenter("Учебная практика – Прикладная информатика", lineWidth) + "║").PadRight(w));
-				Console.WriteLine(("║" + AlignCenter("Версия 1.0 (лаунчер)", lineWidth) + "║").PadRight(w));
-				Console.WriteLine(bottomLine.PadRight(w));
+				WriteLinePadded(topLine, w);
+				WriteLinePadded("║" + AlignCenter("Учебная практика – Прикладная информатика", lineWidth) + "║", w);
+				WriteLinePadded("║" + AlignCenter("Версия 1.0 (лаунчер)", lineWidth) + "║", w);
+				WriteLinePadded(bottomLine, w);
 				Console.ResetColor();
 
-				// Пустая строка после рамки – оставляем ОДНУ
+				// Одна пустая строка после рамки – оставляем
 				Console.WriteLine();
 
 				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine(("▶ Выберите действие:").PadRight(w));
+				WriteLinePadded("▶ Выберите действие:", w);
 				Console.ResetColor();
-
-				// Убираем лишнюю пустую строку, которая была после заголовка
-				// (здесь никогда не было Console.WriteLine())
 
 				string[] lines = {
 			"  ⚡ 1 – Запустить WPF приложение",
@@ -377,7 +376,7 @@ namespace WorkPracticeLauncher
 				for (int i = 0; i < lines.Length; i++)
 				{
 					Console.ForegroundColor = colors[i % colors.Length];
-					Console.WriteLine(lines[i].PadRight(w));
+					WriteLinePadded(lines[i], w);
 				}
 				Console.ResetColor();
 			}
@@ -385,24 +384,23 @@ namespace WorkPracticeLauncher
 			{
 				// упрощённый вариант без рамок
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("=============================================".PadRight(w));
-				Console.WriteLine("   Учебная практика – Прикладная информатика".PadRight(w));
-				Console.WriteLine("   Версия 1.0 (лаунчер)".PadRight(w));
-				Console.WriteLine("=============================================".PadRight(w));
+				WriteLinePadded("=============================================", w);
+				WriteLinePadded("   Учебная практика – Прикладная информатика", w);
+				WriteLinePadded("   Версия 1.0 (лаунчер)", w);
+				WriteLinePadded("=============================================", w);
 				Console.ResetColor();
 
-				// Пустая строка после рамки – оставляем ОДНУ
 				Console.WriteLine();
 
 				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine("Выберите действие:".PadRight(w));
+				WriteLinePadded("Выберите действие:", w);
 				Console.ResetColor();
 
-				Console.WriteLine("  1 – Запустить WPF приложение".PadRight(w));
-				Console.WriteLine("  2 – Просмотр решения в консоли (интерактивно)".PadRight(w));
-				Console.WriteLine("  3 – Скачать актуальную версию (GitHub / Google Drive)".PadRight(w));
-				Console.WriteLine("  4 – Связь с автором".PadRight(w));
-				Console.WriteLine("  0 – Выход".PadRight(w));
+				WriteLinePadded("  1 – Запустить WPF приложение", w);
+				WriteLinePadded("  2 – Просмотр решения в консоли (интерактивно)", w);
+				WriteLinePadded("  3 – Скачать актуальную версию (GitHub / Google Drive)", w);
+				WriteLinePadded("  4 – Связь с автором", w);
+				WriteLinePadded("  0 – Выход", w);
 			}
 
 			// Пустая строка перед приглашением
@@ -412,6 +410,39 @@ namespace WorkPracticeLauncher
 			inputRow = Console.CursorTop;
 			if (inputCol >= w) inputCol = w - 1;
 			if (inputRow >= Console.WindowHeight) inputRow = Console.WindowHeight - 1;
+		}
+
+		// ---- Вспомогательный метод для вывода строки с полным затиранием ----
+		private static void WriteLinePadded(string text, int width)
+		{
+			// Если строка пустая, просто выводим пустую строку (перевод)
+			if (string.IsNullOrEmpty(text))
+			{
+				Console.WriteLine();
+				return;
+			}
+
+			// Получаем текущую позицию курсора (предполагаем, что он в начале строки)
+			int top = Console.CursorTop;
+			// Если мы вышли за пределы видимой области, просто выводим как есть
+			if (top >= Console.WindowHeight)
+			{
+				Console.WriteLine(text);
+				return;
+			}
+
+			// 1. Затираем всю строку пробелами
+			Console.SetCursorPosition(0, top);
+			Console.Write(new string(' ', width));
+			// 2. Возвращаемся в начало строки
+			Console.SetCursorPosition(0, top);
+			// 3. Выводим текст
+			Console.Write(text);
+			// 4. Добиваем пробелами до конца (если нужно)
+			if (text.Length < width)
+				Console.Write(new string(' ', width - text.Length));
+			// 5. Переходим на новую строку
+			Console.WriteLine();
 		}
 		// ---- Остальные методы (ExecuteChoice, RunInteractiveMode, LaunchWpfApp, DownloadLatestVersion, DownloadFromDrive, ShowContacts) остаются без изменений ----
 
