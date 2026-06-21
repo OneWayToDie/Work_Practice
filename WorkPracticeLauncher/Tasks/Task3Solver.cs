@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using WorkPracticeLauncher.Models;
 
@@ -17,7 +17,7 @@ namespace WorkPracticeLauncher.Tasks
 			RedrawScreen();
 
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			if (Program.IsWindowsTerminal)
+			if (Program.SupportsEmoji)
 				Console.WriteLine("Введите действительные числа (через пробел или запятую):");
 			else
 				Console.WriteLine("Введите числа (через пробел):");
@@ -27,8 +27,10 @@ namespace WorkPracticeLauncher.Tasks
 			while (true)
 			{
 				CheckResizeAndRedraw();
-				Console.Write("Числа: ");
+				Console.Write("Числа (Enter/ESC – Назад): ");
 				string inputLine = Console.ReadLine();
+				if (string.IsNullOrEmpty(inputLine))
+					return;
 				var parts = inputLine.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 				numbers = new List<double>();
 				foreach (var p in parts)
@@ -43,7 +45,7 @@ namespace WorkPracticeLauncher.Tasks
 				else
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					if (Program.IsWindowsTerminal)
+					if (Program.SupportsEmoji)
 						Console.WriteLine("❌ Недостаточно чисел (нужно минимум 3). Попробуйте снова.");
 					else
 						Console.WriteLine("Недостаточно чисел (нужно минимум 3). Попробуйте снова.");
@@ -57,8 +59,13 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine("  1 – Собственная реализация");
 			Console.WriteLine("  2 – LinkedList<T>");
+			Console.ForegroundColor = ConsoleColor.DarkGray;
+			Console.WriteLine("  (или ESC/Enter – возврат)");
+			Console.ResetColor();
 			Console.Write("Ваш выбор: ");
 			string choice = Console.ReadLine();
+			if (string.IsNullOrEmpty(choice))
+				return;
 			bool useCustom = (choice == "1");
 
 			Console.WriteLine();
@@ -123,15 +130,16 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine("─" + new string('─', 40) + "─");
 			Console.ResetColor();
-			Console.WriteLine("\nНажмите любую клавишу для возврата...");
+			Console.WriteLine("\nНажмите любую клавишу для возврата (ESC – Назад)...");
 			Console.ReadKey();
+			// ESC обрабатывается на уровне вызывающего метода
 		}
 
 		private static void RedrawScreen()
 		{
 			Console.Clear();
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			if (Program.IsWindowsTerminal)
+			if (Program.SupportsEmoji)
 			{
 				Console.WriteLine("╔═══════════════════════════════╗");
 				Console.WriteLine("║ ЗАДАНИЕ 3: ОДНОСВЯЗНЫЙ СПИСОК ║");

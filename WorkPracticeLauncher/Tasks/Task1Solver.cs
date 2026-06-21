@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -165,7 +165,7 @@ namespace WorkPracticeLauncher.Tasks
 		{
 			Console.Clear();
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			if (Program.IsWindowsTerminal)
+			if (Program.SupportsEmoji)
 				Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ, ПРОЦЕДУРА/ФУНКЦИЯ ===");
 			else
 				Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ ===");

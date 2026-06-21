@@ -23,8 +23,10 @@ namespace WorkPracticeLauncher
 		private static int lastWidth;
 		private static int lastHeight;
 		private static bool isWindowsTerminal;
+		private static bool supportsEmoji;
 
 		public static bool IsWindowsTerminal { get; private set; }
+		public static bool SupportsEmoji => supportsEmoji;
 
 		static void Main()
 		{
@@ -33,6 +35,8 @@ namespace WorkPracticeLauncher
 
 			isWindowsTerminal = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WT_SESSION"));
 			IsWindowsTerminal = isWindowsTerminal;
+
+			supportsEmoji = TestEmojiSupport();
 
 			lastWidth = Console.WindowWidth;
 			lastHeight = Console.WindowHeight;
@@ -65,7 +69,7 @@ namespace WorkPracticeLauncher
 					RedrawScreen(cat);
 					ResetCursorState();
 					// Для Windows Terminal дополнительная перерисовка для затирания артефактов
-					if (isWindowsTerminal)
+			if (supportsEmoji)
 					{
 						Thread.Sleep(30);
 						RedrawScreen(cat);
@@ -203,13 +207,14 @@ namespace WorkPracticeLauncher
 						SetCursorToInput();
 						while (Console.KeyAvailable) Console.ReadKey(true);
 					}
-					else if (key == ConsoleKey.Escape && !string.IsNullOrEmpty(inputBuffer))
+					else if (key == ConsoleKey.Escape)
 					{
 						inputBuffer = "";
 						Console.SetCursorPosition(inputCol, inputRow);
 						Console.Write(new string(' ', 2));
 						SetCursorToInput();
 						while (Console.KeyAvailable) Console.ReadKey(true);
+						running = false;
 					}
 				}
 
@@ -221,15 +226,33 @@ namespace WorkPracticeLauncher
 
 		// ---- Вспомогательные методы ----
 
+		private static bool WaitForAnyKey()
+		{
+			var key = Console.ReadKey(true).Key;
+			return key == ConsoleKey.Escape;
+		}
+
+		private static bool TestEmojiSupport()
+		{
+			int before = Console.CursorLeft;
+			int top = Console.CursorTop;
+			Console.Write("⚡");
+			int after = Console.CursorLeft;
+			Console.SetCursorPosition(before, top);
+			Console.Write("  ");
+			Console.SetCursorPosition(before, top);
+			return (after - before) >= 2;
+		}
+
 		private static void ShowTerminalRecommendation()
 		{
-			if (!isWindowsTerminal)
+			if (!supportsEmoji)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("Для лучшего отображения рекомендуется использовать Windows Terminal.");
 				Console.ResetColor();
-				Console.WriteLine("Нажмите любую клавишу для продолжения...");
-				Console.ReadKey(true);
+				Console.WriteLine("Нажмите любую клавишу для продолжения (ESC – отмена)...");
+				WaitForAnyKey();
 				Console.Clear();
 			}
 			else
@@ -246,10 +269,10 @@ namespace WorkPracticeLauncher
 
 		private static void PrintFooter()
 		{
-			if (isWindowsTerminal)
+			if (!supportsEmoji)
 			{
 				int w = Console.WindowWidth;
-				string msg = "⚠️ Для корректной работы рекомендуется использовать Windows Terminal!";
+				string msg = "[!] Для корректной работы рекомендуется использовать Windows Terminal!";
 				if (msg.Length > w - 2) msg = msg.Substring(0, w - 2);
 				int row = Console.WindowHeight - 1;
 				if (row < 0) row = 0;
@@ -345,7 +368,7 @@ namespace WorkPracticeLauncher
 
 			Console.SetCursorPosition(0, 0);
 
-			if (isWindowsTerminal)
+			if (supportsEmoji)
 			{
 				int lineWidth = Math.Max(w - 2, 2);
 				string topLine = "╔" + new string('═', lineWidth) + "╗";
@@ -378,6 +401,8 @@ namespace WorkPracticeLauncher
 					Console.ForegroundColor = colors[i % colors.Length];
 					WriteLinePadded(lines[i], w);
 				}
+				Console.ForegroundColor = ConsoleColor.DarkGray;
+				WriteLinePadded("  (или ESC/Enter – Назад)", w);
 				Console.ResetColor();
 			}
 			else
@@ -401,6 +426,9 @@ namespace WorkPracticeLauncher
 				WriteLinePadded("  3 – Скачать актуальную версию (GitHub / Google Drive)", w);
 				WriteLinePadded("  4 – Связь с автором", w);
 				WriteLinePadded("  0 – Выход", w);
+				Console.ForegroundColor = ConsoleColor.DarkGray;
+				WriteLinePadded("  (или ESC/Enter – Назад)", w);
+				Console.ResetColor();
 			}
 
 			// Пустая строка перед приглашением
@@ -477,8 +505,8 @@ namespace WorkPracticeLauncher
 					break;
 			}
 
-			Console.WriteLine("\nНажмите любую клавишу для возврата...");
-			Console.ReadKey(true);
+			Console.WriteLine("\nНажмите любую клавишу для возврата (ESC – Назад)...");
+			WaitForAnyKey();
 		}
 
 		static void RunInteractiveMode()
@@ -487,7 +515,7 @@ namespace WorkPracticeLauncher
 			{
 				Console.Clear();
 
-				if (isWindowsTerminal)
+				if (supportsEmoji)
 				{
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					string title = " ИНТЕРАКТИВНЫЙ ПРОСМОТР РЕШЕНИЙ ";
@@ -509,6 +537,8 @@ namespace WorkPracticeLauncher
 					Console.WriteLine("  🔗 3 – Задание 3 (односвязный список)");
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.WriteLine("  ◀️ 0 – Назад в главное меню");
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+					Console.WriteLine("  (или ESC/Enter – Назад)");
 					Console.ResetColor();
 				}
 				else
@@ -521,17 +551,22 @@ namespace WorkPracticeLauncher
 					Console.WriteLine("  2 – Задание 2 (товары, сортировка)");
 					Console.WriteLine("  3 – Задание 3 (односвязный список)");
 					Console.WriteLine("  0 – Назад в главное меню");
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+					Console.WriteLine("  (или ESC/Enter – Назад)");
+					Console.ResetColor();
 				}
 
 				Console.WriteLine();
-				Console.Write("Ваш выбор: ");
+				Console.Write("Ваш выбор (ESC/Enter – Назад): ");
 				string input = Console.ReadLine();
+				if (string.IsNullOrEmpty(input))
+					return;
 				if (!int.TryParse(input, out int choice))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Некорректный ввод. Нажмите любую клавишу...");
+					Console.WriteLine("Некорректный ввод. Нажмите любую клавишу (ESC – Назад)...");
 					Console.ResetColor();
-					Console.ReadKey();
+					WaitForAnyKey();
 					continue;
 				}
 
@@ -550,9 +585,9 @@ namespace WorkPracticeLauncher
 						return;
 					default:
 						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine("Некорректный выбор. Нажмите любую клавишу...");
-						Console.ResetColor();
-						Console.ReadKey();
+					Console.WriteLine("Некорректный выбор. Нажмите любую клавишу (ESC – Назад)...");
+					Console.ResetColor();
+					WaitForAnyKey();
 						break;
 				}
 			}
@@ -603,8 +638,12 @@ namespace WorkPracticeLauncher
 				Console.WriteLine("  1 – Перейти на GitHub (релизы)");
 				Console.WriteLine("  2 – Скачать с Google Drive (автоматически)");
 				Console.WriteLine("  0 – Назад");
-				Console.Write("Ваш выбор (или 0 для отмены): ");
+				Console.ForegroundColor = ConsoleColor.DarkGray;
+				Console.WriteLine("  (или ESC/Enter – Назад)");
+				Console.ResetColor();
+				Console.Write("Ваш выбор: ");
 				string choice = Console.ReadLine();
+				if (string.IsNullOrEmpty(choice)) return;
 				if (choice == "0") return;
 
 				if (choice == "1")
@@ -623,8 +662,8 @@ namespace WorkPracticeLauncher
 						Console.WriteLine($"Не удалось открыть ссылку: {ex.Message}");
 						Console.ResetColor();
 					}
-					Console.WriteLine("Нажмите любую клавишу...");
-					Console.ReadKey();
+					Console.WriteLine("Нажмите любую клавишу (ESC – Назад)...");
+					WaitForAnyKey();
 					continue;
 				}
 				else if (choice == "2")
@@ -634,8 +673,8 @@ namespace WorkPracticeLauncher
 				}
 				else
 				{
-					Console.WriteLine("Некорректный выбор.");
-					Console.ReadKey();
+					Console.WriteLine("Некорректный выбор. Нажмите любую клавишу (ESC – Назад)...");
+					WaitForAnyKey();
 				}
 			}
 		}
@@ -744,8 +783,8 @@ namespace WorkPracticeLauncher
 				}
 			}
 
-			Console.WriteLine("\nНажмите любую клавишу для возврата...");
-			Console.ReadKey();
+			Console.WriteLine("\nНажмите любую клавишу для возврата (ESC – Назад)...");
+			WaitForAnyKey();
 		}
 
 		static void ShowContacts()
