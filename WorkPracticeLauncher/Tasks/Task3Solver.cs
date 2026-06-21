@@ -16,7 +16,6 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine();
 
-			// Инструкция выводится один раз
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine("Введите действительные числа (через пробел или запятую):");
 			Console.ResetColor();
@@ -30,7 +29,8 @@ namespace WorkPracticeLauncher.Tasks
 				numbers = new List<double>();
 				foreach (var p in parts)
 				{
-					if (double.TryParse(p, out double val))
+					string normalized = p.Replace(',', '.');
+					if (double.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double val))
 						numbers.Add(val);
 				}
 
@@ -44,13 +44,13 @@ namespace WorkPracticeLauncher.Tasks
 				}
 			}
 
-			// Далее выбор реализации и вывод результатов
-			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine("\nВыберите реализацию:");
+			// Микро-заголовок – зелёный с префиксом ▶
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("\n▶ Выберите реализацию:");
 			Console.ResetColor();
 			Console.WriteLine("  1 – Собственная реализация");
 			Console.WriteLine("  2 – LinkedList<T>");
-			string choice = InputHelper.ReadLine("Ваше решение: ");
+			string choice = InputHelper.ReadLine("Ваш выбор: ");
 			bool useCustom = (choice == "1");
 
 			Console.WriteLine();
@@ -62,15 +62,17 @@ namespace WorkPracticeLauncher.Tasks
 			{
 				var list = new MyLinkedList<double>();
 				foreach (var n in numbers) list.Add(n);
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.Write("Исходный список: ");
+				// Микро-заголовок для исходного списка – зелёный
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.Write("▶ Исходный список: ");
 				Console.ResetColor();
 				Console.WriteLine(string.Join(" → ", list.ToList()));
 
 				if (list.MoveThirdToFront())
 				{
+					// Микро-заголовок для результата – зелёный (уже есть, добавим ▶)
 					Console.ForegroundColor = ConsoleColor.Green;
-					Console.Write("После переноса:   ");
+					Console.Write("▶ После переноса:   ");
 					Console.ResetColor();
 					Console.WriteLine(string.Join(" → ", list.ToList()));
 				}
@@ -85,8 +87,9 @@ namespace WorkPracticeLauncher.Tasks
 			{
 				var list = new LinkedList<double>();
 				foreach (var n in numbers) list.AddLast(n);
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.Write("Исходный список: ");
+				// Микро-заголовок для исходного списка – зелёный
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.Write("▶ Исходный список: ");
 				Console.ResetColor();
 				Console.WriteLine(string.Join(" → ", list));
 
@@ -98,8 +101,9 @@ namespace WorkPracticeLauncher.Tasks
 						var value = thirdNode.Value;
 						list.Remove(thirdNode);
 						list.AddFirst(value);
+						// Микро-заголовок для результата – зелёный
 						Console.ForegroundColor = ConsoleColor.Green;
-						Console.Write("После переноса:   ");
+						Console.Write("▶ После переноса:   ");
 						Console.ResetColor();
 						Console.WriteLine(string.Join(" → ", list));
 					}

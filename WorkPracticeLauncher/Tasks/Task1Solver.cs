@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace WorkPracticeLauncher.Tasks
 {
@@ -11,58 +12,113 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine("=== ЗАДАНИЕ 1: ПОСЛЕДОВАТЕЛЬНОСТЬ ЧИСЕЛ, ПРОЦЕДУРА/ФУНКЦИЯ ===");
 			Console.ResetColor();
-			Console.WriteLine("Вводите целые числа (до 25 цифр), 0 – Выход из цикла программы.");
 
-			List<string> numbers = new List<string>();
+			int count = 0;
 			while (true)
 			{
-				string input = InputHelper.ReadLine("Число: ");
-				if (input == "0") break;
-				if (string.IsNullOrWhiteSpace(input))
+				string input = InputHelper.ReadLine("Введите количество чисел (N) от 1 до 50 (или 0 для выхода): ");
+				if (input == "0")
 				{
-					Console.WriteLine("Пустой ввод, повторите.");
+					Console.WriteLine("Ввод отменён.");
+					Console.ReadKey();
+					return;
+				}
+				if (!int.TryParse(input, out count) || count <= 0)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Введите положительное целое число.");
+					Console.ResetColor();
 					continue;
 				}
-				bool isValid = true;
-				foreach (char c in input)
+				if (count > 50)
 				{
-					if (!char.IsDigit(c))
-					{
-						isValid = false;
-						break;
-					}
-				}
-				if (!isValid)
-				{
-					Console.WriteLine("Некорректный ввод, введите целое число (только цифры).");
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("Максимальное количество чисел – 50.");
+					Console.ResetColor();
 					continue;
 				}
-				if (input.Length > 25)
-				{
-					Console.WriteLine("Число не должно превышать 25 знаков.");
-					continue;
-				}
-				numbers.Add(input);
+				break;
 			}
+
+			List<string> numbers = new List<string>();
+			Console.WriteLine($"\nВведите {count} чисел (каждое до 25 цифр). Для досрочного завершения введите 0:");
+			for (int i = 0; i < count; i++)
+			{
+				while (true)
+				{
+					string input = InputHelper.ReadLine($"Число {i + 1}: ");
+					if (input == "0")
+					{
+						Console.WriteLine($"Ввод прерван (введено 0). Обработано {i} чисел.");
+						goto EndInput;
+					}
+					if (string.IsNullOrWhiteSpace(input))
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine("Пустой ввод, повторите.");
+						Console.ResetColor();
+						continue;
+					}
+
+					bool isValid = true;
+					foreach (char c in input)
+					{
+						if (!char.IsDigit(c))
+						{
+							isValid = false;
+							break;
+						}
+					}
+					if (!isValid)
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine("Введите целое число (только цифры).");
+						Console.ResetColor();
+						continue;
+					}
+
+					// Убираем ведущие нули
+					string trimmed = input.TrimStart('0');
+					if (string.IsNullOrEmpty(trimmed))
+						trimmed = "0";
+
+					if (trimmed.Length > 25)
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine("Число не должно превышать 25 знаков.");
+						Console.ResetColor();
+						continue;
+					}
+
+					numbers.Add(trimmed);
+					break;
+				}
+			}
+		EndInput:
 
 			if (numbers.Count == 0)
 			{
-				Console.WriteLine("Последовательность пуста.");
+				Console.WriteLine("Нет чисел для обработки.");
 				Console.ReadKey();
 				return;
 			}
 
-			// Находим минимальное число
+			// Минимум и максимум по числовому значению с помощью BigInteger
+			BigInteger minVal = BigInteger.Parse(numbers[0]);
+			BigInteger maxVal = BigInteger.Parse(numbers[0]);
 			string minNumber = numbers[0];
+			string maxNumber = numbers[0];
 			foreach (var n in numbers)
 			{
-				if (n.Length < minNumber.Length)
-					minNumber = n;
-				else if (n.Length == minNumber.Length && string.Compare(n, minNumber, StringComparison.Ordinal) < 0)
-					minNumber = n;
+				BigInteger val = BigInteger.Parse(n);
+				if (val < minVal) { minVal = val; minNumber = n; }
+				if (val > maxVal) { maxVal = val; maxNumber = n; }
 			}
 
-			Console.WriteLine("\nВыберите вариант:");
+			// Микро-заголовок – зелёный с префиксом ▶
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Выберите вариант:");
+			Console.ResetColor();
 			Console.WriteLine("  1 – Процедура");
 			Console.WriteLine("  2 – Функция");
 			string varChoice = InputHelper.ReadLine("Ваш выбор: ");
@@ -84,18 +140,19 @@ namespace WorkPracticeLauncher.Tasks
 			{
 				if (useProc)
 				{
-					GetDigitsInfoProc(n, out int count, out int min);
-					Console.WriteLine($"{n.PadRight(colWidth)} {count.ToString().PadRight(15)} {min.ToString().PadRight(15)}");
+					GetDigitsInfoProc(n, out int countDigits, out int minDigit);
+					Console.WriteLine($"{n.PadRight(colWidth)} {countDigits.ToString().PadRight(15)} {minDigit.ToString().PadRight(15)}");
 				}
 				else
 				{
-					var (count, min) = GetDigitsInfoFunc(n);
-					Console.WriteLine($"{n.PadRight(colWidth)} {count.ToString().PadRight(15)} {min.ToString().PadRight(15)}");
+					var (countDigits, minDigit) = GetDigitsInfoFunc(n);
+					Console.WriteLine($"{n.PadRight(colWidth)} {countDigits.ToString().PadRight(15)} {minDigit.ToString().PadRight(15)}");
 				}
 			}
 
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine($"\nМинимальное число из всех введённых: {minNumber}");
+			Console.WriteLine($"\nМинимальное число: {minNumber}");
+			Console.WriteLine($"Максимальное число: {maxNumber}");
 			Console.ResetColor();
 
 			Console.WriteLine("\nНажмите любую клавишу для возврата...");

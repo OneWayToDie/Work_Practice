@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using WorkPracticeLauncher.Models;
+using System.Windows.Forms;
 
 namespace WorkPracticeLauncher.Tasks
 {
@@ -11,6 +12,7 @@ namespace WorkPracticeLauncher.Tasks
 	{
 		private static List<Product> products = new List<Product>();
 		private static string currentFileName = "products.xml";
+		private static string currentDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
 		private enum FileFormat { Xml, Txt }
 
 		public static void Run()
@@ -24,6 +26,7 @@ namespace WorkPracticeLauncher.Tasks
 				Console.ResetColor();
 				Console.WriteLine($"Всего товаров: {products.Count}");
 				Console.WriteLine($"Текущий файл: {currentFileName}");
+				Console.WriteLine($"Каталог данных: {currentDataDirectory}");
 				Console.WriteLine();
 				Console.WriteLine("  1 – Внести товары в БД");
 				Console.WriteLine("  2 – Посмотреть товары");
@@ -31,6 +34,7 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine("  4 – Удалить всю БД");
 				Console.WriteLine("  5 – Сохранить БД в файл");
 				Console.WriteLine("  6 – Загрузить БД из файла (дополнить)");
+				Console.WriteLine("  7 – Изменить каталог для сохранения/загрузки");
 				Console.WriteLine("  0 – Назад в меню заданий");
 				Console.WriteLine();
 
@@ -57,7 +61,8 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine(bottomLeft + new string(horizontal[0], maxWidth) + bottomRight);
 				Console.ResetColor();
 
-				string input = InputHelper.ReadLine("Ваш выбор: ");
+				string input = InputHelper.ReadLine("Ваш выбор (или Esc для отмены): ", allowEscape: true);
+				if (input == null) continue;
 				if (!int.TryParse(input, out int choice))
 				{
 					Console.WriteLine("Некорректный ввод. Нажмите любую клавишу...");
@@ -85,6 +90,9 @@ namespace WorkPracticeLauncher.Tasks
 					case 6:
 						LoadFromFileWithSelection();
 						break;
+					case 7:
+						ChangeDataDirectory();
+						break;
 					case 0:
 						exit = true;
 						break;
@@ -96,6 +104,118 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
+		// -------------------- Смена каталога --------------------
+		private static void ChangeDataDirectory()
+		{
+			Console.Clear();
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.WriteLine("=== ИЗМЕНЕНИЕ КАТАЛОГА ДАННЫХ ===");
+			Console.ResetColor();
+			Console.WriteLine($"Текущий каталог: {currentDataDirectory}");
+			// Микро-заголовок – зелёный
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Выберите способ указания пути:");
+			Console.ResetColor();
+			Console.WriteLine("  1 – Ввести путь вручную");
+			Console.WriteLine("  2 – Выбрать через проводник");
+			Console.WriteLine("  3 – Использовать папку с программой");
+			Console.Write("Ваш выбор (Esc для отмены): ");
+			string choice = InputHelper.ReadLine("", allowEscape: true);
+			if (choice == null) return;
+
+			string newPath = null;
+			if (choice == "1")
+			{
+				Console.Write("Введите новый путь: ");
+				newPath = Console.ReadLine();
+				if (string.IsNullOrWhiteSpace(newPath))
+				{
+					Console.WriteLine("Изменение отменено.");
+					Console.ReadKey();
+					return;
+				}
+			}
+			else if (choice == "2")
+			{
+				newPath = SelectFolderViaDialog();
+				if (string.IsNullOrEmpty(newPath))
+				{
+					Console.WriteLine("Изменение отменено.");
+					Console.ReadKey();
+					return;
+				}
+			}
+			else if (choice == "3")
+			{
+				newPath = AppDomain.CurrentDomain.BaseDirectory;
+			}
+			else
+			{
+				Console.WriteLine("Некорректный выбор.");
+				Console.ReadKey();
+				return;
+			}
+
+			if (!Directory.Exists(newPath))
+			{
+				Console.Write("Каталог не существует. Создать? (y/n): ");
+				if (Console.ReadKey().KeyChar == 'y')
+				{
+					try
+					{
+						Directory.CreateDirectory(newPath);
+						Console.WriteLine("\nКаталог создан.");
+					}
+					catch (Exception ex)
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine($"\nНе удалось создать каталог: {ex.Message}");
+						Console.ResetColor();
+						Console.ReadKey();
+						return;
+					}
+				}
+				else
+				{
+					Console.WriteLine("\nИзменение отменено.");
+					Console.ReadKey();
+					return;
+				}
+			}
+			currentDataDirectory = newPath;
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine($"\nКаталог изменён на: {currentDataDirectory}");
+			Console.ResetColor();
+			Console.ReadKey();
+		}
+
+		// -------------------- Выбор каталога через проводник --------------------
+		private static string SelectFolderViaDialog()
+		{
+			try
+			{
+				using (var dialog = new FolderBrowserDialog())
+				{
+					dialog.Description = "Выберите каталог для данных";
+					dialog.SelectedPath = currentDataDirectory;
+					dialog.ShowNewFolderButton = true;
+					if (dialog.ShowDialog() == DialogResult.OK)
+					{
+						return dialog.SelectedPath;
+					}
+					return null;
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine($"Ошибка при открытии диалога: {ex.Message}");
+				Console.ResetColor();
+				return null;
+			}
+		}
+
+		// -------------------- Вспомогательные методы --------------------
 		private static void ShowProduct(Product p)
 		{
 			Console.WriteLine($"  Наименование: {p.Name}");
@@ -150,10 +270,11 @@ namespace WorkPracticeLauncher.Tasks
 				{
 					string input = InputHelper.ReadLine("Цена: ", allowEscape: true);
 					if (input == null) return;
-					if (decimal.TryParse(input, out price) && price > 0)
+					string normalized = input.Replace(',', '.');
+					if (decimal.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out price) && price > 0)
 						break;
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Некорректный ввод, повторите.");
+					Console.WriteLine("Некорректный ввод, введите положительное число (например, 10.5 или 10,5).");
 					Console.ResetColor();
 				}
 
@@ -198,113 +319,8 @@ namespace WorkPracticeLauncher.Tasks
 					}
 					else if (actionKey == ConsoleKey.D2)
 					{
-						var lastProduct = products[products.Count - 1];
-						Console.Clear();
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						Console.WriteLine("=== РЕДАКТИРОВАНИЕ ПОСЛЕДНЕЙ ЗАПИСИ ===");
-						Console.ResetColor();
-						Console.WriteLine("Текущие значения:");
-						ShowProduct(lastProduct);
-						Console.WriteLine();
-
-						bool editing = true;
-						while (editing)
-						{
-							Console.ForegroundColor = ConsoleColor.Yellow;
-							Console.WriteLine("Выберите поле для редактирования (1-5) или ESC для отмены:");
-							Console.ResetColor();
-							Console.WriteLine("  1 – Наименование");
-							Console.WriteLine("  2 – Фирма");
-							Console.WriteLine("  3 – Срок хранения");
-							Console.WriteLine("  4 – Цена");
-							Console.WriteLine("  5 – Количество на складе");
-							Console.Write("Ваш выбор: ");
-
-							var fieldKey = Console.ReadKey(true).Key;
-							if (fieldKey == ConsoleKey.Escape)
-							{
-								editing = false;
-								break;
-							}
-
-							bool updated = false;
-							switch (fieldKey)
-							{
-								case ConsoleKey.D1:
-									string newName = InputHelper.ReadLine("Новое наименование: ", allowEscape: true);
-									if (newName != null && !string.IsNullOrWhiteSpace(newName))
-									{
-										lastProduct.Name = newName;
-										updated = true;
-									}
-									break;
-								case ConsoleKey.D2:
-									string newManufacturer = InputHelper.ReadLine("Новая фирма: ", allowEscape: true);
-									if (newManufacturer != null)
-									{
-										lastProduct.Manufacturer = newManufacturer;
-										updated = true;
-									}
-									break;
-								case ConsoleKey.D3:
-									string newShelf = InputHelper.ReadLine("Новый срок хранения (дни): ", allowEscape: true);
-									if (newShelf != null && int.TryParse(newShelf, out int newShelfLife) && newShelfLife > 0)
-									{
-										lastProduct.ShelfLife = newShelfLife;
-										updated = true;
-									}
-									else if (newShelf != null)
-									{
-										Console.ForegroundColor = ConsoleColor.Red;
-										Console.WriteLine("Некорректный ввод.");
-										Console.ResetColor();
-									}
-									break;
-								case ConsoleKey.D4:
-									string newPrice = InputHelper.ReadLine("Новая цена: ", allowEscape: true);
-									if (newPrice != null && decimal.TryParse(newPrice, out decimal newPriceValue) && newPriceValue > 0)
-									{
-										lastProduct.Price = newPriceValue;
-										updated = true;
-									}
-									else if (newPrice != null)
-									{
-										Console.ForegroundColor = ConsoleColor.Red;
-										Console.WriteLine("Некорректный ввод.");
-										Console.ResetColor();
-									}
-									break;
-								case ConsoleKey.D5:
-									string newStock = InputHelper.ReadLine("Новое количество на складе: ", allowEscape: true);
-									if (newStock != null && int.TryParse(newStock, out int newStockValue) && newStockValue >= 0)
-									{
-										lastProduct.StockQuantity = newStockValue;
-										updated = true;
-									}
-									else if (newStock != null)
-									{
-										Console.ForegroundColor = ConsoleColor.Red;
-										Console.WriteLine("Некорректный ввод.");
-										Console.ResetColor();
-									}
-									break;
-								default:
-									Console.ForegroundColor = ConsoleColor.Red;
-									Console.WriteLine("Некорректный выбор.");
-									Console.ResetColor();
-									continue;
-							}
-
-							if (updated)
-							{
-								Console.ForegroundColor = ConsoleColor.Green;
-								Console.WriteLine("Запись обновлена.");
-								Console.ResetColor();
-								Console.WriteLine("Текущие значения:");
-								ShowProduct(lastProduct);
-								Console.WriteLine();
-							}
-						}
+						// Редактирование последней записи с выбором поля
+						EditLastProduct();
 					}
 					else if (actionKey == ConsoleKey.Escape)
 					{
@@ -319,6 +335,129 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine("Нажмите любую клавишу...");
 			Console.ReadKey();
+		}
+
+		// -------------------- Редактирование последней записи (выбор поля) --------------------
+		private static void EditLastProduct()
+		{
+			if (products.Count == 0) return;
+			var lastProduct = products[products.Count - 1];
+
+			bool editing = true;
+			while (editing)
+			{
+				Console.Clear();
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine("=== РЕДАКТИРОВАНИЕ ПОСЛЕДНЕЙ ЗАПИСИ ===");
+				Console.ResetColor();
+				Console.WriteLine("Текущие значения:");
+				ShowProduct(lastProduct);
+				Console.WriteLine();
+
+				// Микро-заголовок – зелёный
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("▶ Выберите поле для редактирования (1-5) или ESC для отмены:");
+				Console.ResetColor();
+				Console.WriteLine("  1 – Наименование");
+				Console.WriteLine("  2 – Фирма");
+				Console.WriteLine("  3 – Срок хранения");
+				Console.WriteLine("  4 – Цена");
+				Console.WriteLine("  5 – Количество на складе");
+				Console.Write("Ваш выбор (или Esc для отмены): ");
+
+				var fieldKey = Console.ReadKey(true).Key;
+				if (fieldKey == ConsoleKey.Escape)
+				{
+					editing = false;
+					break;
+				}
+
+				bool updated = false;
+				switch (fieldKey)
+				{
+					case ConsoleKey.D1:
+						string newName = InputHelper.ReadLine("Новое наименование: ", allowEscape: true);
+						if (newName != null && !string.IsNullOrWhiteSpace(newName))
+						{
+							lastProduct.Name = newName;
+							updated = true;
+						}
+						break;
+					case ConsoleKey.D2:
+						string newManufacturer = InputHelper.ReadLine("Новая фирма: ", allowEscape: true);
+						if (newManufacturer != null)
+						{
+							lastProduct.Manufacturer = newManufacturer;
+							updated = true;
+						}
+						break;
+					case ConsoleKey.D3:
+						string newShelf = InputHelper.ReadLine("Новый срок хранения (дни): ", allowEscape: true);
+						if (newShelf != null && int.TryParse(newShelf, out int newShelfLife) && newShelfLife > 0)
+						{
+							lastProduct.ShelfLife = newShelfLife;
+							updated = true;
+						}
+						else if (newShelf != null)
+						{
+							Console.ForegroundColor = ConsoleColor.Red;
+							Console.WriteLine("Некорректный ввод.");
+							Console.ResetColor();
+						}
+						break;
+					case ConsoleKey.D4:
+						string newPrice = InputHelper.ReadLine("Новая цена: ", allowEscape: true);
+						if (newPrice != null)
+						{
+							string normalized = newPrice.Replace(',', '.');
+							if (decimal.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal newPriceValue) && newPriceValue > 0)
+							{
+								lastProduct.Price = newPriceValue;
+								updated = true;
+							}
+							else
+							{
+								Console.ForegroundColor = ConsoleColor.Red;
+								Console.WriteLine("Некорректный ввод, цена должна быть положительным числом.");
+								Console.ResetColor();
+							}
+						}
+						break;
+					case ConsoleKey.D5:
+						string newStock = InputHelper.ReadLine("Новое количество на складе: ", allowEscape: true);
+						if (newStock != null && int.TryParse(newStock, out int newStockValue) && newStockValue >= 0)
+						{
+							lastProduct.StockQuantity = newStockValue;
+							updated = true;
+						}
+						else if (newStock != null)
+						{
+							Console.ForegroundColor = ConsoleColor.Red;
+							Console.WriteLine("Некорректный ввод.");
+							Console.ResetColor();
+						}
+						break;
+					default:
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine("Некорректный выбор.");
+						Console.ResetColor();
+						continue;
+				}
+
+				if (updated)
+				{
+					Console.ForegroundColor = ConsoleColor.Green;
+					Console.WriteLine("Запись обновлена.");
+					Console.ResetColor();
+				}
+				else
+				{
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.WriteLine("Изменение не выполнено (ввод отменён или некорректен).");
+					Console.ResetColor();
+				}
+				Console.ReadKey();
+			}
 		}
 
 		// -------------------- Просмотр --------------------
@@ -337,12 +476,51 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine("=== ПРОСМОТР ТОВАРОВ ===");
 			Console.ResetColor();
+
+			// Адаптивная ширина столбцов в зависимости от ширины окна
+			int windowWidth = Console.WindowWidth;
+			int nameWidth = Math.Min(20, windowWidth / 5);
+			int mfrWidth = Math.Min(15, windowWidth / 5);
+			int shelfWidth = Math.Min(8, windowWidth / 5);
+			int priceWidth = Math.Min(10, windowWidth / 5);
+			int stockWidth = Math.Min(8, windowWidth / 5);
+
+			// Минимальная ширина, чтобы поместились заголовки
+			nameWidth = Math.Max(nameWidth, "Наименование".Length + 1);
+			mfrWidth = Math.Max(mfrWidth, "Фирма".Length + 1);
+			shelfWidth = Math.Max(shelfWidth, "Срок".Length + 1);
+			priceWidth = Math.Max(priceWidth, "Цена".Length + 1);
+			stockWidth = Math.Max(stockWidth, "Кол-во".Length + 1);
+
+			// Если не хватает места – уменьшаем пропорционально
+			int total = nameWidth + mfrWidth + shelfWidth + priceWidth + stockWidth + 8; // +8 на пробелы
+			if (total > windowWidth)
+			{
+				double ratio = (windowWidth - 8) / (double)(total - 8);
+				nameWidth = (int)(nameWidth * ratio);
+				mfrWidth = (int)(mfrWidth * ratio);
+				shelfWidth = (int)(shelfWidth * ratio);
+				priceWidth = (int)(priceWidth * ratio);
+				stockWidth = (int)(stockWidth * ratio);
+				// Минимум 3 символа
+				nameWidth = Math.Max(nameWidth, 3);
+				mfrWidth = Math.Max(mfrWidth, 3);
+				shelfWidth = Math.Max(shelfWidth, 3);
+				priceWidth = Math.Max(priceWidth, 3);
+				stockWidth = Math.Max(stockWidth, 3);
+			}
+
+			Console.WriteLine($"{"Наименование".PadRight(nameWidth)} {"Фирма".PadRight(mfrWidth)} {"Срок".PadRight(shelfWidth)} {"Цена".PadRight(priceWidth)} {"Кол-во".PadRight(stockWidth)}");
+			Console.WriteLine(new string('-', nameWidth + mfrWidth + shelfWidth + priceWidth + stockWidth + 4));
+
+			// Сортировка (без изменений)
 			Console.WriteLine("Выберите сортировку:");
 			Console.WriteLine("  1 – По сроку хранения (по возрастанию)");
 			Console.WriteLine("  2 – По цене (по возрастанию)");
 			Console.WriteLine("  3 – По наименованию (по алфавиту)");
 			Console.WriteLine("  4 – Без сортировки (в порядке добавления)");
-			string input = InputHelper.ReadLine("Ваш выбор: ");
+			string input = InputHelper.ReadLine("Ваш выбор (или Esc для отмены): ", allowEscape: true);
+			if (input == null) return;
 			int sortMode = 0;
 			if (!int.TryParse(input, out sortMode) || sortMode < 1 || sortMode > 4)
 			{
@@ -373,11 +551,11 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine("=== СПИСОК ТОВАРОВ ===");
 			Console.ResetColor();
-			Console.WriteLine($"{"Наименование",-20} {"Фирма",-15} {"Срок",-8} {"Цена",-10} {"Кол-во",-8}");
-			Console.WriteLine(new string('-', 20 + 15 + 8 + 10 + 8));
+			Console.WriteLine($"{"Наименование".PadRight(nameWidth)} {"Фирма".PadRight(mfrWidth)} {"Срок".PadRight(shelfWidth)} {"Цена".PadRight(priceWidth)} {"Кол-во".PadRight(stockWidth)}");
+			Console.WriteLine(new string('-', nameWidth + mfrWidth + shelfWidth + priceWidth + stockWidth + 4));
 			foreach (var p in sorted)
 			{
-				Console.WriteLine($"{p.Name,-20} {p.Manufacturer,-15} {p.ShelfLife,-8} {p.Price,-10:F2} {p.StockQuantity,-8}");
+				Console.WriteLine($"{p.Name.PadRight(nameWidth)} {p.Manufacturer.PadRight(mfrWidth)} {p.ShelfLife.ToString().PadRight(shelfWidth)} {p.Price.ToString("F2").PadRight(priceWidth)} {p.StockQuantity.ToString().PadRight(stockWidth)}");
 			}
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine($"\nВсего товаров: {products.Count}");
@@ -411,7 +589,8 @@ namespace WorkPracticeLauncher.Tasks
 			}
 			Console.WriteLine();
 
-			string idxStr = InputHelper.ReadLine($"Введите индекс товара (1..{products.Count}) для удаления: ");
+			string idxStr = InputHelper.ReadLine($"Введите индекс товара (1..{products.Count}) для удаления (или Esc для отмены): ", allowEscape: true);
+			if (idxStr == null) return;
 			if (!int.TryParse(idxStr, out int idx) || idx < 1 || idx > products.Count)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
@@ -464,7 +643,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("База данных в памяти полностью очищена.");
 			Console.ResetColor();
 
-			string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, currentFileName);
+			string fullPath = Path.Combine(currentDataDirectory, currentFileName);
 			if (File.Exists(fullPath))
 			{
 				string deleteFile = InputHelper.ReadLine("Удалить файл с диска тоже? (y/n): ");
@@ -512,15 +691,19 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			var xmlFiles = GetFilesByExtension(".xml");
-			var txtFiles = GetFilesByExtension(".txt");
+			var xmlFiles = GetFilesByExtension(".xml", currentDataDirectory);
+			var txtFiles = GetFilesByExtension(".txt", currentDataDirectory);
 			var allFiles = xmlFiles.Concat(txtFiles).ToList();
 
 			Console.Clear();
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine("=== СОХРАНЕНИЕ БАЗЫ ДАННЫХ ===");
 			Console.ResetColor();
-			Console.WriteLine("Выберите действие:");
+			Console.WriteLine($"Текущий каталог: {currentDataDirectory}");
+			// Микро-заголовок – зелёный
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Выберите действие:");
+			Console.ResetColor();
 			Console.WriteLine("  1 – Сохранить в новый файл");
 			if (allFiles.Count > 0)
 			{
@@ -528,7 +711,8 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine("  3 – Перезаписать существующий файл");
 			}
 			Console.WriteLine("  0 – Отмена");
-			string choiceStr = InputHelper.ReadLine("Ваш выбор: ");
+			string choiceStr = InputHelper.ReadLine("Ваш выбор (или Esc для отмены): ", allowEscape: true);
+			if (choiceStr == null) return;
 			if (!int.TryParse(choiceStr, out int choice))
 			{
 				Console.WriteLine("Некорректный ввод.");
@@ -540,12 +724,14 @@ namespace WorkPracticeLauncher.Tasks
 
 			if (choice == 1)
 			{
-				Console.ForegroundColor = ConsoleColor.Cyan;
-				Console.WriteLine("Выберите формат файла:");
+				// Микро-заголовок – зелёный
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("▶ Выберите формат файла:");
+				Console.ResetColor();
 				Console.WriteLine("  1 – XML (совместим с WPF-приложением)");
 				Console.WriteLine("  2 – TXT (текстовый, для ручного просмотра)");
-				Console.ResetColor();
-				string formatChoice = InputHelper.ReadLine("Ваш выбор: ");
+				string formatChoice = InputHelper.ReadLine("Ваш выбор (или Esc для отмены): ", allowEscape: true);
+				if (formatChoice == null) return;
 				FileFormat format;
 				if (formatChoice == "1")
 					format = FileFormat.Xml;
@@ -558,19 +744,77 @@ namespace WorkPracticeLauncher.Tasks
 					return;
 				}
 
-				string fileName = InputHelper.ReadLine("Введите имя файла (без расширения): ");
-				if (string.IsNullOrWhiteSpace(fileName))
+				// Микро-заголовок – зелёный
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("▶ Выберите способ указания имени и пути:");
+				Console.ResetColor();
+				Console.WriteLine("  1 – Ввести имя файла (сохранится в текущий каталог)");
+				Console.WriteLine("  2 – Выбрать каталог и имя файла через проводник");
+				Console.WriteLine("  3 – Использовать папку с программой");
+				Console.Write("Ваш выбор (или Esc для отмены): ");
+				string pathChoice = InputHelper.ReadLine("", allowEscape: true);
+				if (pathChoice == null) return;
+				string fileName = "";
+				string targetPath = "";
+
+				if (pathChoice == "1")
 				{
-					Console.WriteLine("Имя не может быть пустым.");
+					fileName = InputHelper.ReadLine("Введите имя файла (без расширения): ", allowEscape: true);
+					if (fileName == null) return;
+					if (string.IsNullOrWhiteSpace(fileName))
+					{
+						Console.WriteLine("Имя не может быть пустым.");
+						Console.ReadKey();
+						return;
+					}
+					string ext = (format == FileFormat.Xml) ? ".xml" : ".txt";
+					targetPath = Path.Combine(currentDataDirectory, fileName + ext);
+				}
+				else if (pathChoice == "2")
+				{
+					string selectedDir = SelectFolderViaDialog();
+					if (string.IsNullOrEmpty(selectedDir))
+					{
+						Console.WriteLine("Операция отменена.");
+						Console.ReadKey();
+						return;
+					}
+					fileName = InputHelper.ReadLine("Введите имя файла (без расширения): ", allowEscape: true);
+					if (fileName == null) return;
+					if (string.IsNullOrWhiteSpace(fileName))
+					{
+						Console.WriteLine("Имя не может быть пустым.");
+						Console.ReadKey();
+						return;
+					}
+					string ext = (format == FileFormat.Xml) ? ".xml" : ".txt";
+					targetPath = Path.Combine(selectedDir, fileName + ext);
+					currentDataDirectory = selectedDir;
+				}
+				else if (pathChoice == "3")
+				{
+					fileName = InputHelper.ReadLine("Введите имя файла (без расширения): ", allowEscape: true);
+					if (fileName == null) return;
+					if (string.IsNullOrWhiteSpace(fileName))
+					{
+						Console.WriteLine("Имя не может быть пустым.");
+						Console.ReadKey();
+						return;
+					}
+					string ext = (format == FileFormat.Xml) ? ".xml" : ".txt";
+					targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName + ext);
+					currentDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
+				}
+				else
+				{
+					Console.WriteLine("Некорректный выбор.");
 					Console.ReadKey();
 					return;
 				}
-				string ext = (format == FileFormat.Xml) ? ".xml" : ".txt";
-				string fullName = fileName + ext;
-				string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fullName);
 
-				SaveToFile(path, format, append: false);
-				currentFileName = fullName;
+				SaveToFile(targetPath, format, append: false);
+				if (File.Exists(targetPath))
+					currentFileName = Path.GetFileName(targetPath);
 				Console.ReadKey();
 				return;
 			}
@@ -582,12 +826,16 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			Console.WriteLine("Доступные файлы:");
+			// Микро-заголовок – зелёный
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Доступные файлы:");
+			Console.ResetColor();
 			for (int i = 0; i < allFiles.Count; i++)
 			{
 				Console.WriteLine($"  {i + 1} – {allFiles[i]}");
 			}
-			string fileIdxStr = InputHelper.ReadLine("Введите номер файла: ");
+			string fileIdxStr = InputHelper.ReadLine("Введите номер файла (или Esc для отмены): ", allowEscape: true);
+			if (fileIdxStr == null) return;
 			if (!int.TryParse(fileIdxStr, out int fileIdx) || fileIdx < 1 || fileIdx > allFiles.Count)
 			{
 				Console.WriteLine("Некорректный выбор.");
@@ -595,7 +843,7 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 			string selectedFile = allFiles[fileIdx - 1];
-			string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, selectedFile);
+			string fullPath = Path.Combine(currentDataDirectory, selectedFile);
 			FileFormat existingFormat = GetFormatFromExtension(selectedFile);
 
 			if (choice == 2)
@@ -623,6 +871,7 @@ namespace WorkPracticeLauncher.Tasks
 				return FileFormat.Xml;
 		}
 
+		// -------------------- Основной метод сохранения с улучшенной обработкой ошибок --------------------
 		private static void SaveToFile(string path, FileFormat format, bool append)
 		{
 			try
@@ -678,11 +927,108 @@ namespace WorkPracticeLauncher.Tasks
 				}
 				Console.ResetColor();
 			}
+			catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("Нет прав доступа на создание файла в этой папке.");
+				Console.ResetColor();
+				Console.Write("Хотите выбрать другой каталог для сохранения? (y/n): ");
+				if (Console.ReadKey().KeyChar == 'y')
+				{
+					Console.WriteLine();
+					string newPath = RequestSavePath(format);
+					if (!string.IsNullOrEmpty(newPath))
+					{
+						SaveToFile(newPath, format, append);
+						return;
+					}
+				}
+				Console.WriteLine();
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine($"Ошибка при сохранении: {ex.Message}");
+				Console.ResetColor();
+			}
 			catch (Exception ex)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine($"Ошибка при сохранении: {ex.Message}");
 				Console.ResetColor();
+			}
+		}
+
+		// -------------------- Запрос нового пути для сохранения --------------------
+		private static string RequestSavePath(FileFormat format)
+		{
+			// Микро-заголовок – зелёный
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Выберите способ указания пути:");
+			Console.ResetColor();
+			Console.WriteLine("  1 – Ввести путь вручную");
+			Console.WriteLine("  2 – Выбрать через проводник");
+			Console.WriteLine("  3 – Использовать папку с программой");
+			Console.Write("Ваш выбор (или Esc для отмены): ");
+			string choice = InputHelper.ReadLine("", allowEscape: true);
+			if (choice == null) return null;
+
+			string dir = null;
+			if (choice == "1")
+			{
+				Console.Write("Введите путь к каталогу: ");
+				dir = Console.ReadLine();
+				if (string.IsNullOrWhiteSpace(dir)) return null;
+			}
+			else if (choice == "2")
+			{
+				dir = SelectFolderViaDialog();
+				if (string.IsNullOrEmpty(dir))
+				{
+					Console.WriteLine("Операция отменена.");
+					return null;
+				}
+			}
+			else if (choice == "3")
+			{
+				dir = AppDomain.CurrentDomain.BaseDirectory;
+			}
+			else
+			{
+				Console.WriteLine("Некорректный выбор.");
+				return null;
+			}
+
+			try
+			{
+				if (!Directory.Exists(dir))
+				{
+					Console.Write("Каталог не существует. Создать? (y/n): ");
+					if (Console.ReadKey().KeyChar == 'y')
+					{
+						Directory.CreateDirectory(dir);
+						Console.WriteLine("\nКаталог создан.");
+					}
+					else
+					{
+						Console.WriteLine("\nОперация отменена.");
+						return null;
+					}
+				}
+				currentDataDirectory = dir;
+				Console.Write("Введите имя файла (без расширения): ");
+				string fileName = Console.ReadLine();
+				if (string.IsNullOrWhiteSpace(fileName))
+				{
+					Console.WriteLine("Имя не может быть пустым. Используем имя по умолчанию 'products'.");
+					fileName = "products";
+				}
+				string ext = (format == FileFormat.Xml) ? ".xml" : ".txt";
+				return Path.Combine(dir, fileName + ext);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine($"\nНе удалось создать/использовать каталог: {ex.Message}");
+				Console.ResetColor();
+				return null;
 			}
 		}
 
@@ -709,7 +1055,7 @@ namespace WorkPracticeLauncher.Tasks
 					var parts = line.Split('|');
 					if (parts.Length != 5) continue;
 					if (int.TryParse(parts[2], out int shelf) &&
-						decimal.TryParse(parts[3], out decimal price) &&
+						decimal.TryParse(parts[3].Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal price) &&
 						int.TryParse(parts[4], out int stock))
 					{
 						result.Add(new Product
@@ -726,14 +1072,92 @@ namespace WorkPracticeLauncher.Tasks
 			return result;
 		}
 
-		// -------------------- Загрузка --------------------
+		// -------------------- Загрузка с выбором каталога --------------------
 		private static void LoadFromFileWithSelection()
 		{
-			var files = GetFilesByExtension(".xml").Concat(GetFilesByExtension(".txt")).ToList();
+			Console.Clear();
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.WriteLine("=== ЗАГРУЗКА ИЗ ФАЙЛА (ДОПОЛНЕНИЕ) ===");
+			Console.ResetColor();
+			Console.WriteLine($"Текущий каталог: {currentDataDirectory}");
+			// Микро-заголовок – зелёный
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Выберите способ указания каталога:");
+			Console.ResetColor();
+			Console.WriteLine("  1 – Использовать текущий каталог");
+			Console.WriteLine("  2 – Выбрать другой каталог");
+			Console.WriteLine("  3 – Использовать папку с программой (по умолчанию)");
+			Console.Write("Ваш выбор (или Esc для отмены): ");
+			string choice = InputHelper.ReadLine("", allowEscape: true);
+			if (choice == null) return;
+
+			string selectedDirectory = currentDataDirectory;
+
+			if (choice == "3")
+			{
+				selectedDirectory = AppDomain.CurrentDomain.BaseDirectory;
+				Console.ForegroundColor = ConsoleColor.Cyan;
+				Console.WriteLine($"Выбрана папка с программой: {selectedDirectory}");
+				Console.ResetColor();
+			}
+			else if (choice == "2")
+			{
+				// Микро-заголовок – зелёный
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("▶ Выберите способ указания пути:");
+				Console.ResetColor();
+				Console.WriteLine("  1 – Ввести путь вручную");
+				Console.WriteLine("  2 – Выбрать через проводник");
+				Console.Write("Ваш выбор (или Esc для отмены): ");
+				string pathChoice = InputHelper.ReadLine("", allowEscape: true);
+				if (pathChoice == null) return;
+				if (pathChoice == "1")
+				{
+					Console.Write("Введите путь к каталогу: ");
+					string dir = Console.ReadLine();
+					if (!string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir))
+						selectedDirectory = dir;
+					else
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine("Каталог не существует или путь не указан. Используем текущий каталог.");
+						Console.ResetColor();
+						selectedDirectory = currentDataDirectory;
+					}
+				}
+				else if (pathChoice == "2")
+				{
+					string dir = SelectFolderViaDialog();
+					if (!string.IsNullOrEmpty(dir))
+						selectedDirectory = dir;
+					else
+					{
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine("Выбор отменён. Используем текущий каталог.");
+						Console.ResetColor();
+						selectedDirectory = currentDataDirectory;
+					}
+				}
+				else
+				{
+					Console.WriteLine("Некорректный выбор. Используем текущий каталог.");
+					selectedDirectory = currentDataDirectory;
+				}
+			}
+			else if (choice != "1")
+			{
+				Console.WriteLine("Некорректный выбор. Используем текущий каталог.");
+				Console.ReadKey();
+				return;
+			}
+
+			var files = GetFilesByExtension(".xml", selectedDirectory)
+						.Concat(GetFilesByExtension(".txt", selectedDirectory))
+						.ToList();
 			if (files.Count == 0)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("В папке программы нет XML или TXT файлов.");
+				Console.WriteLine($"В каталоге {selectedDirectory} нет XML или TXT файлов.");
 				Console.ResetColor();
 				Console.ReadKey();
 				return;
@@ -743,12 +1167,18 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine("=== ЗАГРУЗКА ИЗ ФАЙЛА (ДОПОЛНЕНИЕ) ===");
 			Console.ResetColor();
-			Console.WriteLine("Список доступных файлов:");
+			Console.WriteLine($"Текущий каталог: {selectedDirectory}");
+			// Микро-заголовок – зелёный
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("▶ Список доступных файлов:");
+			Console.ResetColor();
 			for (int i = 0; i < files.Count; i++)
 			{
 				Console.WriteLine($"  {i + 1} – {files[i]}");
 			}
-			string idxStr = InputHelper.ReadLine("Выберите номер файла для загрузки (0 – отмена): ");
+			Console.Write("Выберите номер файла для загрузки (0 – отмена, Esc – выход): ");
+			string idxStr = InputHelper.ReadLine("", allowEscape: true);
+			if (idxStr == null) return;
 			if (!int.TryParse(idxStr, out int idx) || idx < 0 || idx > files.Count)
 			{
 				Console.WriteLine("Некорректный выбор.");
@@ -758,7 +1188,7 @@ namespace WorkPracticeLauncher.Tasks
 			if (idx == 0) return;
 
 			string selectedFile = files[idx - 1];
-			string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, selectedFile);
+			string fullPath = Path.Combine(selectedDirectory, selectedFile);
 			FileFormat format = GetFormatFromExtension(selectedFile);
 
 			try
@@ -780,7 +1210,7 @@ namespace WorkPracticeLauncher.Tasks
 				if (loaded == null || loaded.Count == 0)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Файл пуст или не содержит данных.");
+					Console.WriteLine("Файл пуст или не соответствует ожидаемому формату (не содержит данных для базы).");
 					Console.ResetColor();
 					Console.ReadKey();
 					return;
@@ -804,9 +1234,11 @@ namespace WorkPracticeLauncher.Tasks
 		}
 
 		// -------------------- Вспомогательные методы для файлов --------------------
-		private static List<string> GetFilesByExtension(string extension)
+		private static List<string> GetFilesByExtension(string extension, string directory)
 		{
-			var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*" + extension)
+			if (!Directory.Exists(directory))
+				return new List<string>();
+			var files = Directory.GetFiles(directory, "*" + extension)
 								 .Select(Path.GetFileName)
 								 .ToList();
 			return files;

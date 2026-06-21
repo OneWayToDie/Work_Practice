@@ -29,22 +29,30 @@ namespace WorkPracticeLauncher
 
 			while (true)
 			{
-				// Перерисовываем строку ввода + подчёркивание
-				Console.SetCursorPosition(_cursorCol, _cursorRow);
-				Console.Write(new string(' ', input.Length + 1)); // затираем
-				Console.SetCursorPosition(_cursorCol, _cursorRow);
-				if (input.Length > 0)
-				{
-					Console.Write(input.ToString());
-				}
-				// Мигающее подчёркивание
+				// Обновляем мигание подчёркивания
 				if ((DateTime.Now - _lastToggle).TotalMilliseconds >= _blinkInterval)
 				{
 					_cursorVisible = !_cursorVisible;
 					_lastToggle = DateTime.Now;
 				}
+
+				// Перерисовываем строку ввода: сначала затираем старую строку (буфер + подчёркивание)
+				Console.SetCursorPosition(_cursorCol, _cursorRow);
+				// Затираем всю область: длина буфера + 1 (подчёркивание) + запас (на случай, если что-то осталось)
+				int currentLen = input.Length;
+				Console.Write(new string(' ', currentLen + 2));
+				Console.SetCursorPosition(_cursorCol, _cursorRow);
+
+				// Выводим текущий ввод
+				if (currentLen > 0)
+				{
+					Console.Write(input.ToString());
+				}
+
+				// Выводим мигающее подчёркивание
 				Console.Write(_cursorVisible ? '_' : ' ');
 
+				// Проверяем клавиши
 				if (Console.KeyAvailable)
 				{
 					var keyInfo = Console.ReadKey(true);
@@ -52,8 +60,9 @@ namespace WorkPracticeLauncher
 
 					if (key == ConsoleKey.Enter)
 					{
-						Console.SetCursorPosition(_cursorCol, _cursorRow);
-						Console.Write(new string(' ', input.Length + 1));
+						// Затираем подчёркивание перед завершением
+						Console.SetCursorPosition(_cursorCol + input.Length, _cursorRow);
+						Console.Write(' ');
 						Console.SetCursorPosition(_cursorCol + input.Length, _cursorRow);
 						Console.CursorVisible = true;
 						Console.WriteLine();
@@ -64,7 +73,7 @@ namespace WorkPracticeLauncher
 						if (input.Length > 0)
 						{
 							input.Remove(input.Length - 1, 1);
-							// Перерисовка на следующем цикле
+							// Перерисовка произойдёт на следующем цикле
 						}
 					}
 					else if (key == ConsoleKey.Escape && allowEscape)
@@ -75,7 +84,7 @@ namespace WorkPracticeLauncher
 					else if (!char.IsControl(keyInfo.KeyChar))
 					{
 						input.Append(keyInfo.KeyChar);
-						// Перерисовка на следующем цикле
+						// Перерисовка произойдёт на следующем цикле
 					}
 				}
 

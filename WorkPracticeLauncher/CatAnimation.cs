@@ -5,8 +5,8 @@ namespace WorkPracticeLauncher
 {
 	public class CatAnimation
 	{
-		private readonly int leftPad = 100; // изменено с 100 на 2
-		private readonly int topPad;
+		private readonly int leftPad = 2;
+		private int topPad;
 		private string[][] sleepFrames;
 		private string[] frameQuestion;
 		private string[] frameOpen;
@@ -18,16 +18,22 @@ namespace WorkPracticeLauncher
 
 		public CatAnimation()
 		{
+			RecalculatePosition();
+			InitializeFrames();
+			nextSleepChange = DateTime.Now.AddMilliseconds(700);
+		}
+
+		private void RecalculatePosition()
+		{
 			int windowHeight = Console.WindowHeight;
 			int frameHeight = 20;
-			int menuHeight = 7;
-
+			int menuHeight = 12;
 			int availableHeight = windowHeight - menuHeight;
 			topPad = menuHeight + (availableHeight - frameHeight) / 2;
 			if (topPad < menuHeight) topPad = menuHeight;
-
-			InitializeFrames();
-			nextSleepChange = DateTime.Now.AddMilliseconds(700);
+			if (topPad + frameHeight > windowHeight)
+				topPad = windowHeight - frameHeight - 1;
+			if (topPad < 0) topPad = 0;
 		}
 
 		private void InitializeFrames()
@@ -86,7 +92,7 @@ namespace WorkPracticeLauncher
 				int maxWidth = 0;
 				foreach (var line in baseFrame)
 					if (line.Length > maxWidth) maxWidth = line.Length;
-				int textPos = (maxWidth - text.Length + 125) / 2;
+				int textPos = (maxWidth - text.Length) / 2;
 				if (textPos < 0) textPos = 0;
 				copy[0] = new string(' ', leftPad + textPos) + text;
 				return copy;
@@ -104,18 +110,29 @@ namespace WorkPracticeLauncher
 
 		private void DrawFrame(string[] frame)
 		{
+			RecalculatePosition();
 			int height = frame.Length;
+			int windowWidth = Console.WindowWidth;
+			int windowHeight = Console.WindowHeight;
+
 			for (int row = 0; row < height; row++)
 			{
-				Console.SetCursorPosition(0, topPad + row);
-				Console.Write(new string(' ', Console.WindowWidth - 1));
-			}
-			for (int row = 0; row < height; row++)
-			{
-				if (topPad + row < Console.WindowHeight)
+				if (topPad + row < windowHeight && topPad + row >= 0)
 				{
+					Console.SetCursorPosition(0, topPad + row);
+					Console.Write(new string(' ', windowWidth));
+				}
+			}
+
+			for (int row = 0; row < height; row++)
+			{
+				if (topPad + row < windowHeight && topPad + row >= 0)
+				{
+					string line = frame[row];
+					if (line.Length + leftPad > windowWidth)
+						line = line.Substring(0, Math.Max(0, windowWidth - leftPad - 1));
 					Console.SetCursorPosition(leftPad, topPad + row);
-					Console.Write(frame[row]);
+					Console.Write(line);
 				}
 			}
 		}
@@ -158,7 +175,6 @@ namespace WorkPracticeLauncher
 
 		public void WakeUpWithCancel(Func<bool> shouldCancel)
 		{
-			// Функция shouldCancel будет возвращать true, если нужно прервать анимацию
 			DrawFrame(frameQuestion);
 			if (shouldCancel()) return;
 			Thread.Sleep(1500);
