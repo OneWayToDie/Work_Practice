@@ -8,6 +8,7 @@
         Style="{StaticResource KasperskyWindowStyle}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
+        Icon="/Resources/Images/list.ico"
         Height="650" Width="800">
     <Window.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>

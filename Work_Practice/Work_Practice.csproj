@@ -213,6 +213,11 @@
     <Resource Include="Resources\Images\calculator.ico" />
     <Resource Include="Resources\Images\list.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Images\warning.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\university.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

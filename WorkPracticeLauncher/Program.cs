@@ -402,7 +402,7 @@ namespace WorkPracticeLauncher
 					WriteLinePadded(lines[i], w);
 				}
 				Console.ForegroundColor = ConsoleColor.DarkGray;
-				WriteLinePadded("  (или ESC/Enter – Назад)", w);
+				WriteLinePadded("  (или ESC Назад)", w);
 				Console.ResetColor();
 			}
 			else
@@ -427,7 +427,7 @@ namespace WorkPracticeLauncher
 				WriteLinePadded("  4 – Связь с автором", w);
 				WriteLinePadded("  0 – Выход", w);
 				Console.ForegroundColor = ConsoleColor.DarkGray;
-				WriteLinePadded("  (или ESC/Enter – Назад)", w);
+				WriteLinePadded("  (или ESC Назад)", w);
 				Console.ResetColor();
 			}
 
@@ -505,7 +505,7 @@ namespace WorkPracticeLauncher
 					break;
 			}
 
-			Console.WriteLine("\nНажмите любую клавишу для возврата (ESC – Назад)...");
+			Console.WriteLine("\nНажмите любую клавишу для возврата (ESC/Enter – Назад)...");
 			WaitForAnyKey();
 		}
 
@@ -538,7 +538,7 @@ namespace WorkPracticeLauncher
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.WriteLine("  ◀️ 0 – Назад в главное меню");
 					Console.ForegroundColor = ConsoleColor.DarkGray;
-					Console.WriteLine("  (или ESC/Enter – Назад)");
+					Console.WriteLine("  (или Enter – Назад)");
 					Console.ResetColor();
 				}
 				else
@@ -552,7 +552,7 @@ namespace WorkPracticeLauncher
 					Console.WriteLine("  3 – Задание 3 (односвязный список)");
 					Console.WriteLine("  0 – Назад в главное меню");
 					Console.ForegroundColor = ConsoleColor.DarkGray;
-					Console.WriteLine("  (или ESC/Enter – Назад)");
+					Console.WriteLine("  (или Enter – Назад)");
 					Console.ResetColor();
 				}
 
@@ -595,14 +595,14 @@ namespace WorkPracticeLauncher
 
 		static void LaunchWpfApp()
 		{
-			string wpfExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SummerPractice.exe");
+			string wpfExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Work_Practice.exe");
 			if (!File.Exists(wpfExePath))
 			{
-				wpfExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "SummerPractice.exe");
+				wpfExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "Work_Practice.exe");
 				if (!File.Exists(wpfExePath))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Не удалось найти SummerPractice.exe. Проверьте, что он находится в той же папке, что и лаунчер.");
+					Console.WriteLine("Не удалось найти Work_practice.exe. Проверьте, что он находится в той же папке, что и лаунчер.");
 					Console.ResetColor();
 					return;
 				}
@@ -683,7 +683,7 @@ namespace WorkPracticeLauncher
 		{
 			string fileId = "18mXjs8BIOmtAF1VyQer-e5B2r8fy6TGJ"; // замените на свой ID
 			string downloadUrl = $"https://drive.google.com/uc?export=download&id={fileId}";
-			string zipPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SummerPractice_latest.zip");
+			string zipPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorkPractice_latest.zip");
 
 			Console.Clear();
 			Console.ForegroundColor = ConsoleColor.Cyan;

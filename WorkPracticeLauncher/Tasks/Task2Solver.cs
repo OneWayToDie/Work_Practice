@@ -40,7 +40,7 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine("  7 – Изменить каталог для сохранения/загрузки");
 				Console.WriteLine("  0 – Назад в меню заданий");
 				Console.ForegroundColor = ConsoleColor.DarkGray;
-				Console.WriteLine("  (или ESC/Enter – Назад)");
+				Console.WriteLine("  (Enter – Назад)");
 				Console.ResetColor();
 				Console.WriteLine();
 
@@ -79,7 +79,7 @@ namespace WorkPracticeLauncher.Tasks
 					Console.ResetColor();
 				}
 
-				Console.Write("Ваш выбор (ESC/Enter – Назад): ");
+				Console.Write("Ваш выбор: ");
 				string input = Console.ReadLine();
 				if (string.IsNullOrEmpty(input))
 				{
@@ -88,7 +88,7 @@ namespace WorkPracticeLauncher.Tasks
 				}
 				if (!int.TryParse(input, out int choice))
 				{
-				Console.WriteLine("Некорректный ввод. Нажмите любую клавишу (ESC – Назад)...");
+				Console.WriteLine("Некорректный ввод. Нажмите любую клавишу для возврата...");
 				Console.ReadKey();
 					continue;
 				}
@@ -104,7 +104,7 @@ namespace WorkPracticeLauncher.Tasks
 					case 7: ChangeDataDirectory(); break;
 					case 0: exit = true; break;
 					default:
-					Console.WriteLine("Некорректный выбор. Нажмите любую клавишу (ESC – Назад)...");
+					Console.WriteLine("Некорректный выбор. Нажмите любую клавишу для возврата...");
 					Console.ReadKey();
 						break;
 				}
@@ -119,6 +119,9 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine($"Всего товаров: {products.Count}");
 			Console.WriteLine($"Текущий файл: {currentFileName}");
 			Console.WriteLine($"Каталог данных: {currentDataDirectory}");
+			Console.ForegroundColor = ConsoleColor.DarkGray;
+			Console.WriteLine("  (пустая строка — возврат в меню)");
+			Console.ResetColor();
 		}
 
 		private static void CheckResizeAndRedraw()
@@ -148,7 +151,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("  2 – Выбрать через проводник");
 			Console.WriteLine("  3 – Использовать папку с программой");
 			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.WriteLine("  (или ESC/Enter – отмена)");
+			Console.WriteLine("  (Enter – отмена)");
 			Console.ResetColor();
 			Console.Write("Ваш выбор: ");
 			string choice = Console.ReadLine();
@@ -342,19 +345,14 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine($"Товар добавлен. Всего в БД: {products.Count}");
 				Console.ResetColor();
 
-				Console.WriteLine("Нажмите Enter для продолжения или ESC для выхода.");
-				ConsoleKey key = Console.ReadKey(true).Key;
-				if (key == ConsoleKey.Escape)
-				{
-					Console.WriteLine("Выход в меню...");
-					return;
-				}
+			Console.WriteLine("Нажмите Enter для продолжения...");
+			Console.ReadKey();
 			}
 
 			Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine($"\nДобавлено {added} товаров.");
 			Console.ResetColor();
-			Console.WriteLine("Нажмите любую клавишу (ESC – Назад)...");
+			Console.WriteLine("Нажмите любую клавишу для возврата...");
 			Console.ReadKey();
 		}
 
@@ -375,21 +373,21 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine();
 
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("▶ Выберите поле для редактирования (1-5) или ESC/Enter для отмены:");
+				Console.WriteLine("▶ Выберите поле для редактирования (1-5, Enter – отмена):");
 				Console.ResetColor();
 				Console.WriteLine("  1 – Наименование");
 				Console.WriteLine("  2 – Фирма");
 				Console.WriteLine("  3 – Срок хранения");
 				Console.WriteLine("  4 – Цена");
 				Console.WriteLine("  5 – Количество на складе");
-				Console.Write("Ваш выбор (или Esc для отмены): ");
+			Console.Write("Ваш выбор (Enter – отмена): ");
 
-				ConsoleKey fieldKey = Console.ReadKey(true).Key;
-				if (fieldKey == ConsoleKey.Escape)
-				{
-					editing = false;
-					break;
-				}
+			ConsoleKey fieldKey = Console.ReadKey(true).Key;
+			if (fieldKey == ConsoleKey.Enter)
+			{
+				editing = false;
+				break;
+			}
 
 				bool updated = false;
 				switch (fieldKey)
@@ -578,7 +576,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine($"\nВсего товаров: {products.Count}");
 			Console.ResetColor();
-			Console.WriteLine("\nНажмите любую клавишу для возврата (ESC – Назад)...");
+			Console.WriteLine("\nНажмите любую клавишу для возврата...");
 			Console.ReadKey();
 		}
 
@@ -604,7 +602,7 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine($"  {i + 1,-7} | {products[i].Name}");
 			Console.WriteLine();
 
-			Console.Write($"Введите индекс товара (1..{products.Count}) для удаления (ESC/Enter – отмена): ");
+			Console.Write($"Введите индекс товара (1..{products.Count}) для удаления (Enter – отмена): ");
 			string idxStr = Console.ReadLine();
 			if (string.IsNullOrEmpty(idxStr))
 				return;
@@ -623,7 +621,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine($"Удалён товар: {removedProduct.Name} (индекс {idx})");
 			Console.ResetColor();
 			Console.WriteLine($"В БД осталось {products.Count} товаров.");
-			Console.WriteLine("Нажмите любую клавишу (ESC – Назад)...");
+			Console.WriteLine("Нажмите любую клавишу для возврата...");
 			Console.ReadKey();
 		}
 
@@ -643,14 +641,14 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("=== УДАЛЕНИЕ ВСЕЙ БАЗЫ ДАННЫХ ===");
 			Console.ResetColor();
 			Console.WriteLine($"Внимание! Вы собираетесь удалить все {products.Count} товаров из памяти.");
-			Console.Write("Подтвердите удаление (введите 'ДА' или Enter/ESC для отмены): ");
+			Console.Write("Подтвердите удаление (введите 'ДА' или Enter для отмены): ");
 			string confirm = Console.ReadLine();
 			if (string.IsNullOrEmpty(confirm) || confirm != "ДА")
 			{
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.WriteLine("Удаление отменено.");
 				Console.ResetColor();
-				Console.WriteLine("Нажмите любую клавишу (ESC – Назад)...");
+				Console.WriteLine("Нажмите любую клавишу для возврата...");
 				Console.ReadKey();
 				return;
 			}
@@ -691,7 +689,7 @@ namespace WorkPracticeLauncher.Tasks
 			else
 				Console.WriteLine("Файл не найден на диске.");
 
-			Console.WriteLine("Нажмите любую клавишу (ESC – Назад)...");
+			Console.WriteLine("Нажмите любую клавишу для возврата...");
 			Console.ReadKey();
 		}
 
@@ -726,7 +724,7 @@ namespace WorkPracticeLauncher.Tasks
 			}
 			Console.WriteLine("  0 – Отмена");
 			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.WriteLine("  (или ESC/Enter для отмены)");
+			Console.WriteLine("  (Enter – отмена)");
 			Console.ResetColor();
 			Console.Write("Ваш выбор: ");
 			string choiceStr = Console.ReadLine();
@@ -1076,7 +1074,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("  2 – Выбрать другой каталог");
 			Console.WriteLine("  3 – Использовать папку с программой (по умолчанию)");
 			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.WriteLine("  (или ESC/Enter – отмена)");
+			Console.WriteLine("  (Enter – отмена)");
 			Console.ResetColor();
 			Console.Write("Ваш выбор: ");
 			string choice = Console.ReadLine();

@@ -7,6 +7,7 @@
         Width="500" Height="250"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
+        Icon="/Resources/Images/warning.ico"
         Style="{StaticResource KasperskyWindowStyle}">
     <Window.DataContext>
         <vm:AppDialogViewModel/>
