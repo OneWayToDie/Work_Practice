@@ -1,0 +1,41 @@
+<Window x:Class="Work_Practice.Views.AppDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Work_Practice.ViewModels"
+        xmlns:local="clr-namespace:Work_Practice.Views"
+        Title="{Binding Title}"
+        Width="500" Height="250"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Style="{StaticResource KasperskyWindowStyle}">
+    <Window.DataContext>
+        <vm:AppDialogViewModel/>
+    </Window.DataContext>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Иконка и заголовок -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
+            <TextBlock Text="{Binding IconSymbol}" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"
+                       Foreground="{Binding AccentColor, Converter={x:Static local:HexToBrushConverter.Instance}}"/>
+            <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"
+                       Foreground="{Binding AccentColor, Converter={x:Static local:HexToBrushConverter.Instance}}"/>
+        </StackPanel>
+
+        <!-- Текст сообщения -->
+        <TextBlock Grid.Row="1" Text="{Binding Message}" TextWrapping="Wrap"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="White" FontSize="14" TextAlignment="Center"
+                   Margin="10,0"/>
+
+        <!-- Кнопка OK -->
+        <Button Grid.Row="2" Content="OK" Width="100" Height="36"
+                Style="{StaticResource KasperskyButton}"
+                HorizontalAlignment="Center" Margin="0,15,0,0"
+                Click="OkButton_Click"/>
+    </Grid>
+</Window>

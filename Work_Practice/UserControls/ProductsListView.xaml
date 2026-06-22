@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Work_Practice.UserControls.ProductsListView"
+<UserControl x:Class="Work_Practice.UserControls.ProductsListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Margin="5">
@@ -12,6 +12,8 @@
             <Button Content="Сохранить в файл" Width="140" Command="{Binding SaveToFileCommand}" 
             Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
             <Button Content="Загрузить из файла" Width="140" Command="{Binding LoadFromFileCommand}" 
+            Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
+            <Button Content="Загрузить примеры" Width="140" Command="{Binding LoadSampleDataCommand}" 
             Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>
             <Button Content="Очистить БД" Width="100" Command="{Binding ClearDatabaseCommand}" 
             Margin="5" Padding="8,5" Style="{StaticResource TaskButton}"/>

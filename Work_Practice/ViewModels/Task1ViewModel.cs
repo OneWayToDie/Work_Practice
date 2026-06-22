@@ -6,47 +6,48 @@ using System.Windows;
 using System.Windows.Input;
 using Work_Practice.Models;
 using Work_Practice.Commands;
+using Work_Practice.Views;
 
 namespace Work_Practice.ViewModels
 {
 	public class Task1ViewModel : INotifyPropertyChanged
 	{
-		private string _currentNumberInput = "";
-		private ObservableCollection<int> _numbers = new ObservableCollection<int>();
-		private ObservableCollection<NumberInfo> _results = new ObservableCollection<NumberInfo>();
-		private bool _isProcSelected = true;
-		private string _selectedVariant = "Proc";
-		private string _codeExampleText = "// Код процедуры будет здесь";
+		private string currentNumberInput = "";
+		private ObservableCollection<long> numbers = new ObservableCollection<long>();
+		private ObservableCollection<NumberInfo> results = new ObservableCollection<NumberInfo>();
+		private bool isProcSelected = true;
+		private string selectedVariant = "Proc";
+		private string codeExampleText = "// Код процедуры будет здесь";
 
 		public string CurrentNumberInput
 		{
-			get => _currentNumberInput;
-			set { _currentNumberInput = value; OnPropertyChanged(); }
+			get => currentNumberInput;
+			set { currentNumberInput = value; OnPropertyChanged(); }
 		}
 
-		public ObservableCollection<int> Numbers
+		public ObservableCollection<long> Numbers
 		{
-			get => _numbers;
-			set { _numbers = value; OnPropertyChanged(); }
+			get => numbers;
+			set { numbers = value; OnPropertyChanged(); }
 		}
 
 		public ObservableCollection<NumberInfo> Results
 		{
-			get => _results;
-			set { _results = value; OnPropertyChanged(); }
+			get => results;
+			set { results = value; OnPropertyChanged(); }
 		}
 
 		public bool IsProcSelected
 		{
-			get => _isProcSelected;
+			get => isProcSelected;
 			set
 			{
-				if (_isProcSelected == value) return;
-				_isProcSelected = value;
+				if (isProcSelected == value) return;
+				isProcSelected = value;
 				OnPropertyChanged();
 				if (value)
 				{
-					_isFuncSelected = false;
+					isFuncSelected = false;
 					OnPropertyChanged(nameof(IsFuncSelected));
 					SelectedVariant = "Proc";
 				}
@@ -54,18 +55,18 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
-		private bool _isFuncSelected;
+		private bool isFuncSelected;
 		public bool IsFuncSelected
 		{
-			get => _isFuncSelected;
+			get => isFuncSelected;
 			set
 			{
-				if (_isFuncSelected == value) return;
-				_isFuncSelected = value;
+				if (isFuncSelected == value) return;
+				isFuncSelected = value;
 				OnPropertyChanged();
 				if (value)
 				{
-					_isProcSelected = false;
+					isProcSelected = false;
 					OnPropertyChanged(nameof(IsProcSelected));
 					SelectedVariant = "Func";
 				}
@@ -75,8 +76,8 @@ namespace Work_Practice.ViewModels
 
 		public string SelectedVariant
 		{
-			get => _selectedVariant;
-			private set { _selectedVariant = value; OnPropertyChanged(); }
+			get => selectedVariant;
+			private set { selectedVariant = value; OnPropertyChanged(); }
 		}
 
 		public ICommand AddNumberCommand { get; }
@@ -93,16 +94,16 @@ namespace Work_Practice.ViewModels
 
 		private void AddNumber()
 		{
-			if (int.TryParse(CurrentNumberInput, out int num))
+			if (long.TryParse(CurrentNumberInput, out long num))
 			{
 				if (num == 0)
 				{
-					MessageBox.Show("Последовательность завершена (0 не добавляется). Нажмите 'Обработать'.");
+					AppDialog.ShowInfo("Последовательность завершена (0 не добавляется). Нажмите 'Обработать'.");
 					return;
 				}
 				if (num < 0)
 				{
-					MessageBox.Show("Введите положительное число.");
+					AppDialog.ShowWarning("Введите положительное число.");
 					return;
 				}
 				Numbers.Add(num);
@@ -110,7 +111,7 @@ namespace Work_Practice.ViewModels
 			}
 			else
 			{
-				MessageBox.Show("Введите целое число.");
+				AppDialog.ShowWarning("Введите целое число.");
 			}
 		}
 
@@ -124,12 +125,12 @@ namespace Work_Practice.ViewModels
 		{
 			if (Numbers.Count == 0)
 			{
-				MessageBox.Show("Нет чисел для обработки.");
+				AppDialog.ShowWarning("Нет чисел для обработки.");
 				return;
 			}
 
 			Results.Clear();
-			foreach (int n in Numbers)
+			foreach (long n in Numbers)
 			{
 				if (SelectedVariant == "Proc")
 				{
@@ -145,7 +146,7 @@ namespace Work_Practice.ViewModels
 		}
 
 		// Процедура
-		private void GetDigitsInfoProc(int number, out int count, out int? minDigit)
+		private void GetDigitsInfoProc(long number, out int count, out int? minDigit)
 		{
 			if (number <= 0)
 			{
@@ -153,12 +154,12 @@ namespace Work_Practice.ViewModels
 				minDigit = null;
 				return;
 			}
-			int temp = number;
+			long temp = number;
 			count = 0;
 			minDigit = 9;
 			while (temp > 0)
 			{
-				int digit = temp % 10;
+				int digit = (int)(temp % 10);
 				if (digit < minDigit) minDigit = digit;
 				count++;
 				temp /= 10;
@@ -166,15 +167,15 @@ namespace Work_Practice.ViewModels
 		}
 
 		// Функция, возвращающая кортеж
-		private (int count, int? minDigit) GetDigitsInfoFunc(int number)
+		private (int count, int? minDigit) GetDigitsInfoFunc(long number)
 		{
 			if (number <= 0) return (0, null);
-			int temp = number;
+			long temp = number;
 			int count = 0;
 			int? minDigit = 9;
 			while (temp > 0)
 			{
-				int digit = temp % 10;
+				int digit = (int)(temp % 10);
 				if (digit < minDigit) minDigit = digit;
 				count++;
 				temp /= 10;
@@ -190,15 +191,15 @@ namespace Work_Practice.ViewModels
 
 		public string CodeExampleText
 		{
-			get => _codeExampleText;
-			set { _codeExampleText = value; OnPropertyChanged(); }
+			get => codeExampleText;
+			set { codeExampleText = value; OnPropertyChanged(); }
 		}
 
 		private void UpdateCodeExample()
 		{
 			if (SelectedVariant == "Proc")
 			{
-				CodeExampleText = "void GetDigitsInfoProc(int number, out int count, out int minDigit)\n" +
+				CodeExampleText = "void GetDigitsInfoProc(long number, out int count, out int minDigit)\n" +
 					"{\n" +
 					"    if (number <= 0)\n" +
 					"    {\n" +
@@ -206,12 +207,12 @@ namespace Work_Practice.ViewModels
 					"        minDigit = -1;\n" +
 					"        return;\n" +
 					"    }\n" +
-					"    int temp = number;\n" +
+					"    long temp = number;\n" +
 					"    count = 0;\n" +
 					"    minDigit = 9;\n" +
 					"    while (temp > 0)\n" +
 					"    {\n" +
-					"        int digit = temp % 10;\n" +
+					"        int digit = (int)(temp % 10);\n" +
 					"        if (digit < minDigit) minDigit = digit;\n" +
 					"        count++;\n" +
 					"        temp /= 10;\n" +
@@ -221,14 +222,14 @@ namespace Work_Practice.ViewModels
 			else
 			{
 				CodeExampleText =
-				"(int count, int minDigit) GetDigitsInfoFunc(int number)\n" +
+				"(int count, int minDigit) GetDigitsInfoFunc(long number)\n" +
 				"{\n" +
-				"    int temp = number;\n" +
+				"    long temp = number;\n" +
 				"    int count = 0;\n" +
 				"    int minDigit = 9;\n" +
 				"    while (temp > 0)\n" +
 				"    {\n" +
-				"        int digit = temp % 10;\n" +
+				"        int digit = (int)(temp % 10);\n" +
 				"        if (digit < minDigit) minDigit = digit;\n" +
 				"        count++;\n" +
 				"        temp /= 10;\n" +

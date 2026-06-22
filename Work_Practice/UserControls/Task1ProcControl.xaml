@@ -37,7 +37,7 @@
         <TextBox Text="{Binding CodeExampleText}" Grid.Row="4" 
          IsReadOnly="True" 
          FontFamily="Consolas" FontSize="12"
-         Height="250" Margin="0,10,0,0"
+         Height="300" Margin="0,10,0,0"
          TextWrapping="NoWrap"
          HorizontalScrollBarVisibility="Auto"/>
     </Grid>

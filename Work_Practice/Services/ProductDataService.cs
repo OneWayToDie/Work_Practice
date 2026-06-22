@@ -7,11 +7,11 @@ namespace Work_Practice.Services
 {
 	public class ProductDataService
 	{
-		private readonly string _filePath;
+		private readonly string filePath;
 
 		public ProductDataService(string filePath = "products.xml")
 		{
-			_filePath = filePath;
+			filePath = filePath;
 		}
 
 		public bool SaveToXml(List<Product> products)
@@ -19,7 +19,7 @@ namespace Work_Practice.Services
 			try
 			{
 				var serializer = new XmlSerializer(typeof(List<Product>));
-				using (var writer = new StreamWriter(_filePath))
+				using (var writer = new StreamWriter(filePath))
 				{
 					serializer.Serialize(writer, products);
 				}
@@ -33,13 +33,21 @@ namespace Work_Practice.Services
 
 		public List<Product> LoadFromXml()
 		{
-			if (!File.Exists(_filePath))
+			if (!File.Exists(filePath))
+				return null;
+
+			return LoadFromXml(filePath);
+		}
+
+		public List<Product> LoadFromXml(string filePath)
+		{
+			if (!File.Exists(filePath))
 				return null;
 
 			try
 			{
 				var serializer = new XmlSerializer(typeof(List<Product>));
-				using (var reader = new StreamReader(_filePath))
+				using (var reader = new StreamReader(filePath))
 				{
 					return (List<Product>)serializer.Deserialize(reader);
 				}

@@ -109,6 +109,11 @@
     <Compile Include="ViewModels\Task1ViewModel.cs" />
     <Compile Include="ViewModels\Task2ViewModel.cs" />
     <Compile Include="ViewModels\Task3ViewModel.cs" />
+    <Compile Include="ViewModels\AppDialogViewModel.cs" />
+    <Compile Include="Views\AppDialog.xaml.cs">
+      <DependentUpon>AppDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HexToBrushConverter.cs" />
     <Compile Include="Views\Task1Window.xaml.cs">
       <DependentUpon>Task1Window.xaml</DependentUpon>
     </Compile>
@@ -118,6 +123,10 @@
     <Compile Include="Views\Task3Window.xaml.cs">
       <DependentUpon>Task3Window.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\AppDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styles\Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

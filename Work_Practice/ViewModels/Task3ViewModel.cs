@@ -9,76 +9,77 @@ using System.Windows.Input;
 using Work_Practice.Commands;
 using Work_Practice.Models;
 using Work_Practice.Services;
+using Work_Practice.Views;
 
 namespace Work_Practice.ViewModels
 {
 	public class Task3ViewModel : INotifyPropertyChanged
 	{
-		private static readonly Random _rand = new Random();
+		private static readonly Random rand = new Random();
 		// --- Режимы отображения ---
-		private bool _isCustomViewSelected = true;
+		private bool isCustomViewSelected = true;
 		public bool IsCustomViewSelected
 		{
-			get => _isCustomViewSelected;
-			set { _isCustomViewSelected = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsBuiltInViewSelected)); }
+			get => isCustomViewSelected;
+			set { isCustomViewSelected = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsBuiltInViewSelected)); }
 		}
 		public bool IsBuiltInViewSelected
 		{
-			get => !_isCustomViewSelected;
-			set { _isCustomViewSelected = !value; OnPropertyChanged(); OnPropertyChanged(nameof(IsCustomViewSelected)); }
+			get => !isCustomViewSelected;
+			set { isCustomViewSelected = !value; OnPropertyChanged(); OnPropertyChanged(nameof(IsCustomViewSelected)); }
 		}
 
 		// --- Тип генерируемых чисел (теперь просто TypeOfNumber) ---
-		private TypeOfNumber _selectedNumberType = TypeOfNumber.Integer;
+		private TypeOfNumber selectedNumberType = TypeOfNumber.Integer;
 		public TypeOfNumber SelectedNumberType
 		{
-			get => _selectedNumberType;
-			set { _selectedNumberType = value; OnPropertyChanged(); }
+			get => selectedNumberType;
+			set { selectedNumberType = value; OnPropertyChanged(); }
 		}
 
 		// --- Собственная реализация списка ---
-		private SinglyLinkedList<double> _customList = new SinglyLinkedList<double>();
-		private ObservableCollection<double> _customListItems = new ObservableCollection<double>();
+		private SinglyLinkedList<double> customList = new SinglyLinkedList<double>();
+		private ObservableCollection<double> customListItems = new ObservableCollection<double>();
 		public ObservableCollection<double> CustomListItems
 		{
-			get => _customListItems;
-			set { _customListItems = value; OnPropertyChanged(); }
+			get => customListItems;
+			set { customListItems = value; OnPropertyChanged(); }
 		}
-		private ObservableCollection<double> _customListResultItems = new ObservableCollection<double>();
+		private ObservableCollection<double> customListResultItems = new ObservableCollection<double>();
 		public ObservableCollection<double> CustomListResultItems
 		{
-			get => _customListResultItems;
-			set { _customListResultItems = value; OnPropertyChanged(); }
+			get => customListResultItems;
+			set { customListResultItems = value; OnPropertyChanged(); }
 		}
 
 		// --- Реализация через LinkedList<T> ---
-		private LinkedList<double> _builtInList = new LinkedList<double>();
-		private ObservableCollection<double> _builtInListItems = new ObservableCollection<double>();
+		private LinkedList<double> builtInList = new LinkedList<double>();
+		private ObservableCollection<double> builtInListItems = new ObservableCollection<double>();
 		public ObservableCollection<double> BuiltInListItems
 		{
-			get => _builtInListItems;
-			set { _builtInListItems = value; OnPropertyChanged(); }
+			get => builtInListItems;
+			set { builtInListItems = value; OnPropertyChanged(); }
 		}
-		private ObservableCollection<double> _builtInListResultItems = new ObservableCollection<double>();
+		private ObservableCollection<double> builtInListResultItems = new ObservableCollection<double>();
 		public ObservableCollection<double> BuiltInListResultItems
 		{
-			get => _builtInListResultItems;
-			set { _builtInListResultItems = value; OnPropertyChanged(); }
+			get => builtInListResultItems;
+			set { builtInListResultItems = value; OnPropertyChanged(); }
 		}
 
 		// --- Общие свойства UI ---
-		private string _numbersInput = "";
+		private string numbersInput = "";
 		public string NumbersInput
 		{
-			get => _numbersInput;
-			set { _numbersInput = value; OnPropertyChanged(); }
+			get => numbersInput;
+			set { numbersInput = value; OnPropertyChanged(); }
 		}
 
-		private string _nValue = "";
+		private string nValue = "";
 		public string NValue
 		{
-			get => _nValue;
-			set { _nValue = value; OnPropertyChanged(); }
+			get => nValue;
+			set { nValue = value; OnPropertyChanged(); }
 		}
 
 		// --- Команды ---
@@ -97,15 +98,14 @@ namespace Work_Practice.ViewModels
 		{
 			if (!int.TryParse(NValue, out int n) || n <= 0)
 			{
-				MessageBox.Show("Введите положительное целое число N.");
+				AppDialog.ShowWarning("Введите положительное целое число N.");
 				return;
 			}
 			if (n > 500)
 			{
-				MessageBox.Show("Количество чисел не должно превышать 500.");
+				AppDialog.ShowWarning("Количество чисел не должно превышать 500.");
 				return;
 			}
-			var rand = _rand;
 			double[] randomNumbers;
 
 			if (SelectedNumberType == TypeOfNumber.Integer)
@@ -121,27 +121,27 @@ namespace Work_Practice.ViewModels
 
 			if (IsCustomViewSelected)
 			{
-				_customList.Clear();
+				customList.Clear();
 				CustomListItems.Clear();
 				CustomListResultItems.Clear();
 				foreach (var num in randomNumbers)
 				{
-					_customList.Add(num);
+					customList.Add(num);
 					CustomListItems.Add(num);
 				}
-				MessageBox.Show($"Создан случайный список (собственная реализация) из {n} {typeName} чисел.");
+				AppDialog.ShowInfo($"Создан случайный список (собственная реализация) из {n} {typeName} чисел.");
 			}
 			else
 			{
-				_builtInList.Clear();
+				builtInList.Clear();
 				BuiltInListItems.Clear();
 				BuiltInListResultItems.Clear();
 				foreach (var num in randomNumbers)
 				{
-					_builtInList.AddLast(num);
+					builtInList.AddLast(num);
 					BuiltInListItems.Add(num);
 				}
-				MessageBox.Show($"Создан случайный список (LinkedList<T>) из {n} {typeName} чисел.");
+				AppDialog.ShowInfo($"Создан случайный список (LinkedList<T>) из {n} {typeName} чисел.");
 			}
 		}
 
@@ -149,7 +149,7 @@ namespace Work_Practice.ViewModels
 		{
 			if (string.IsNullOrWhiteSpace(NumbersInput))
 			{
-				MessageBox.Show("Введите числа через запятую или пробел.");
+				AppDialog.ShowWarning("Введите числа через запятую или пробел.");
 				return;
 			}
 			string[] parts = NumbersInput.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -160,40 +160,40 @@ namespace Work_Practice.ViewModels
 					parsedNumbers.Add(val);
 				else
 				{
-					MessageBox.Show($"Некорректное число: {part}");
+					AppDialog.ShowError($"Некорректное число: {part}");
 					return;
 				}
 			}
 			if (parsedNumbers.Count == 0) return;
 			if (parsedNumbers.Count > 500)
 			{
-				MessageBox.Show("Количество чисел не должно превышать 500.");
+				AppDialog.ShowWarning("Количество чисел не должно превышать 500.");
 				return;
 			}
 
 			if (IsCustomViewSelected)
 			{
-				_customList.Clear();
+				customList.Clear();
 				CustomListItems.Clear();
 				CustomListResultItems.Clear();
 				foreach (var num in parsedNumbers)
 				{
-					_customList.Add(num);
+					customList.Add(num);
 					CustomListItems.Add(num);
 				}
-				MessageBox.Show($"Загружено {parsedNumbers.Count} чисел (собственная реализация).");
+				AppDialog.ShowInfo($"Загружено {parsedNumbers.Count} чисел (собственная реализация).");
 			}
 			else
 			{
-				_builtInList.Clear();
+				builtInList.Clear();
 				BuiltInListItems.Clear();
 				BuiltInListResultItems.Clear();
 				foreach (var num in parsedNumbers)
 				{
-					_builtInList.AddLast(num);
+					builtInList.AddLast(num);
 					BuiltInListItems.Add(num);
 				}
-				MessageBox.Show($"Загружено {parsedNumbers.Count} чисел (LinkedList<T>).");
+				AppDialog.ShowInfo($"Загружено {parsedNumbers.Count} чисел (LinkedList<T>).");
 			}
 		}
 
@@ -201,53 +201,67 @@ namespace Work_Practice.ViewModels
 		{
 			if (IsCustomViewSelected)
 			{
-				if (_customList.Head?.Next?.Next != null)
+				if (customList.Head?.Next?.Next != null)
 				{
+					// Синхронизируем "До" с текущим состоянием списка
+					CustomListItems.Clear();
+					foreach (var item in customList.ToList())
+						CustomListItems.Add(item);
+
+					// Копируем "До" в "После"
 					CustomListResultItems.Clear();
 					foreach (var item in CustomListItems)
 						CustomListResultItems.Add(item);
 
-					bool success = _customList.MoveThirdToFront();
+					bool success = customList.MoveThirdToFront();
 					if (success)
 					{
-						CustomListItems.Clear();
-						foreach (var item in _customList.ToList())
-							CustomListItems.Add(item);
-						MessageBox.Show("Собственная реализация: третий элемент перенесён в начало.");
+						// Обновляем "После" результатом переноса
+						CustomListResultItems.Clear();
+						foreach (var item in customList.ToList())
+							CustomListResultItems.Add(item);
+						AppDialog.ShowInfo("Собственная реализация: третий элемент перенесён в начало.");
 					}
 					else
 					{
 						CustomListResultItems.Clear();
-						MessageBox.Show("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
+						AppDialog.ShowWarning("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
 					}
 				}
 				else
-					MessageBox.Show("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
+					AppDialog.ShowWarning("Собственная реализация: в списке меньше трёх элементов. Операция невозможна.");
 			}
 			else
 			{
-				if (_builtInList.Count >= 3)
+				if (builtInList.Count >= 3)
 				{
-					var thirdNode = _builtInList.First?.Next?.Next;
+					// Синхронизируем "До" с текущим состоянием списка
+					BuiltInListItems.Clear();
+					foreach (var item in builtInList)
+						BuiltInListItems.Add(item);
+
+					// Копируем "До" в "После"
+					BuiltInListResultItems.Clear();
+					foreach (var item in BuiltInListItems)
+						BuiltInListResultItems.Add(item);
+
+					var thirdNode = builtInList.First?.Next?.Next;
 					if (thirdNode != null)
 					{
-						BuiltInListResultItems.Clear();
-						foreach (var item in BuiltInListItems)
-							BuiltInListResultItems.Add(item);
-
 						var value = thirdNode.Value;
-						_builtInList.Remove(thirdNode);
-						_builtInList.AddFirst(value);
-						BuiltInListItems.Clear();
-						foreach (var item in _builtInList)
-							BuiltInListItems.Add(item);
-						MessageBox.Show("LinkedList<T>: третий элемент перенесён в начало.");
+						builtInList.Remove(thirdNode);
+						builtInList.AddFirst(value);
+						// Обновляем "После" результатом переноса
+						BuiltInListResultItems.Clear();
+						foreach (var item in builtInList)
+							BuiltInListResultItems.Add(item);
+						AppDialog.ShowInfo("LinkedList<T>: третий элемент перенесён в начало.");
 					}
 					else
-						MessageBox.Show("LinkedList<T>: не удалось найти третий элемент.");
+						AppDialog.ShowError("LinkedList<T>: не удалось найти третий элемент.");
 				}
 				else
-					MessageBox.Show($"LinkedList<T>: в списке {_builtInList.Count} элементов. Операция требует минимум 3 элемента.");
+					AppDialog.ShowWarning($"LinkedList<T>: в списке {builtInList.Count} элементов. Операция требует минимум 3 элемента.");
 			}
 		}
 

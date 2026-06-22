@@ -7,7 +7,7 @@
         Style="{StaticResource KasperskyWindowStyle}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize"
-        Height="900" Width="800">
+        Height="950" Width="800">
     <Window.DataContext>
         <vm:Task1ViewModel/>
     </Window.DataContext>

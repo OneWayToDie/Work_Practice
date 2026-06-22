@@ -6,94 +6,80 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Win32;
 using Work_Practice.Commands;
 using Work_Practice.Models;
 using Work_Practice.Services;
+using Work_Practice.Views;
 
 namespace Work_Practice.ViewModels
 {
 	public class Task2ViewModel : INotifyPropertyChanged
 	{
-		private ObservableCollection<Product> _products;
-		private ObservableCollection<Product> _filteredProducts;
-		private readonly ProductDataService _dataService;
+		private ObservableCollection<Product> products;
+		private ObservableCollection<Product> filteredProducts;
+		private readonly ProductDataService dataService;
 
 		// Поля для нового товара
-		private string _newName = "";
-		private string _newManufacturer = "";
-		private int _newShelfLife = 0;
-		private decimal _newPrice = 0;
-		private int _newStockQuantity = 0;
+		private string newName = "";
+		private string newManufacturer = "";
+		private int newShelfLife = 0;
+		private decimal newPrice = 0;
+		private int newStockQuantity = 0;
 
 		// Поле для фильтра
-		private int _minStockQuantity = 0;
+		private int minStockQuantity = 0;
 
 		public ObservableCollection<Product> Products
 		{
-			get => _products;
-			set { _products = value; OnPropertyChanged(); }
+			get => products;
+			set { products = value; OnPropertyChanged(); }
 		}
 
 		public ObservableCollection<Product> FilteredProducts
 		{
-			get => _filteredProducts;
-			set { _filteredProducts = value; OnPropertyChanged(); }
+			get => filteredProducts;
+			set { filteredProducts = value; OnPropertyChanged(); }
 		}
 
-		public string NewName { get => _newName; set { _newName = value; OnPropertyChanged(); } }
-		public string NewManufacturer { get => _newManufacturer; set { _newManufacturer = value; OnPropertyChanged(); } }
-		public int NewShelfLife { get => _newShelfLife; set { _newShelfLife = value; OnPropertyChanged(); } }
-		public decimal NewPrice { get => _newPrice; set { _newPrice = value; OnPropertyChanged(); } }
-		public int NewStockQuantity { get => _newStockQuantity; set { _newStockQuantity = value; OnPropertyChanged(); } }
+		public string NewName { get => newName; set { newName = value; OnPropertyChanged(); } }
+		public string NewManufacturer { get => newManufacturer; set { newManufacturer = value; OnPropertyChanged(); } }
+		public int NewShelfLife { get => newShelfLife; set { newShelfLife = value; OnPropertyChanged(); } }
+		public decimal NewPrice { get => newPrice; set { newPrice = value; OnPropertyChanged(); } }
+		public int NewStockQuantity { get => newStockQuantity; set { newStockQuantity = value; OnPropertyChanged(); } }
 
 		public int MinStockQuantity
 		{
-			get => _minStockQuantity;
-			set { _minStockQuantity = value; OnPropertyChanged(); }
+			get => minStockQuantity;
+			set { minStockQuantity = value; OnPropertyChanged(); }
 		}
 
 		public ICommand SaveToFileCommand { get; }
 		public ICommand LoadFromFileCommand { get; }
+		public ICommand LoadSampleDataCommand { get; }
 		public ICommand AddProductCommand { get; }
 		public ICommand ClearDatabaseCommand { get; }
 		public ICommand SortAndFilterCommand { get; }
 
 		public Task2ViewModel()
 		{
-			_dataService = new ProductDataService();
+			dataService = new ProductDataService();
 
-			var loaded = _dataService.LoadFromXml();
-			if (loaded != null)
+			var loaded = dataService.LoadFromXml();
+			if (loaded != null && loaded.Count > 0)
 			{
 				Products = new ObservableCollection<Product>(loaded);
 			}
 			else
 			{
-				// Тестовые данные (15 штук)
-				Products = new ObservableCollection<Product>
-				{
-					new Product { Name = "Молоко", Manufacturer = "Простоквашино", ShelfLife = 7, Price = 80m, StockQuantity = 50 },
-					new Product { Name = "Хлеб", Manufacturer = "Дарницкий", ShelfLife = 3, Price = 45m, StockQuantity = 120 },
-					new Product { Name = "Сыр", Manufacturer = "Hochland", ShelfLife = 30, Price = 350m, StockQuantity = 30 },
-					new Product { Name = "Йогурт", Manufacturer = "Activia", ShelfLife = 14, Price = 60m, StockQuantity = 80 },
-					new Product { Name = "Мясо", Manufacturer = "Мираторг", ShelfLife = 5, Price = 400m, StockQuantity = 20 },
-					new Product { Name = "Рыба", Manufacturer = "Меридиан", ShelfLife = 4, Price = 300m, StockQuantity = 15 },
-					new Product { Name = "Печенье", Manufacturer = "Юбилейное", ShelfLife = 180, Price = 90m, StockQuantity = 200 },
-					new Product { Name = "Сок", Manufacturer = "Добрый", ShelfLife = 365, Price = 120m, StockQuantity = 100 },
-					new Product { Name = "Вода", Manufacturer = "Святой источник", ShelfLife = 365, Price = 40m, StockQuantity = 500 },
-					new Product { Name = "Макароны", Manufacturer = "Макфа", ShelfLife = 720, Price = 70m, StockQuantity = 150 },
-					new Product { Name = "Крупа гречневая", Manufacturer = "Увелка", ShelfLife = 540, Price = 95m, StockQuantity = 80 },
-					new Product { Name = "Масло подсолнечное", Manufacturer = "Золотая семечка", ShelfLife = 365, Price = 110m, StockQuantity = 60 },
-					new Product { Name = "Кофе", Manufacturer = "Jacobs", ShelfLife = 720, Price = 450m, StockQuantity = 40 },
-					new Product { Name = "Чай", Manufacturer = "Lipton", ShelfLife = 720, Price = 250m, StockQuantity = 70 },
-					new Product { Name = "Конфеты", Manufacturer = "Красный Октябрь", ShelfLife = 180, Price = 200m, StockQuantity = 90 }
-				};
+				Products = new ObservableCollection<Product>();
 			}
 
 			FilteredProducts = new ObservableCollection<Product>(Products);
 
 			SaveToFileCommand = new DelegateCommand(SaveToFile);
 			LoadFromFileCommand = new DelegateCommand(LoadFromFile);
+			LoadSampleDataCommand = new DelegateCommand(LoadSampleData);
 			AddProductCommand = new DelegateCommand(AddProduct);
 			ClearDatabaseCommand = new DelegateCommand(ClearDatabase);
 			SortAndFilterCommand = new DelegateCommand(SortAndFilter);
@@ -101,31 +87,66 @@ namespace Work_Practice.ViewModels
 
 		private void SaveToFile()
 		{
-			bool success = _dataService.SaveToXml(new List<Product>(Products));
+			bool success = dataService.SaveToXml(new List<Product>(Products));
 			if (success)
-				MessageBox.Show("Данные сохранены в файл products.xml");
+				AppDialog.ShowInfo("Данные сохранены в файл products.xml");
 			else
-				MessageBox.Show("Ошибка при сохранении. Проверьте, что файл не заблокирован.");
+				AppDialog.ShowError("Ошибка при сохранении. Проверьте, что файл не заблокирован.");
+		}
+
+		private void LoadSampleData()
+		{
+			Products.Clear();
+			var samples = new List<Product>
+			{
+				new Product { Name = "Молоко", Manufacturer = "Простоквашино", ShelfLife = 7, Price = 80m, StockQuantity = 50 },
+				new Product { Name = "Хлеб", Manufacturer = "Дарницкий", ShelfLife = 3, Price = 45m, StockQuantity = 120 },
+				new Product { Name = "Сыр", Manufacturer = "Hochland", ShelfLife = 30, Price = 350m, StockQuantity = 30 },
+				new Product { Name = "Йогурт", Manufacturer = "Activia", ShelfLife = 14, Price = 60m, StockQuantity = 80 },
+				new Product { Name = "Мясо", Manufacturer = "Мираторг", ShelfLife = 5, Price = 400m, StockQuantity = 20 },
+				new Product { Name = "Рыба", Manufacturer = "Меридиан", ShelfLife = 4, Price = 300m, StockQuantity = 15 },
+				new Product { Name = "Печенье", Manufacturer = "Юбилейное", ShelfLife = 180, Price = 90m, StockQuantity = 200 },
+				new Product { Name = "Сок", Manufacturer = "Добрый", ShelfLife = 365, Price = 120m, StockQuantity = 100 },
+				new Product { Name = "Вода", Manufacturer = "Святой источник", ShelfLife = 365, Price = 40m, StockQuantity = 500 },
+				new Product { Name = "Макароны", Manufacturer = "Макфа", ShelfLife = 720, Price = 70m, StockQuantity = 150 },
+				new Product { Name = "Крупа гречневая", Manufacturer = "Увелка", ShelfLife = 540, Price = 95m, StockQuantity = 80 },
+				new Product { Name = "Масло подсолнечное", Manufacturer = "Золотая семечка", ShelfLife = 365, Price = 110m, StockQuantity = 60 },
+				new Product { Name = "Кофе", Manufacturer = "Jacobs", ShelfLife = 720, Price = 450m, StockQuantity = 40 },
+				new Product { Name = "Чай", Manufacturer = "Lipton", ShelfLife = 720, Price = 250m, StockQuantity = 70 },
+				new Product { Name = "Конфеты", Manufacturer = "Красный Октябрь", ShelfLife = 180, Price = 200m, StockQuantity = 90 }
+			};
+			foreach (var p in samples)
+				Products.Add(p);
+			FilterProductsAndSort();
+			AppDialog.ShowInfo("Загружены примеры (15 товаров).");
 		}
 
 		private void LoadFromFile()
 		{
-			var loaded = _dataService.LoadFromXml();
+			var dialog = new OpenFileDialog
+			{
+				Filter = "XML файлы (*.xml)|*.xml|Все файлы (*.*)|*.*",
+				Title = "Выберите файл для загрузки"
+			};
+			if (dialog.ShowDialog() != true)
+				return;
+
+			var loaded = dataService.LoadFromXml(dialog.FileName);
 			if (loaded != null && loaded.Count > 0)
 			{
 				Products.Clear();
 				foreach (var p in loaded)
 					Products.Add(p);
 				FilterProductsAndSort();
-				MessageBox.Show("Данные загружены из файла");
+				AppDialog.ShowInfo($"Данные загружены из файла: {System.IO.Path.GetFileName(dialog.FileName)}");
 			}
 			else if (loaded != null)
 			{
-				MessageBox.Show("Файл пуст. Данные не загружены.");
+				AppDialog.ShowWarning("Файл пуст. Данные не загружены.");
 			}
 			else
 			{
-				MessageBox.Show("Файл не найден или повреждён.");
+				AppDialog.ShowError("Не удалось загрузить файл. Проверьте формат.");
 			}
 		}
 
@@ -134,31 +155,31 @@ namespace Work_Practice.ViewModels
 			// Проверка наименования
 			if (string.IsNullOrWhiteSpace(NewName))
 			{
-				MessageBox.Show("Наименование товара не может быть пустым.", "Ошибка ввода");
+				AppDialog.ShowError("Наименование товара не может быть пустым.");
 				return;
 			}
 			// Проверка фирмы
 			if (string.IsNullOrWhiteSpace(NewManufacturer))
 			{
-				MessageBox.Show("Фирма-изготовитель не может быть пустой.", "Ошибка ввода");
+				AppDialog.ShowError("Фирма-изготовитель не может быть пустой.");
 				return;
 			}
 			// Проверка цены
 			if (NewPrice <= 0)
 			{
-				MessageBox.Show("Цена должна быть больше 0.", "Ошибка ввода");
+				AppDialog.ShowError("Цена должна быть больше 0.");
 				return;
 			}
 			// Проверка срока хранения
 			if (NewShelfLife <= 0)
 			{
-				MessageBox.Show("Срок хранения должен быть больше 0 дней.", "Ошибка ввода");
+				AppDialog.ShowError("Срок хранения должен быть больше 0 дней.");
 				return;
 			}
 			// Проверка количества на складе
 			if (NewStockQuantity < 0)
 			{
-				MessageBox.Show("Количество на складе не может быть отрицательным.", "Ошибка ввода");
+				AppDialog.ShowError("Количество на складе не может быть отрицательным.");
 				return;
 			}
 
@@ -180,18 +201,18 @@ namespace Work_Practice.ViewModels
 			NewPrice = 0;
 			NewStockQuantity = 0;
 
-			MessageBox.Show("Товар добавлен.", "Успешно");
+			AppDialog.ShowInfo("Товар добавлен.");
 		}
 
 		private void ClearDatabase()
 		{
 			Products.Clear();
 			FilteredProducts.Clear();
-			bool success = _dataService.SaveToXml(new List<Product>());
+			bool success = dataService.SaveToXml(new List<Product>());
 			if (success)
-				MessageBox.Show("База данных очищена.");
+				AppDialog.ShowInfo("База данных очищена.");
 			else
-				MessageBox.Show("БД очищена из памяти, но не удалось сохранить в файл.");
+				AppDialog.ShowWarning("БД очищена из памяти, но не удалось сохранить в файл.");
 		}
 
 		private void SortAndFilter()

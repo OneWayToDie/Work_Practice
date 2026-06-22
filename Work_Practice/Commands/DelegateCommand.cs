@@ -1,21 +1,21 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 
 namespace Work_Practice.Commands
 {
 	public class DelegateCommand : ICommand
 	{
-		private readonly Action _execute;
-		private readonly Func<bool> _canExecute;
+		private readonly Action execute;
+		private readonly Func<bool> canExecute;
 
 		public DelegateCommand(Action execute, Func<bool> canExecute = null)
 		{
-			_execute = execute;
-			_canExecute = canExecute;
+			execute = execute;
+			canExecute = canExecute;
 		}
 
-		public bool CanExecute(object parameter) => _canExecute == null || _canExecute();
-		public void Execute(object parameter) => _execute();
+		public bool CanExecute(object parameter) => canExecute == null || canExecute();
+		public void Execute(object parameter) => execute();
 		public event EventHandler CanExecuteChanged
 		{
 			add { CommandManager.RequerySuggested += value; }
