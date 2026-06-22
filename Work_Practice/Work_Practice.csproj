@@ -113,7 +113,7 @@
     <Compile Include="Views\AppDialog.xaml.cs">
       <DependentUpon>AppDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HexToBrushConverter.cs" />
+    <Compile Include="Converters\HexToBrushConverter.cs" />
     <Compile Include="Views\Task1Window.xaml.cs">
       <DependentUpon>Task1Window.xaml</DependentUpon>
     </Compile>

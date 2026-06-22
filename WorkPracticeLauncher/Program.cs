@@ -221,6 +221,8 @@ namespace WorkPracticeLauncher
 				Thread.Sleep(30);
 			}
 
+			Console.Clear();
+
 			Console.CursorVisible = true;
 		}
 
@@ -741,13 +743,46 @@ namespace WorkPracticeLauncher
 					Console.WriteLine("Распаковка архива...");
 					Console.ResetColor();
 
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("Выберите папку для распаковки:");
+				Console.ResetColor();
+
+				string extractPath = null;
+				try
+				{
+					var staThread = new Thread(() =>
+						{
+							using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+					{
+						dialog.Description = "Выберите папку для распаковки обновления";
+						dialog.ShowNewFolderButton = true;
+						if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+							extractPath = dialog.SelectedPath;
+					}
+						});
+						staThread.SetApartmentState(ApartmentState.STA);
+						staThread.Start();
+						staThread.Join();
+				}
+				catch { }
+
+				if (string.IsNullOrEmpty(extractPath))
+				{
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.WriteLine("Raspakovka otmenena.");
+					Console.ResetColor();
+					File.Delete(zipPath);
+					return;
+				}
+
+
 					try
 					{
 						using (ZipArchive archive = ZipFile.OpenRead(zipPath))
 						{
 							foreach (ZipArchiveEntry entry in archive.Entries)
 							{
-								string destinationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, entry.FullName);
+								string destinationPath = Path.Combine(extractPath, entry.FullName);
 								if (string.IsNullOrEmpty(entry.Name))
 								{
 									Directory.CreateDirectory(destinationPath);

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Work_Practice.Views
+namespace Work_Practice.Converters
 {
 	public class HexToBrushConverter : IValueConverter
 	{

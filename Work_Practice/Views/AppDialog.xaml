@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Work_Practice.ViewModels"
         xmlns:local="clr-namespace:Work_Practice.Views"
+        xmlns:conv="clr-namespace:Work_Practice.Converters"
         Title="{Binding Title}"
         Width="500" Height="250"
         WindowStartupLocation="CenterOwner"
@@ -22,9 +23,9 @@
         <!-- Иконка и заголовок -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
             <TextBlock Text="{Binding IconSymbol}" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"
-                       Foreground="{Binding AccentColor, Converter={x:Static local:HexToBrushConverter.Instance}}"/>
+                       Foreground="{Binding AccentColor, Converter={x:Static conv:HexToBrushConverter.Instance}}"/>
             <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"
-                       Foreground="{Binding AccentColor, Converter={x:Static local:HexToBrushConverter.Instance}}"/>
+                       Foreground="{Binding AccentColor, Converter={x:Static conv:HexToBrushConverter.Instance}}"/>
         </StackPanel>
 
         <!-- Текст сообщения -->
