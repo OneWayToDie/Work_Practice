@@ -84,6 +84,7 @@ namespace Work_Practice.ViewModels
 		public ICommand ProcessCommand { get; }
 		public ICommand ClearNumbersCommand { get; }
 
+		// Конструктор — привязка команд задания 1
 		public Task1ViewModel()
 		{
 			AddNumberCommand = new DelegateCommand(AddNumber);
@@ -92,6 +93,7 @@ namespace Work_Practice.ViewModels
 			UpdateCodeExample();
 		}
 
+		// Добавление числа в последовательность
 		private void AddNumber()
 		{
 			if (long.TryParse(CurrentNumberInput, out long num))
@@ -115,12 +117,14 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
+		// Очистка чисел и результатов
 		private void ClearNumbers()
 		{
 			Numbers.Clear();
 			Results.Clear();
 		}
 
+		// Обработка всех чисел (процедура или функция)
 		private void Process()
 		{
 			if (Numbers.Count == 0)
@@ -130,6 +134,7 @@ namespace Work_Practice.ViewModels
 			}
 
 			Results.Clear();
+			// Обработка каждого числа в списке
 			foreach (long n in Numbers)
 			{
 				if (SelectedVariant == "Proc")
@@ -145,7 +150,7 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
-		// Процедура
+		// Процедура — подсчёт цифр и минимума через out
 		private void GetDigitsInfoProc(long number, out int count, out int? minDigit)
 		{
 			if (number <= 0)
@@ -157,6 +162,7 @@ namespace Work_Practice.ViewModels
 			long temp = number;
 			count = 0;
 			minDigit = 9;
+			// Извлечение цифр числа
 			while (temp > 0)
 			{
 				int digit = (int)(temp % 10);
@@ -166,13 +172,15 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
-		// Функция, возвращающая кортеж
+		// Функция — подсчёт цифр и минимума через кортеж
 		private (int count, int? minDigit) GetDigitsInfoFunc(long number)
 		{
 			if (number <= 0) return (0, null);
 			long temp = number;
 			int count = 0;
 			int? minDigit = 9;
+			// Извлечение цифр числа
+			// Извлечение цифр числа
 			while (temp > 0)
 			{
 				int digit = (int)(temp % 10);
@@ -184,6 +192,7 @@ namespace Work_Practice.ViewModels
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+		// Уведомление об изменении свойства
 		protected void OnPropertyChanged([CallerMemberName] string name = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -195,6 +204,7 @@ namespace Work_Practice.ViewModels
 			set { codeExampleText = value; OnPropertyChanged(); }
 		}
 
+		// Обновление примера кода в интерфейсе
 		private void UpdateCodeExample()
 		{
 			if (SelectedVariant == "Proc")

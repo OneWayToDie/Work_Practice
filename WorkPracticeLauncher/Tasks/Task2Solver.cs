@@ -18,12 +18,14 @@ namespace WorkPracticeLauncher.Tasks
 		private static int lastWidth;
 		private static int lastHeight;
 
+		// Главное меню задания 2
 		public static void Run()
 		{
 			lastWidth = Console.WindowWidth;
 			lastHeight = Console.WindowHeight;
 
 			bool exit = false;
+			// Главный цикл меню задания 2
 			while (!exit)
 			{
 				CheckResizeAndRedraw();
@@ -111,6 +113,7 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
+		// Вывод заголовка с информацией о БД
 		private static void ShowHeader()
 		{
 			Console.ForegroundColor = ConsoleColor.Yellow;
@@ -124,6 +127,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 		}
 
+		// Проверка изменения размера окна
 		private static void CheckResizeAndRedraw()
 		{
 			if (Console.WindowWidth != lastWidth || Console.WindowHeight != lastHeight)
@@ -135,8 +139,8 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
-		// -------------------- Остальные методы (без InputHelper) --------------------
-
+		
+		// Смена каталога для хранения данных
 		private static void ChangeDataDirectory()
 		{
 			Console.Clear();
@@ -224,6 +228,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();
 		}
 
+		// Выбор папки через проводник Windows
 		private static string SelectFolderViaDialog()
 		{
 			try
@@ -247,15 +252,10 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
-		private static void ShowProduct(Product p)
-		{
-			Console.WriteLine($"  Наименование: {p.Name}");
-			Console.WriteLine($"  Фирма: {p.Manufacturer}");
-			Console.WriteLine($"  Срок хранения: {p.ShelfLife} дней");
-			Console.WriteLine($"  Цена: {p.Price:F2} руб.");
-			Console.WriteLine($"  Количество на складе: {p.StockQuantity}");
-		}
+		// Вывод информации о товаре
+		
 
+		// Добавление новых товаров в БД
 		private static void AddProducts()
 		{
 			Console.Clear();
@@ -268,6 +268,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 
 			int added = 0;
+			// Цикл добавления товаров
 			while (true)
 			{
 				Console.Write("Наименование: ");
@@ -279,6 +280,7 @@ namespace WorkPracticeLauncher.Tasks
 				if (string.IsNullOrWhiteSpace(manufacturer)) break;
 
 				int shelfLife;
+				// Ввод срока хранения (валидация)
 				while (true)
 				{
 					Console.Write("Срок хранения (дни): ");
@@ -296,6 +298,7 @@ namespace WorkPracticeLauncher.Tasks
 				}
 
 				decimal price;
+				// Ввод цены (валидация)
 				while (true)
 				{
 					Console.Write("Цена: ");
@@ -314,6 +317,7 @@ namespace WorkPracticeLauncher.Tasks
 				}
 
 				int stock;
+				// Ввод количества (валидация)
 				while (true)
 				{
 					Console.Write("Количество на складе: ");
@@ -355,133 +359,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("Нажмите любую клавишу для возврата...");
 			Console.ReadKey();
 		}
-
-		private static void EditLastProduct()
-		{
-			if (products.Count == 0) return;
-			Product lastProduct = products[products.Count - 1];
-
-			bool editing = true;
-			while (editing)
-			{
-				Console.Clear();
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine("=== РЕДАКТИРОВАНИЕ ПОСЛЕДНЕЙ ЗАПИСИ ===");
-				Console.ResetColor();
-				Console.WriteLine("Текущие значения:");
-				ShowProduct(lastProduct);
-				Console.WriteLine();
-
-				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("▶ Выберите поле для редактирования (1-5, Enter – отмена):");
-				Console.ResetColor();
-				Console.WriteLine("  1 – Наименование");
-				Console.WriteLine("  2 – Фирма");
-				Console.WriteLine("  3 – Срок хранения");
-				Console.WriteLine("  4 – Цена");
-				Console.WriteLine("  5 – Количество на складе");
-			Console.Write("Ваш выбор (Enter – отмена): ");
-
-			ConsoleKey fieldKey = Console.ReadKey(true).Key;
-			if (fieldKey == ConsoleKey.Enter)
-			{
-				editing = false;
-				break;
-			}
-
-				bool updated = false;
-				switch (fieldKey)
-				{
-					case ConsoleKey.D1:
-						Console.Write("Новое наименование: ");
-						string newName = Console.ReadLine();
-						if (!string.IsNullOrWhiteSpace(newName))
-						{
-							lastProduct.Name = newName;
-							updated = true;
-						}
-						break;
-					case ConsoleKey.D2:
-						Console.Write("Новая фирма: ");
-						string newManufacturer = Console.ReadLine();
-						if (!string.IsNullOrWhiteSpace(newManufacturer))
-						{
-							lastProduct.Manufacturer = newManufacturer;
-							updated = true;
-						}
-						break;
-					case ConsoleKey.D3:
-						Console.Write("Новый срок хранения (дни): ");
-						string newShelf = Console.ReadLine();
-						if (int.TryParse(newShelf, out int newShelfLife) && newShelfLife > 0)
-						{
-							lastProduct.ShelfLife = newShelfLife;
-							updated = true;
-						}
-						else
-						{
-							Console.ForegroundColor = ConsoleColor.Red;
-							Console.WriteLine("Некорректный ввод.");
-							Console.ResetColor();
-						}
-						break;
-					case ConsoleKey.D4:
-						Console.Write("Новая цена: ");
-						string newPrice = Console.ReadLine();
-						if (!string.IsNullOrWhiteSpace(newPrice))
-						{
-							string normalized = newPrice.Replace(',', '.');
-							if (decimal.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal newPriceValue) && newPriceValue > 0)
-							{
-								lastProduct.Price = newPriceValue;
-								updated = true;
-							}
-							else
-							{
-								Console.ForegroundColor = ConsoleColor.Red;
-								Console.WriteLine("Некорректный ввод, цена должна быть положительным числом.");
-								Console.ResetColor();
-							}
-						}
-						break;
-					case ConsoleKey.D5:
-						Console.Write("Новое количество на складе: ");
-						string newStock = Console.ReadLine();
-						if (int.TryParse(newStock, out int newStockValue) && newStockValue >= 0)
-						{
-							lastProduct.StockQuantity = newStockValue;
-							updated = true;
-						}
-						else
-						{
-							Console.ForegroundColor = ConsoleColor.Red;
-							Console.WriteLine("Некорректный ввод.");
-							Console.ResetColor();
-						}
-						break;
-					default:
-						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine("Некорректный выбор.");
-						Console.ResetColor();
-						continue;
-				}
-
-				if (updated)
-				{
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.WriteLine("Запись обновлена.");
-					Console.ResetColor();
-				}
-				else
-				{
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					Console.WriteLine("Изменение не выполнено.");
-					Console.ResetColor();
-				}
-				Console.ReadKey();
-			}
-		}
-
+		// Просмотр всех товаров с сортировкой
 		private static void ViewProducts()
 		{
 			if (products.Count == 0)
@@ -581,6 +459,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine($"{"Наименование".PadRight(nameWidth)} {"Фирма".PadRight(mfrWidth)} {"Срок".PadRight(shelfWidth)} {"Цена".PadRight(priceWidth)} {"Кол-во".PadRight(stockWidth)}");
 			Console.WriteLine(new string('-', nameWidth + mfrWidth + shelfWidth + priceWidth + stockWidth + 4));
+			// Вывод отсортированных товаров
 			foreach (Product p in sorted)
 			{
 				Console.WriteLine($"{p.Name.PadRight(nameWidth)} {p.Manufacturer.PadRight(mfrWidth)} {p.ShelfLife.ToString().PadRight(shelfWidth)} {p.Price.ToString("F2").PadRight(priceWidth)} {p.StockQuantity.ToString().PadRight(stockWidth)}");
@@ -592,6 +471,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();
 		}
 
+		// Удаление товара по индексу
 		private static void DeleteProduct()
 		{
 			if (products.Count == 0)
@@ -610,6 +490,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine("Список товаров:");
 			Console.WriteLine("  Индекс  |  Наименование");
 			Console.WriteLine("  -----------------------");
+			// Вывод списка товаров для удаления
 			for (int i = 0; i < products.Count; i++)
 				Console.WriteLine($"  {i + 1,-7} | {products[i].Name}");
 			Console.WriteLine();
@@ -637,6 +518,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();
 		}
 
+		// Полная очистка базы данных
 		private static void DeleteAllProducts()
 		{
 			if (products.Count == 0)
@@ -705,6 +587,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();
 		}
 
+		// Сохранение БД в файл с выбором формата
 		private static void SaveWithOptions()
 		{
 			if (products.Count == 0)
@@ -882,6 +765,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();
 		}
 
+		// Определение формата по расширению файла
 		private static FileFormat GetFormatFromExtension(string fileName)
 		{
 			if (fileName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
@@ -892,6 +776,7 @@ namespace WorkPracticeLauncher.Tasks
 				return FileFormat.Xml;
 		}
 
+		// Запись данных в файл (XML или TXT)
 		private static void SaveToFile(string path, FileFormat format, bool append)
 		{
 			try
@@ -964,6 +849,7 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
+		// Запрос пути для сохранения файла
 		private static string RequestSavePath(FileFormat format)
 		{
 			Console.ForegroundColor = ConsoleColor.Green;
@@ -1037,6 +923,7 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
+		// Сохранение в текстовый формат
 		private static void SaveToTxtInternal(string path, List<Product> data)
 		{
 		using (StreamWriter writer = new StreamWriter(path))
@@ -1044,12 +931,14 @@ namespace WorkPracticeLauncher.Tasks
 					writer.WriteLine($"{p.Name}|{p.Manufacturer}|{p.ShelfLife}|{p.Price}|{p.StockQuantity}");
 		}
 
+		// Загрузка из текстового формата
 		private static List<Product> LoadFromTxtInternal(string path)
 		{
 			List<Product> result = new List<Product>();
 			using (StreamReader reader = new StreamReader(path))
 			{
 				string line;
+				// Чтение строк из текстового файла
 				while ((line = reader.ReadLine()) != null)
 				{
 					string[] parts = line.Split('|');
@@ -1072,6 +961,7 @@ namespace WorkPracticeLauncher.Tasks
 			return result;
 		}
 
+		// Загрузка БД из файла с выбором
 		private static void LoadFromFileWithSelection()
 		{
 			Console.Clear();
@@ -1229,6 +1119,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();
 		}
 
+		// Получение списка файлов по расширению
 		private static List<string> GetFilesByExtension(string extension, string directory)
 		{
 			if (!Directory.Exists(directory))

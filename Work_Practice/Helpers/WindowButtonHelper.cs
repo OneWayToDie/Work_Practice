@@ -13,6 +13,7 @@ namespace Work_Practice.Helpers
 			ControlTemplate template = window.Template;
 			if (template == null) return;
 
+			// Поиск кнопок в шаблоне окна
 			ButtonBase minimize = template.FindName("PART_MinimizeButton", window) as ButtonBase;
 			ButtonBase maximize = template.FindName("PART_MaximizeButton", window) as ButtonBase;
 			ButtonBase close = template.FindName("PART_CloseButton", window) as ButtonBase;
@@ -22,6 +23,7 @@ namespace Work_Practice.Helpers
 				window.WindowState = window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 			if (close != null) close.Click += (s, e) => window.Close();
 
+			// Привязка перетаскивания за заголовок
 			FrameworkElement titleBar = template.FindName("PART_TitleBar", window) as FrameworkElement;
 			if (titleBar != null)
 			{

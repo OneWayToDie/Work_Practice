@@ -61,6 +61,7 @@ namespace Work_Practice.ViewModels
 		public ICommand ClearDatabaseCommand { get; }
 		public ICommand SortAndFilterCommand { get; }
 
+		// Конструктор — загрузка данных и привязка команд
 		public Task2ViewModel()
 		{
 			dataService = new ProductDataService();
@@ -85,6 +86,7 @@ namespace Work_Practice.ViewModels
 			SortAndFilterCommand = new DelegateCommand(SortAndFilter);
 		}
 
+		// Сохранение БД в XML файл
 		private void SaveToFile()
 		{
 			bool success = dataService.SaveToXml(new List<Product>(Products));
@@ -94,6 +96,7 @@ namespace Work_Practice.ViewModels
 				AppDialog.ShowError("Ошибка при сохранении. Проверьте, что файл не заблокирован.");
 		}
 
+		// Загрузка демо-данных (15 товаров)
 		private void LoadSampleData()
 		{
 			Products.Clear();
@@ -115,12 +118,14 @@ namespace Work_Practice.ViewModels
 				new Product { Name = "Чай", Manufacturer = "Lipton", ShelfLife = 720, Price = 250m, StockQuantity = 70 },
 				new Product { Name = "Конфеты", Manufacturer = "Красный Октябрь", ShelfLife = 180, Price = 200m, StockQuantity = 90 }
 			};
+			// Добавление каждого примера в коллекцию
 			foreach (Product p in samples)
 				Products.Add(p);
 			FilterProductsAndSort();
 			AppDialog.ShowInfo("Загружены примеры (15 товаров).");
 		}
 
+		// Загрузка БД из выбранного XML файла
 		private void LoadFromFile()
 		{
 			OpenFileDialog dialog = new OpenFileDialog
@@ -135,6 +140,7 @@ namespace Work_Practice.ViewModels
 			if (loaded != null && loaded.Count > 0)
 			{
 				Products.Clear();
+				// Копирование загруженных товаров
 				foreach (Product p in loaded)
 					Products.Add(p);
 				FilterProductsAndSort();
@@ -150,6 +156,7 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
+		// Добавление нового товара с валидацией
 		private void AddProduct()
 		{
 			// Проверка наименования
@@ -204,6 +211,7 @@ namespace Work_Practice.ViewModels
 			AppDialog.ShowInfo("Товар добавлен.");
 		}
 
+		// Очистка всей базы данных
 		private void ClearDatabase()
 		{
 			Products.Clear();
@@ -215,19 +223,23 @@ namespace Work_Practice.ViewModels
 				AppDialog.ShowWarning("БД очищена из памяти, но не удалось сохранить в файл.");
 		}
 
+		// Применение сортировки и фильтра
 		private void SortAndFilter()
 		{
 			FilterProductsAndSort();
 		}
 
+		// Фильтрация и сортировка пузырьком
 		private void FilterProductsAndSort()
 		{
 			// Фильтр по остатку
 			List<Product> filtered = Products.Where(p => p.StockQuantity >= MinStockQuantity).ToList();
 
 			// Сортировка пузырьком по сроку хранения (по возрастанию)
+			// Сортировка пузырьком по сроку хранения
 			for (int i = 0; i < filtered.Count - 1; i++)
 			{
+				// Сравнение соседних элементов
 				for (int j = 0; j < filtered.Count - i - 1; j++)
 				{
 					if (filtered[j].ShelfLife > filtered[j + 1].ShelfLife)
@@ -240,6 +252,7 @@ namespace Work_Practice.ViewModels
 			}
 
 			FilteredProducts.Clear();
+			// Копирование отфильтрованных товаров
 			foreach (Product p in filtered)
 			{
 				FilteredProducts.Add(new Product
@@ -254,6 +267,7 @@ namespace Work_Practice.ViewModels
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
+		// Уведомление об изменении свойства
 		protected void OnPropertyChanged([CallerMemberName] string name = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

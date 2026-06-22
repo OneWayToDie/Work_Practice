@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Work_Practice.Models
 {
+	// Модель товара для базы данных
 	public class Product : INotifyPropertyChanged
 	{
 		private string name;

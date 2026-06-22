@@ -14,6 +14,7 @@ namespace WorkPracticeLauncher.Models
 			else
 			{
 				Node<T> current = Head;
+				// Поиск последнего узла
 				while (current.Next != null) current = current.Next;
 				current.Next = newNode;
 			}

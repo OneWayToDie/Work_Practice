@@ -28,6 +28,7 @@ namespace WorkPracticeLauncher
 		public static bool IsWindowsTerminal { get; private set; }
 		public static bool SupportsEmoji => supportsEmoji;
 
+		// Точка входа — инициализация и главный цикл
 		static void Main()
 		{
 			Console.OutputEncoding = Encoding.UTF8;
@@ -59,6 +60,7 @@ namespace WorkPracticeLauncher
 
 			bool running = true;
 
+			// Главный цикл приложения
 			while (running)
 			{
 				if (Console.WindowWidth != lastWidth || Console.WindowHeight != lastHeight)
@@ -115,6 +117,7 @@ namespace WorkPracticeLauncher
 						animThread.Start();
 
 						bool cancelled = false;
+						// Ожидание завершения анимации
 						while (animThread.IsAlive)
 						{
 							if (Console.KeyAvailable)
@@ -228,12 +231,14 @@ namespace WorkPracticeLauncher
 
 		// ---- Вспомогательные методы ----
 
+		// Ожидание нажатия любой клавиши
 		private static bool WaitForAnyKey()
 		{
 			ConsoleKey key = Console.ReadKey(true).Key;
 			return key == ConsoleKey.Escape;
 		}
 
+		// Проверка поддержки эмодзи в терминале
 		private static bool TestEmojiSupport()
 		{
 			int before = Console.CursorLeft;
@@ -246,6 +251,7 @@ namespace WorkPracticeLauncher
 			return (after - before) >= 2;
 		}
 
+		// Рекомендация по использованию Windows Terminal
 		private static void ShowTerminalRecommendation()
 		{
 			if (!supportsEmoji)
@@ -269,6 +275,7 @@ namespace WorkPracticeLauncher
 			}
 		}
 
+		// Вывод предупреждения в подвале окна
 		private static void PrintFooter()
 		{
 			if (!supportsEmoji)
@@ -290,6 +297,7 @@ namespace WorkPracticeLauncher
 			}
 		}
 
+		// Центрирование текста по ширине
 		private static string AlignCenter(string text, int width)
 		{
 			if (width <= 0) return text;
@@ -300,6 +308,7 @@ namespace WorkPracticeLauncher
 
 		// ---- Курсор и анимация ----
 
+		// Отрисовка мигающего курсора ввода
 		private static void DrawCursor()
 		{
 			int row = inputRow;
@@ -327,6 +336,7 @@ namespace WorkPracticeLauncher
 			Console.Write(showCursorState ? '_' : ' ');
 		}
 
+		// Установка позиции курсора на поле ввода
 		private static void SetCursorToInput()
 		{
 			int offset = inputBuffer.Length;
@@ -339,6 +349,7 @@ namespace WorkPracticeLauncher
 			Console.SetCursorPosition(col, row);
 		}
 
+		// Сброс состояния курсора
 		private static void ResetCursorState()
 		{
 			Console.CursorVisible = false;
@@ -348,6 +359,7 @@ namespace WorkPracticeLauncher
 			DrawCursor();
 		}
 
+		// Полная перерисовка главного экрана
 		static void RedrawScreen(CatAnimation cat)
 		{
 			Console.Clear();
@@ -357,6 +369,7 @@ namespace WorkPracticeLauncher
 			PrintFooter();
 		}
 
+		// Отрисовка главного меню
 		static void PrintMenu()
 		{
 			int w = Console.WindowWidth;
@@ -398,6 +411,7 @@ namespace WorkPracticeLauncher
 			"  🚪 0 – Выход"
 		};
 				ConsoleColor[] colors = { ConsoleColor.Cyan, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Magenta, ConsoleColor.Red };
+				// Вывод пунктов меню с эмодзи
 				for (int i = 0; i < lines.Length; i++)
 				{
 					Console.ForegroundColor = colors[i % colors.Length];
@@ -445,6 +459,7 @@ namespace WorkPracticeLauncher
 		}
 
 		// ---- Вспомогательный метод для вывода строки с полным затиранием ----
+		// Вывод строки с полным затиранием
 		private static void WriteLinePadded(string text, int width)
 		{
 			// Если строка пустая, просто выводим пустую строку (перевод)
@@ -473,8 +488,7 @@ namespace WorkPracticeLauncher
 			// 4. Переходим на новую строку
 			Console.WriteLine();
 		}
-		// ---- Остальные методы (ExecuteChoice, RunInteractiveMode, LaunchWpfApp, DownloadLatestVersion, DownloadFromDrive, ShowContacts) остаются без изменений ----
-
+				// Обработка выбора пользователя
 		static void ExecuteChoice(int choice)
 		{
 			Console.Clear();
@@ -513,6 +527,7 @@ namespace WorkPracticeLauncher
 			WaitForAnyKey();
 		}
 
+		// Интерактивный режим выбора задания
 		static void RunInteractiveMode()
 		{
 			while (true)
@@ -597,6 +612,7 @@ namespace WorkPracticeLauncher
 			}
 		}
 
+		// Запуск WPF приложения
 		static void LaunchWpfApp()
 		{
 			string wpfExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Work_Practice.exe");
@@ -631,8 +647,10 @@ namespace WorkPracticeLauncher
 		// Пункт 3 – Скачать актуальную версию
 		// --------------------------------------------
 
+		// Меню скачивания обновлений
 		static void DownloadLatestVersion()
 		{
+			// Цикл меню скачивания
 			while (true)
 			{
 				Console.Clear();
@@ -683,6 +701,7 @@ namespace WorkPracticeLauncher
 			}
 		}
 
+		// Скачивание и распаковка с Google Drive
 		static void DownloadFromDrive()
 		{
 			string fileId = "18mXjs8BIOmtAF1VyQer-e5B2r8fy6TGJ"; // замените на свой ID
@@ -712,6 +731,7 @@ namespace WorkPracticeLauncher
 							int cursorTop = Console.CursorTop;
 							int cursorLeft = 0;
 
+							// Чтение данных из потока
 							while ((bytesInBuffer = stream.Read(buffer, 0, buffer.Length)) > 0)
 							{
 								fileStream.Write(buffer, 0, bytesInBuffer);
@@ -782,6 +802,7 @@ namespace WorkPracticeLauncher
 					{
 						using (ZipArchive archive = ZipFile.OpenRead(zipPath))
 						{
+							// Распаковка каждого файла
 							foreach (ZipArchiveEntry entry in archive.Entries)
 							{
 								string destinationPath = Path.Combine(extractPath, entry.FullName);
@@ -824,6 +845,7 @@ namespace WorkPracticeLauncher
 			WaitForAnyKey();
 		}
 
+		// Вывод контактных данных автора
 		static void ShowContacts()
 		{
 			Console.ForegroundColor = ConsoleColor.Magenta;

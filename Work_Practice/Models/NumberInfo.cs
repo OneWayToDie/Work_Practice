@@ -1,5 +1,6 @@
 namespace Work_Practice.Models
 {
+	// Модель результата анализа числа
 	public class NumberInfo
 	{
 		public long Number { get; set; }

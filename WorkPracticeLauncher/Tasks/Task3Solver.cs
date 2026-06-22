@@ -9,6 +9,7 @@ namespace WorkPracticeLauncher.Tasks
 		private static int lastWidth;
 		private static int lastHeight;
 
+		// Основной метод задания 3
 		public static void Run()
 		{
 			lastWidth = Console.WindowWidth;
@@ -24,6 +25,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 
 			List<double> numbers = null;
+			// Цикл ввода чисел с валидацией
 			while (true)
 			{
 				CheckResizeAndRedraw();
@@ -33,6 +35,7 @@ namespace WorkPracticeLauncher.Tasks
 					return;
 				string[] parts = inputLine.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 				numbers = new List<double>();
+				// Парсинг каждого числа из строки
 				foreach (string p in parts)
 				{
 					string normalized = p.Replace(',', '.');
@@ -76,6 +79,7 @@ namespace WorkPracticeLauncher.Tasks
 			if (useCustom)
 			{
 				MyLinkedList<double> list = new MyLinkedList<double>();
+				// Заполнение списка числами
 				foreach (double n in numbers) list.Add(n);
 				Console.ForegroundColor = ConsoleColor.Cyan;
 				Console.Write("Исходный список: ");
@@ -99,6 +103,7 @@ namespace WorkPracticeLauncher.Tasks
 			else
 			{
 				LinkedList<double> list = new LinkedList<double>();
+				// Заполнение LinkedList числами
 				foreach (double n in numbers) list.AddLast(n);
 				Console.ForegroundColor = ConsoleColor.Cyan;
 				Console.Write("Исходный список: ");
@@ -135,6 +140,7 @@ namespace WorkPracticeLauncher.Tasks
 			// ESC обрабатывается на уровне вызывающего метода
 		}
 
+		// Перерисовка заголовка экрана
 		private static void RedrawScreen()
 		{
 			Console.Clear();
@@ -151,6 +157,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.WriteLine();
 		}
 
+		// Проверка и обработка изменения размера окна
 		private static void CheckResizeAndRedraw()
 		{
 			if (Console.WindowWidth != lastWidth || Console.WindowHeight != lastHeight)

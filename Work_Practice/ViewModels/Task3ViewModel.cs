@@ -87,6 +87,7 @@ namespace Work_Practice.ViewModels
 		public ICommand LoadFromStringCommand { get; }
 		public ICommand MoveThirdToFrontCommand { get; }
 
+		// Конструктор — привязка команд задания 3
 		public Task3ViewModel()
 		{
 			CreateRandomListCommand = new DelegateCommand(CreateRandomList);
@@ -94,6 +95,7 @@ namespace Work_Practice.ViewModels
 			MoveThirdToFrontCommand = new DelegateCommand(MoveThirdToFront);
 		}
 
+		// Генерация случайного списка чисел
 		private void CreateRandomList()
 		{
 			if (!int.TryParse(NValue, out int n) || n <= 0)
@@ -124,6 +126,7 @@ namespace Work_Practice.ViewModels
 				customList.Clear();
 				CustomListItems.Clear();
 				CustomListResultItems.Clear();
+			// Заполнение собственного списка
 			foreach (double num in randomNumbers)
 			{
 				customList.Add(num);
@@ -136,6 +139,7 @@ namespace Work_Practice.ViewModels
 				builtInList.Clear();
 				BuiltInListItems.Clear();
 				BuiltInListResultItems.Clear();
+			// Заполнение LinkedList
 			foreach (double num in randomNumbers)
 			{
 				builtInList.AddLast(num);
@@ -145,6 +149,7 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
+		// Загрузка списка из текстового ввода
 		private void LoadFromString()
 		{
 			if (string.IsNullOrWhiteSpace(NumbersInput))
@@ -197,6 +202,7 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
+		// Перенос третьего элемента в начало
 		private void MoveThirdToFront()
 		{
 			if (IsCustomViewSelected)
