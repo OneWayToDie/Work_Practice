@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 namespace WorkPracticeLauncher
@@ -97,7 +97,7 @@ namespace WorkPracticeLauncher
 			{
 				string[] copy = (string[])baseFrame.Clone();
 				int maxWidth = 0;
-				foreach (var line in baseFrame)
+				foreach (string line in baseFrame)
 					if (line.Length > maxWidth) maxWidth = line.Length;
 				int textPos = (maxWidth - text.Length) / 2;
 				if (textPos < 0) textPos = 0;

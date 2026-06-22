@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Work_Practice.Models;
 
@@ -10,13 +10,13 @@ namespace Work_Practice.Services
 
 		public void Add(T data)
 		{
-			var newNode = new Node<T>(data);
+			Node<T> newNode = new Node<T>(data);
 			if (Head == null)
 			{
 				Head = newNode;
 				return;
 			}
-			var current = Head;
+			Node<T> current = Head;
 			while (current.Next != null)
 				current = current.Next;
 			current.Next = newNode;
@@ -24,17 +24,14 @@ namespace Work_Practice.Services
 
 		public bool MoveThirdToFront()
 		{
-			// Если меньше 3 элементов, операция невозможна
 			if (Head?.Next?.Next == null)
 				return false;
 
-			var first = Head;
-			var second = Head.Next;
-			var third = Head.Next.Next;
+			Node<T> first = Head;
+			Node<T> second = Head.Next;
+			Node<T> third = Head.Next.Next;
 
-			// Переподвязка: второй указывает на четвёртый (если есть)
 			second.Next = third.Next;
-			// Третий становится головой, его следующий – первый
 			third.Next = first;
 			Head = third;
 
@@ -43,8 +40,8 @@ namespace Work_Practice.Services
 
 		public List<T> ToList()
 		{
-			var result = new List<T>();
-			var current = Head;
+			List<T> result = new List<T>();
+			Node<T> current = Head;
 			while (current != null)
 			{
 				result.Add(current.Data);

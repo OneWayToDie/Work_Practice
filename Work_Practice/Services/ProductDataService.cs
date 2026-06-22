@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using Work_Practice.Models;
@@ -11,15 +11,15 @@ namespace Work_Practice.Services
 
 		public ProductDataService(string filePath = "products.xml")
 		{
-			filePath = filePath;
+			this.filePath = filePath;
 		}
 
 		public bool SaveToXml(List<Product> products)
 		{
 			try
 			{
-				var serializer = new XmlSerializer(typeof(List<Product>));
-				using (var writer = new StreamWriter(filePath))
+				XmlSerializer serializer = new XmlSerializer(typeof(List<Product>));
+				using (StreamWriter writer = new StreamWriter(filePath))
 				{
 					serializer.Serialize(writer, products);
 				}
@@ -46,8 +46,8 @@ namespace Work_Practice.Services
 
 			try
 			{
-				var serializer = new XmlSerializer(typeof(List<Product>));
-				using (var reader = new StreamReader(filePath))
+				XmlSerializer serializer = new XmlSerializer(typeof(List<Product>));
+				using (StreamReader reader = new StreamReader(filePath))
 				{
 					return (List<Product>)serializer.Deserialize(reader);
 				}

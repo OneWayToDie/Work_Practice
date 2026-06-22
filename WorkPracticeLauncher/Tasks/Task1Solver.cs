@@ -119,7 +119,7 @@ namespace WorkPracticeLauncher.Tasks
 			BigInteger maxVal = BigInteger.Parse(numbers[0]);
 			string minNumber = numbers[0];
 			string maxNumber = numbers[0];
-			foreach (var n in numbers)
+			foreach (string n in numbers)
 			{
 				BigInteger val = BigInteger.Parse(n);
 				if (val < minVal) { minVal = val; minNumber = n; }
@@ -127,7 +127,7 @@ namespace WorkPracticeLauncher.Tasks
 			}
 
 			int maxLength = 0;
-			foreach (var n in numbers)
+			foreach (string n in numbers)
 				if (n.Length > maxLength) maxLength = n.Length;
 			int colWidth = Math.Max(maxLength, "Число".Length) + 2;
 
@@ -147,7 +147,7 @@ namespace WorkPracticeLauncher.Tasks
 				}
 				else
 				{
-					var (countDigits, minDigit) = GetDigitsInfoFunc(n);
+					(int countDigits, int minDigit) = GetDigitsInfoFunc(n);
 					Console.WriteLine($"{n.PadRight(colWidth)} {countDigits.ToString().PadRight(15)} {minDigit.ToString().PadRight(15)}");
 				}
 			}

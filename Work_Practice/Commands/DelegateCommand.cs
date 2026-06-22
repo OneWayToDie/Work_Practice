@@ -10,8 +10,8 @@ namespace Work_Practice.Commands
 
 		public DelegateCommand(Action execute, Func<bool> canExecute = null)
 		{
-			execute = execute;
-			canExecute = canExecute;
+			this.execute = execute;
+			this.canExecute = canExecute;
 		}
 
 		public bool CanExecute(object parameter) => canExecute == null || canExecute();

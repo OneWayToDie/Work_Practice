@@ -65,7 +65,7 @@ namespace Work_Practice.ViewModels
 		{
 			dataService = new ProductDataService();
 
-			var loaded = dataService.LoadFromXml();
+			List<Product> loaded = dataService.LoadFromXml();
 			if (loaded != null && loaded.Count > 0)
 			{
 				Products = new ObservableCollection<Product>(loaded);
@@ -97,7 +97,7 @@ namespace Work_Practice.ViewModels
 		private void LoadSampleData()
 		{
 			Products.Clear();
-			var samples = new List<Product>
+			List<Product> samples = new List<Product>
 			{
 				new Product { Name = "Молоко", Manufacturer = "Простоквашино", ShelfLife = 7, Price = 80m, StockQuantity = 50 },
 				new Product { Name = "Хлеб", Manufacturer = "Дарницкий", ShelfLife = 3, Price = 45m, StockQuantity = 120 },
@@ -115,7 +115,7 @@ namespace Work_Practice.ViewModels
 				new Product { Name = "Чай", Manufacturer = "Lipton", ShelfLife = 720, Price = 250m, StockQuantity = 70 },
 				new Product { Name = "Конфеты", Manufacturer = "Красный Октябрь", ShelfLife = 180, Price = 200m, StockQuantity = 90 }
 			};
-			foreach (var p in samples)
+			foreach (Product p in samples)
 				Products.Add(p);
 			FilterProductsAndSort();
 			AppDialog.ShowInfo("Загружены примеры (15 товаров).");
@@ -123,7 +123,7 @@ namespace Work_Practice.ViewModels
 
 		private void LoadFromFile()
 		{
-			var dialog = new OpenFileDialog
+			OpenFileDialog dialog = new OpenFileDialog
 			{
 				Filter = "XML файлы (*.xml)|*.xml|Все файлы (*.*)|*.*",
 				Title = "Выберите файл для загрузки"
@@ -131,11 +131,11 @@ namespace Work_Practice.ViewModels
 			if (dialog.ShowDialog() != true)
 				return;
 
-			var loaded = dataService.LoadFromXml(dialog.FileName);
+			List<Product> loaded = dataService.LoadFromXml(dialog.FileName);
 			if (loaded != null && loaded.Count > 0)
 			{
 				Products.Clear();
-				foreach (var p in loaded)
+				foreach (Product p in loaded)
 					Products.Add(p);
 				FilterProductsAndSort();
 				AppDialog.ShowInfo($"Данные загружены из файла: {System.IO.Path.GetFileName(dialog.FileName)}");
@@ -183,7 +183,7 @@ namespace Work_Practice.ViewModels
 				return;
 			}
 
-			var newProduct = new Product
+			Product newProduct = new Product
 			{
 				Name = NewName.Trim(),
 				Manufacturer = NewManufacturer.Trim(),
@@ -223,7 +223,7 @@ namespace Work_Practice.ViewModels
 		private void FilterProductsAndSort()
 		{
 			// Фильтр по остатку
-			var filtered = Products.Where(p => p.StockQuantity >= MinStockQuantity).ToList();
+			List<Product> filtered = Products.Where(p => p.StockQuantity >= MinStockQuantity).ToList();
 
 			// Сортировка пузырьком по сроку хранения (по возрастанию)
 			for (int i = 0; i < filtered.Count - 1; i++)
@@ -232,7 +232,7 @@ namespace Work_Practice.ViewModels
 				{
 					if (filtered[j].ShelfLife > filtered[j + 1].ShelfLife)
 					{
-						var temp = filtered[j];
+						Product temp = filtered[j];
 						filtered[j] = filtered[j + 1];
 						filtered[j + 1] = temp;
 					}
@@ -240,7 +240,7 @@ namespace Work_Practice.ViewModels
 			}
 
 			FilteredProducts.Clear();
-			foreach (var p in filtered)
+			foreach (Product p in filtered)
 			{
 				FilteredProducts.Add(new Product
 				{

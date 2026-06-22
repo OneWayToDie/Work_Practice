@@ -124,11 +124,11 @@ namespace Work_Practice.ViewModels
 				customList.Clear();
 				CustomListItems.Clear();
 				CustomListResultItems.Clear();
-				foreach (var num in randomNumbers)
-				{
-					customList.Add(num);
-					CustomListItems.Add(num);
-				}
+			foreach (double num in randomNumbers)
+			{
+				customList.Add(num);
+				CustomListItems.Add(num);
+			}
 				AppDialog.ShowInfo($"Создан случайный список (собственная реализация) из {n} {typeName} чисел.");
 			}
 			else
@@ -136,11 +136,11 @@ namespace Work_Practice.ViewModels
 				builtInList.Clear();
 				BuiltInListItems.Clear();
 				BuiltInListResultItems.Clear();
-				foreach (var num in randomNumbers)
-				{
-					builtInList.AddLast(num);
-					BuiltInListItems.Add(num);
-				}
+			foreach (double num in randomNumbers)
+			{
+				builtInList.AddLast(num);
+				BuiltInListItems.Add(num);
+			}
 				AppDialog.ShowInfo($"Создан случайный список (LinkedList<T>) из {n} {typeName} чисел.");
 			}
 		}
@@ -153,8 +153,8 @@ namespace Work_Practice.ViewModels
 				return;
 			}
 			string[] parts = NumbersInput.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-			var parsedNumbers = new List<double>();
-			foreach (var part in parts)
+			List<double> parsedNumbers = new List<double>();
+			foreach (string part in parts)
 			{
 				if (double.TryParse(part, out double val))
 					parsedNumbers.Add(val);
@@ -176,11 +176,11 @@ namespace Work_Practice.ViewModels
 				customList.Clear();
 				CustomListItems.Clear();
 				CustomListResultItems.Clear();
-				foreach (var num in parsedNumbers)
-				{
-					customList.Add(num);
-					CustomListItems.Add(num);
-				}
+			foreach (double num in parsedNumbers)
+			{
+				customList.Add(num);
+				CustomListItems.Add(num);
+			}
 				AppDialog.ShowInfo($"Загружено {parsedNumbers.Count} чисел (собственная реализация).");
 			}
 			else
@@ -188,11 +188,11 @@ namespace Work_Practice.ViewModels
 				builtInList.Clear();
 				BuiltInListItems.Clear();
 				BuiltInListResultItems.Clear();
-				foreach (var num in parsedNumbers)
-				{
-					builtInList.AddLast(num);
-					BuiltInListItems.Add(num);
-				}
+			foreach (double num in parsedNumbers)
+			{
+				builtInList.AddLast(num);
+				BuiltInListItems.Add(num);
+			}
 				AppDialog.ShowInfo($"Загружено {parsedNumbers.Count} чисел (LinkedList<T>).");
 			}
 		}
@@ -205,21 +205,21 @@ namespace Work_Practice.ViewModels
 				{
 					// Синхронизируем "До" с текущим состоянием списка
 					CustomListItems.Clear();
-					foreach (var item in customList.ToList())
-						CustomListItems.Add(item);
+				foreach (double item in customList.ToList())
+					CustomListItems.Add(item);
 
-					// Копируем "До" в "После"
-					CustomListResultItems.Clear();
-					foreach (var item in CustomListItems)
-						CustomListResultItems.Add(item);
+				// Копируем "До" в "После"
+				CustomListResultItems.Clear();
+				foreach (double item in CustomListItems)
+					CustomListResultItems.Add(item);
 
 					bool success = customList.MoveThirdToFront();
 					if (success)
 					{
 						// Обновляем "После" результатом переноса
 						CustomListResultItems.Clear();
-						foreach (var item in customList.ToList())
-							CustomListResultItems.Add(item);
+					foreach (double item in customList.ToList())
+						CustomListResultItems.Add(item);
 						AppDialog.ShowInfo("Собственная реализация: третий элемент перенесён в начало.");
 					}
 					else
@@ -237,24 +237,24 @@ namespace Work_Practice.ViewModels
 				{
 					// Синхронизируем "До" с текущим состоянием списка
 					BuiltInListItems.Clear();
-					foreach (var item in builtInList)
-						BuiltInListItems.Add(item);
+				foreach (double item in builtInList)
+					BuiltInListItems.Add(item);
 
-					// Копируем "До" в "После"
-					BuiltInListResultItems.Clear();
-					foreach (var item in BuiltInListItems)
-						BuiltInListResultItems.Add(item);
+				// Копируем "До" в "После"
+				BuiltInListResultItems.Clear();
+				foreach (double item in BuiltInListItems)
+					BuiltInListResultItems.Add(item);
 
-					var thirdNode = builtInList.First?.Next?.Next;
+				LinkedListNode<double> thirdNode = builtInList.First?.Next?.Next;
 					if (thirdNode != null)
 					{
-						var value = thirdNode.Value;
+						double value = thirdNode.Value;
 						builtInList.Remove(thirdNode);
 						builtInList.AddFirst(value);
 						// Обновляем "После" результатом переноса
 						BuiltInListResultItems.Clear();
-						foreach (var item in builtInList)
-							BuiltInListResultItems.Add(item);
+					foreach (double item in builtInList)
+						BuiltInListResultItems.Add(item);
 						AppDialog.ShowInfo("LinkedList<T>: третий элемент перенесён в начало.");
 					}
 					else

@@ -8,12 +8,12 @@ namespace WorkPracticeLauncher.Models
 
 		public void Add(T data)
 		{
-			var newNode = new Node<T>(data);
+			Node<T> newNode = new Node<T>(data);
 			if (Head == null)
 				Head = newNode;
 			else
 			{
-				var current = Head;
+				Node<T> current = Head;
 				while (current.Next != null) current = current.Next;
 				current.Next = newNode;
 			}
@@ -21,28 +21,26 @@ namespace WorkPracticeLauncher.Models
 
 		public bool MoveThirdToFront()
 		{
-			// Необходимо минимум 3 элемента
 			if (Head?.Next?.Next == null)
 				return false;
 
-			var first = Head;
-			var second = Head.Next;
-			var third = Head.Next.Next;
-			var fourth = third.Next; // может быть null
+			Node<T> first = Head;
+			Node<T> second = Head.Next;
+			Node<T> third = Head.Next.Next;
+			Node<T> fourth = third.Next;
 
-			// Переставляем ссылки
-			first.Next = second;      // 1 -> 2
-			second.Next = fourth;     // 2 -> 4 (или null)
-			third.Next = first;       // 3 -> 1
-			Head = third;             // голова теперь 3
+			first.Next = second;
+			second.Next = fourth;
+			third.Next = first;
+			Head = third;
 
 			return true;
 		}
 
 		public List<T> ToList()
 		{
-			var result = new List<T>();
-			var current = Head;
+			List<T> result = new List<T>();
+			Node<T> current = Head;
 			while (current != null)
 			{
 				result.Add(current.Data);

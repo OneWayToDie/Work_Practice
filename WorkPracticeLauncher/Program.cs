@@ -43,7 +43,7 @@ namespace WorkPracticeLauncher
 
 			ShowTerminalRecommendation();
 
-			var cat = new CatAnimation();
+			CatAnimation cat = new CatAnimation();
 
 			RedrawScreen(cat);
 			ResetCursorState();
@@ -82,8 +82,8 @@ namespace WorkPracticeLauncher
 
 				if (Console.KeyAvailable)
 				{
-					var keyInfo = Console.ReadKey(true);
-					var key = keyInfo.Key;
+					ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+					ConsoleKey key = keyInfo.Key;
 					char keyChar = keyInfo.KeyChar;
 
 					bool isValidKey = (key >= ConsoleKey.D0 && key <= ConsoleKey.D4) ||
@@ -119,7 +119,7 @@ namespace WorkPracticeLauncher
 						{
 							if (Console.KeyAvailable)
 							{
-								var checkKey = Console.ReadKey(true).Key;
+								ConsoleKey checkKey = Console.ReadKey(true).Key;
 								if (checkKey == ConsoleKey.Enter)
 								{
 									cancelAnimation = true;
@@ -228,7 +228,7 @@ namespace WorkPracticeLauncher
 
 		private static bool WaitForAnyKey()
 		{
-			var key = Console.ReadKey(true).Key;
+			ConsoleKey key = Console.ReadKey(true).Key;
 			return key == ConsoleKey.Escape;
 		}
 
@@ -690,16 +690,16 @@ namespace WorkPracticeLauncher
 			Console.WriteLine("Начинается скачивание обновления...");
 			Console.ResetColor();
 
-			using (var client = new HttpClient())
+			using (HttpClient client = new HttpClient())
 			{
 				try
 				{
-					using (var response = client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead).Result)
+					using (HttpResponseMessage response = client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead).Result)
 					{
 						response.EnsureSuccessStatusCode();
 						long totalBytes = response.Content.Headers.ContentLength ?? -1;
-						using (var stream = response.Content.ReadAsStreamAsync().Result)
-						using (var fileStream = File.Create(zipPath))
+					using (Stream stream = response.Content.ReadAsStreamAsync().Result)
+					using (FileStream fileStream = File.Create(zipPath))
 						{
 							byte[] buffer = new byte[8192];
 							long bytesRead = 0;

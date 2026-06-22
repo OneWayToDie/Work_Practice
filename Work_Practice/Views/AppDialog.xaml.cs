@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using Work_Practice.ViewModels;
 
@@ -39,7 +39,7 @@ namespace Work_Practice.Views
 
 		private static void ShowDialog(string message, string title, string icon, string colorHex)
 		{
-			var dialog = new AppDialog
+			AppDialog dialog = new AppDialog
 			{
 				DataContext = new AppDialogViewModel
 				{

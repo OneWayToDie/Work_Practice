@@ -139,7 +139,7 @@ namespace Work_Practice.ViewModels
 				}
 				else
 				{
-					var (count, minDigit) = GetDigitsInfoFunc(n);
+					(int count, int? minDigit) = GetDigitsInfoFunc(n);
 					Results.Add(new NumberInfo { Number = n, DigitCount = count, MinDigit = minDigit });
 				}
 			}

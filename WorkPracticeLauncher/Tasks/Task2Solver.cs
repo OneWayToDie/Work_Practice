@@ -62,7 +62,7 @@ namespace WorkPracticeLauncher.Tasks
 					string vertical = "│";
 
 					Console.WriteLine(topLeft + new string(horizontal[0], maxWidth) + topRight);
-					foreach (var line in tipLines)
+					foreach (string line in tipLines)
 					{
 						Console.WriteLine(vertical + " " + line.PadRight(maxWidth - 2) + " " + vertical);
 					}
@@ -225,7 +225,7 @@ namespace WorkPracticeLauncher.Tasks
 		{
 			try
 			{
-				using (var dialog = new FolderBrowserDialog())
+				using (FolderBrowserDialog dialog = new FolderBrowserDialog())
 				{
 					dialog.Description = "Выберите каталог для данных";
 					dialog.SelectedPath = currentDataDirectory;
@@ -327,7 +327,7 @@ namespace WorkPracticeLauncher.Tasks
 					Console.ResetColor();
 				}
 
-				var newProduct = new Product
+				Product newProduct = new Product
 				{
 					Name = name,
 					Manufacturer = manufacturer,
@@ -343,7 +343,7 @@ namespace WorkPracticeLauncher.Tasks
 				Console.ResetColor();
 
 				Console.WriteLine("Нажмите Enter для продолжения или ESC для выхода.");
-				var key = Console.ReadKey(true).Key;
+				ConsoleKey key = Console.ReadKey(true).Key;
 				if (key == ConsoleKey.Escape)
 				{
 					Console.WriteLine("Выход в меню...");
@@ -361,7 +361,7 @@ namespace WorkPracticeLauncher.Tasks
 		private static void EditLastProduct()
 		{
 			if (products.Count == 0) return;
-			var lastProduct = products[products.Count - 1];
+			Product lastProduct = products[products.Count - 1];
 
 			bool editing = true;
 			while (editing)
@@ -384,7 +384,7 @@ namespace WorkPracticeLauncher.Tasks
 				Console.WriteLine("  5 – Количество на складе");
 				Console.Write("Ваш выбор (или Esc для отмены): ");
 
-				var fieldKey = Console.ReadKey(true).Key;
+				ConsoleKey fieldKey = Console.ReadKey(true).Key;
 				if (fieldKey == ConsoleKey.Escape)
 				{
 					editing = false;
@@ -571,7 +571,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine($"{"Наименование".PadRight(nameWidth)} {"Фирма".PadRight(mfrWidth)} {"Срок".PadRight(shelfWidth)} {"Цена".PadRight(priceWidth)} {"Кол-во".PadRight(stockWidth)}");
 			Console.WriteLine(new string('-', nameWidth + mfrWidth + shelfWidth + priceWidth + stockWidth + 4));
-			foreach (var p in sorted)
+			foreach (Product p in sorted)
 			{
 				Console.WriteLine($"{p.Name.PadRight(nameWidth)} {p.Manufacturer.PadRight(mfrWidth)} {p.ShelfLife.ToString().PadRight(shelfWidth)} {p.Price.ToString("F2").PadRight(priceWidth)} {p.StockQuantity.ToString().PadRight(stockWidth)}");
 			}
@@ -617,7 +617,7 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			var removedProduct = products[idx - 1];
+			Product removedProduct = products[idx - 1];
 			products.RemoveAt(idx - 1);
 			Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine($"Удалён товар: {removedProduct.Name} (индекс {idx})");
@@ -706,9 +706,9 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			var xmlFiles = GetFilesByExtension(".xml", currentDataDirectory);
-			var txtFiles = GetFilesByExtension(".txt", currentDataDirectory);
-			var allFiles = xmlFiles.Concat(txtFiles).ToList();
+			List<string> xmlFiles = GetFilesByExtension(".xml", currentDataDirectory);
+			List<string> txtFiles = GetFilesByExtension(".txt", currentDataDirectory);
+			List<string> allFiles = xmlFiles.Concat(txtFiles).ToList();
 
 			Console.Clear();
 			Console.ForegroundColor = ConsoleColor.Yellow;
@@ -893,8 +893,8 @@ namespace WorkPracticeLauncher.Tasks
 					{
 						if (format == FileFormat.Xml)
 						{
-							var serializer = new XmlSerializer(typeof(List<Product>));
-							using (var reader = new StreamReader(path))
+						XmlSerializer serializer = new XmlSerializer(typeof(List<Product>));
+						using (StreamReader reader = new StreamReader(path))
 								existing = (List<Product>)serializer.Deserialize(reader);
 						}
 						else
@@ -913,8 +913,8 @@ namespace WorkPracticeLauncher.Tasks
 
 				if (format == FileFormat.Xml)
 				{
-					var serializer = new XmlSerializer(typeof(List<Product>));
-					using (var writer = new StreamWriter(path))
+				XmlSerializer serializer = new XmlSerializer(typeof(List<Product>));
+				using (StreamWriter writer = new StreamWriter(path))
 						serializer.Serialize(writer, toSave);
 				}
 				else
@@ -1029,20 +1029,20 @@ namespace WorkPracticeLauncher.Tasks
 
 		private static void SaveToTxtInternal(string path, List<Product> data)
 		{
-			using (var writer = new StreamWriter(path))
-				foreach (var p in data)
+		using (StreamWriter writer = new StreamWriter(path))
+			foreach (Product p in data)
 					writer.WriteLine($"{p.Name}|{p.Manufacturer}|{p.ShelfLife}|{p.Price}|{p.StockQuantity}");
 		}
 
 		private static List<Product> LoadFromTxtInternal(string path)
 		{
-			var result = new List<Product>();
-			using (var reader = new StreamReader(path))
+			List<Product> result = new List<Product>();
+			using (StreamReader reader = new StreamReader(path))
 			{
 				string line;
 				while ((line = reader.ReadLine()) != null)
 				{
-					var parts = line.Split('|');
+					string[] parts = line.Split('|');
 					if (parts.Length != 5) continue;
 					if (int.TryParse(parts[2], out int shelf) &&
 						decimal.TryParse(parts[3].Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal price) &&
@@ -1143,7 +1143,7 @@ namespace WorkPracticeLauncher.Tasks
 				return;
 			}
 
-			var files = GetFilesByExtension(".xml", selectedDirectory)
+			List<string> files = GetFilesByExtension(".xml", selectedDirectory)
 						.Concat(GetFilesByExtension(".txt", selectedDirectory))
 						.ToList();
 			if (files.Count == 0)
@@ -1186,8 +1186,8 @@ namespace WorkPracticeLauncher.Tasks
 				List<Product> loaded;
 				if (format == FileFormat.Xml)
 				{
-					var serializer = new XmlSerializer(typeof(List<Product>));
-					using (var reader = new StreamReader(fullPath))
+				XmlSerializer serializer = new XmlSerializer(typeof(List<Product>));
+				using (StreamReader reader = new StreamReader(fullPath))
 						loaded = (List<Product>)serializer.Deserialize(reader);
 				}
 				else

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -15,7 +15,7 @@ namespace Work_Practice.Views
 			{
 				try
 				{
-					var color = (Color)ColorConverter.ConvertFromString(hex);
+					Color color = (Color)ColorConverter.ConvertFromString(hex);
 					return new SolidColorBrush(color);
 				}
 				catch

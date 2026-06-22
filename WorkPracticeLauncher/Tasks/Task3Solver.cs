@@ -31,9 +31,9 @@ namespace WorkPracticeLauncher.Tasks
 				string inputLine = Console.ReadLine();
 				if (string.IsNullOrEmpty(inputLine))
 					return;
-				var parts = inputLine.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+				string[] parts = inputLine.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 				numbers = new List<double>();
-				foreach (var p in parts)
+				foreach (string p in parts)
 				{
 					string normalized = p.Replace(',', '.');
 					if (double.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double val))
@@ -75,8 +75,8 @@ namespace WorkPracticeLauncher.Tasks
 
 			if (useCustom)
 			{
-				var list = new MyLinkedList<double>();
-				foreach (var n in numbers) list.Add(n);
+				MyLinkedList<double> list = new MyLinkedList<double>();
+				foreach (double n in numbers) list.Add(n);
 				Console.ForegroundColor = ConsoleColor.Cyan;
 				Console.Write("Исходный список: ");
 				Console.ResetColor();
@@ -98,8 +98,8 @@ namespace WorkPracticeLauncher.Tasks
 			}
 			else
 			{
-				var list = new LinkedList<double>();
-				foreach (var n in numbers) list.AddLast(n);
+				LinkedList<double> list = new LinkedList<double>();
+				foreach (double n in numbers) list.AddLast(n);
 				Console.ForegroundColor = ConsoleColor.Cyan;
 				Console.Write("Исходный список: ");
 				Console.ResetColor();
@@ -107,10 +107,10 @@ namespace WorkPracticeLauncher.Tasks
 
 				if (list.Count >= 3)
 				{
-					var thirdNode = list.First?.Next?.Next;
+					LinkedListNode<double> thirdNode = list.First?.Next?.Next;
 					if (thirdNode != null)
 					{
-						var value = thirdNode.Value;
+						double value = thirdNode.Value;
 						list.Remove(thirdNode);
 						list.AddFirst(value);
 						Console.ForegroundColor = ConsoleColor.Green;
