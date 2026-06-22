@@ -499,32 +499,44 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 
 			int windowWidth = Console.WindowWidth;
-			int nameWidth = Math.Min(20, windowWidth / 5);
-			int mfrWidth = Math.Min(15, windowWidth / 5);
-			int shelfWidth = Math.Min(8, windowWidth / 5);
-			int priceWidth = Math.Min(10, windowWidth / 5);
-			int stockWidth = Math.Min(8, windowWidth / 5);
+			int maxLen = 20;
 
-			nameWidth = Math.Max(nameWidth, "Наименование".Length + 1);
-			mfrWidth = Math.Max(mfrWidth, "Фирма".Length + 1);
-			shelfWidth = Math.Max(shelfWidth, "Срок".Length + 1);
-			priceWidth = Math.Max(priceWidth, "Цена".Length + 1);
-			stockWidth = Math.Max(stockWidth, "Кол-во".Length + 1);
+			bool hasLongName = false;
+			foreach (Product p in products)
+			{
+				if (p.Name.Length > maxLen) { hasLongName = true; break; }
+			}
+			if (hasLongName)
+			{
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine("Внимание: некоторые наименования превышают 20 символов и будут обрезаны.");
+				Console.ResetColor();
+			}
+
+			int nameWidth = Math.Max("Наименование".Length + 1, Math.Min(maxLen, "Наименование".Length + 1));
+			int mfrWidth = Math.Max("Фирма".Length + 1, Math.Min(maxLen, "Фирма".Length + 1));
+			int shelfWidth = Math.Max("Срок".Length + 1, Math.Min(maxLen, "Срок".Length + 1));
+			int priceWidth = Math.Max("Цена".Length + 1, Math.Min(maxLen, "Цена".Length + 1));
+			int stockWidth = Math.Max("Кол-во".Length + 1, Math.Min(maxLen, "Кол-во".Length + 1));
+
+			foreach (Product p in products)
+			{
+				nameWidth = Math.Max(nameWidth, Math.Min(p.Name.Length + 1, maxLen));
+				mfrWidth = Math.Max(mfrWidth, Math.Min(p.Manufacturer.Length + 1, maxLen));
+				shelfWidth = Math.Max(shelfWidth, Math.Min(p.ShelfLife.ToString().Length + 1, maxLen));
+				priceWidth = Math.Max(priceWidth, Math.Min(p.Price.ToString("F2").Length + 1, maxLen));
+				stockWidth = Math.Max(stockWidth, Math.Min(p.StockQuantity.ToString().Length + 1, maxLen));
+			}
 
 			int total = nameWidth + mfrWidth + shelfWidth + priceWidth + stockWidth + 8;
 			if (total > windowWidth)
 			{
 				double ratio = (windowWidth - 8) / (double)(total - 8);
-				nameWidth = (int)(nameWidth * ratio);
-				mfrWidth = (int)(mfrWidth * ratio);
-				shelfWidth = (int)(shelfWidth * ratio);
-				priceWidth = (int)(priceWidth * ratio);
-				stockWidth = (int)(stockWidth * ratio);
-				nameWidth = Math.Max(nameWidth, 3);
-				mfrWidth = Math.Max(mfrWidth, 3);
-				shelfWidth = Math.Max(shelfWidth, 3);
-				priceWidth = Math.Max(priceWidth, 3);
-				stockWidth = Math.Max(stockWidth, 3);
+				nameWidth = Math.Max(3, (int)(nameWidth * ratio));
+				mfrWidth = Math.Max(3, (int)(mfrWidth * ratio));
+				shelfWidth = Math.Max(3, (int)(shelfWidth * ratio));
+				priceWidth = Math.Max(3, (int)(priceWidth * ratio));
+				stockWidth = Math.Max(3, (int)(stockWidth * ratio));
 			}
 
 			Console.WriteLine($"{"Наименование".PadRight(nameWidth)} {"Фирма".PadRight(mfrWidth)} {"Срок".PadRight(shelfWidth)} {"Цена".PadRight(priceWidth)} {"Кол-во".PadRight(stockWidth)}");

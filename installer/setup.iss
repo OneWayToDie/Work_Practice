@@ -1,5 +1,5 @@
 ﻿; Inno Setup Script
-; Work_Practice — Учебная практика
+; Work_Practice - Учебная практика
 
 #define MyAppName "Work_Practice"
 #define MyAppVersion "1.0"
@@ -55,7 +55,8 @@ Source: "C:\проверка связи\Work_Practice\WorkPracticeLauncher\termi
 Name: "{group}\Work_Practice (WPF)"; Filename: "{app}\Work_Practice.exe"
 Name: "{group}\Work_Practice (Лаунчер)"; Filename: "{app}\WorkPracticeLauncher.exe"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Work_Practice (Лаунчер)"; Filename: "{app}\WorkPracticeLauncher.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Work_Practice (WPF)"; Filename: "{app}\Work_Practice.exe"; IconFilename: "{app}\icons\rocketMonitor.ico"; Tasks: desktopicon
+Name: "{autodesktop}\Work_Practice (Лаунчер)"; Filename: "{app}\WorkPracticeLauncher.exe"; IconFilename: "{app}\icons\terminal.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\WorkPracticeLauncher.exe"; Description: "Запустить лаунчер"; Flags: nowait postinstall skipifsilent

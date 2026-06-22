@@ -379,7 +379,7 @@ namespace WorkPracticeLauncher
 				Console.ForegroundColor = ConsoleColor.Green;
 				WriteLinePadded(topLine, w);
 				WriteLinePadded("║" + AlignCenter("Учебная практика – Прикладная информатика", lineWidth) + "║", w);
-				WriteLinePadded("║" + AlignCenter("Версия 1.0 (лаунчер)", lineWidth) + "║", w);
+				WriteLinePadded("║" + AlignCenter("Launcher(V1.0)", lineWidth) + "║", w);
 				WriteLinePadded(bottomLine, w);
 				Console.ResetColor();
 
@@ -413,7 +413,7 @@ namespace WorkPracticeLauncher
 				Console.ForegroundColor = ConsoleColor.Green;
 				WriteLinePadded("=============================================", w);
 				WriteLinePadded("   Учебная практика – Прикладная информатика", w);
-				WriteLinePadded("   Версия 1.0 (лаунчер)", w);
+				WriteLinePadded("             Launcher(V1.0)", w);
 				WriteLinePadded("=============================================", w);
 				Console.ResetColor();
 
@@ -431,9 +431,11 @@ namespace WorkPracticeLauncher
 				Console.ForegroundColor = ConsoleColor.DarkGray;
 				WriteLinePadded("  (или ESC Назад)", w);
 				Console.ResetColor();
+
+			
 			}
 
-			// Пустая строка перед приглашением
+			
 			Console.WriteLine();
 			Console.Write("Ваш выбор: ");
 			inputCol = Console.CursorLeft;
