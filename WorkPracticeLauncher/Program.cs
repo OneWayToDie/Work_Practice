@@ -721,8 +721,8 @@ namespace WorkPracticeLauncher
 					{
 						response.EnsureSuccessStatusCode();
 						long totalBytes = response.Content.Headers.ContentLength ?? -1;
-					using (Stream stream = response.Content.ReadAsStreamAsync().Result)
-					using (FileStream fileStream = File.Create(zipPath))
+						using (Stream stream = response.Content.ReadAsStreamAsync().Result)
+						using (FileStream fileStream = File.Create(zipPath))
 						{
 							byte[] buffer = new byte[8192];
 							long bytesRead = 0;
@@ -773,18 +773,18 @@ namespace WorkPracticeLauncher
 				try
 				{
 					var staThread = new Thread(() =>
-						{
-							using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
 					{
-						dialog.Description = "Выберите папку для распаковки обновления";
-						dialog.ShowNewFolderButton = true;
-						if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-							extractPath = dialog.SelectedPath;
-					}
-						});
-						staThread.SetApartmentState(ApartmentState.STA);
-						staThread.Start();
-						staThread.Join();
+						using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+						{
+							dialog.Description = "Выберите папку для распаковки обновления";
+							dialog.ShowNewFolderButton = true;
+							if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+								extractPath = dialog.SelectedPath;
+						}
+					});
+					staThread.SetApartmentState(ApartmentState.STA);
+					staThread.Start();
+					staThread.Join();
 				}
 				catch { }
 
