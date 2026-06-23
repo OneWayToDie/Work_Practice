@@ -1,38 +1,42 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
+﻿//========================================================= Библиотеки ================================================================//
+using System;                     // Базовые типы (InvalidOperationException)
+using System.Windows;             // Базовые WPF-классы (Window, WindowState)
+using System.Windows.Controls;    // Элементы управления (ButtonBase, FrameworkElement)
+using System.Windows.Controls.Primitives; // ButtonBase (базовый класс для кнопок)
+using System.Windows.Input;       // MouseButtonState, MouseButtonEventArgs
 
 namespace Work_Practice.Helpers
 {
+	//========================================================= Класс-помощник для управления кастомным заголовком окна ================================================================//
 	public static class WindowButtonHelper
 	{
+		//========================================================= Привязка обработчиков к кнопкам и заголовку окна ================================================================//
 		public static void Attach(Window window)
 		{
-			ControlTemplate template = window.Template;
-			if (template == null) return;
+			ControlTemplate template = window.Template;                 // Получаем шаблон окна (если задан)
+			if (template == null) return;                               // Если шаблона нет – выходим (нечего привязывать)
 
-			// Поиск кнопок в шаблоне окна
-			ButtonBase minimize = template.FindName("PART_MinimizeButton", window) as ButtonBase;
-			ButtonBase maximize = template.FindName("PART_MaximizeButton", window) as ButtonBase;
-			ButtonBase close = template.FindName("PART_CloseButton", window) as ButtonBase;
+			// Поиск кнопок управления окном в шаблоне
+			ButtonBase minimize = template.FindName("PART_MinimizeButton", window) as ButtonBase; // Кнопка "Свернуть"
+			ButtonBase maximize = template.FindName("PART_MaximizeButton", window) as ButtonBase; // Кнопка "Развернуть/Восстановить"
+			ButtonBase close = template.FindName("PART_CloseButton", window) as ButtonBase;       // Кнопка "Закрыть"
 
-			if (minimize != null) minimize.Click += (s, e) => window.WindowState = WindowState.Minimized;
+			// Подписка на события кликов
+			if (minimize != null) minimize.Click += (s, e) => window.WindowState = WindowState.Minimized; // Свернуть окно
 			if (maximize != null) maximize.Click += (s, e) =>
-				window.WindowState = window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-			if (close != null) close.Click += (s, e) => window.Close();
+				window.WindowState = window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; // Переключение состояния
+			if (close != null) close.Click += (s, e) => window.Close(); // Закрыть окно
 
-			// Привязка перетаскивания за заголовок
-			FrameworkElement titleBar = template.FindName("PART_TitleBar", window) as FrameworkElement;
-			if (titleBar != null)
+			// Поиск элемента-заголовка для перетаскивания окна
+			FrameworkElement titleBar = template.FindName("PART_TitleBar", window) as FrameworkElement; // Заголовок (обычно Border или Panel)
+			if (titleBar != null)                                         // Если заголовок найден
 			{
-				titleBar.MouseLeftButtonDown += (s, e) =>
+				titleBar.MouseLeftButtonDown += (s, e) =>                 // При нажатии левой кнопки мыши на заголовке
 				{
-					if (e.ButtonState == MouseButtonState.Pressed)
+					if (e.ButtonState == MouseButtonState.Pressed)       // Если кнопка действительно нажата
 					{
-						try { window.DragMove(); }
-						catch (InvalidOperationException) { }
+						try { window.DragMove(); }                       // Пытаемся начать перетаскивание окна
+						catch (InvalidOperationException) { }           // Игнорируем ошибки (например, если окно уже в режиме изменения размера)
 					}
 				};
 			}

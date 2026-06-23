@@ -1,27 +1,32 @@
-using System;
-using System.Windows.Input;
+//========================================================= Библиотеки ================================================================//
+using System;                     // Базовые типы (Action, Func, EventHandler)
+using System.Windows.Input;       // ICommand, CommandManager
 
 namespace Work_Practice.Commands
 {
-	// Реализация ICommand для MVVM привязки команд
+	//========================================================= Реализация ICommand для MVVM-привязки команд ================================================================//
 	public class DelegateCommand : ICommand
 	{
-		private readonly Action execute;
-		private readonly Func<bool> canExecute;
+		//========================================================= Приватные поля ================================================================//
+		private readonly Action execute;          // Делегат, выполняющий основное действие команды
+		private readonly Func<bool> canExecute;   // Делегат, определяющий, доступна ли команда
 
-		// Конструктор — делегаты выполнения и проверки
+		//========================================================= Конструктор ================================================================//
 		public DelegateCommand(Action execute, Func<bool> canExecute = null)
 		{
-			this.execute = execute;
-			this.canExecute = canExecute;
+			this.execute = execute;               // Сохраняем делегат выполнения
+			this.canExecute = canExecute;         // Сохраняем делегат проверки (может быть null)
 		}
 
-		public bool CanExecute(object parameter) => canExecute == null || canExecute();
-		public void Execute(object parameter) => execute();
+		//========================================================= Реализация ICommand ================================================================//
+		public bool CanExecute(object parameter) => canExecute == null || canExecute(); // Если делегат не задан – всегда доступна, иначе вызываем его
+		public void Execute(object parameter) => execute();                            // Выполняем действие (параметр игнорируется)
+
+		//========================================================= Событие изменения состояния доступности команды ================================================================//
 		public event EventHandler CanExecuteChanged
 		{
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
+			add { CommandManager.RequerySuggested += value; }   // Подписываемся на глобальное событие перезапроса состояния команд
+			remove { CommandManager.RequerySuggested -= value; } // Отписываемся
 		}
 	}
 }

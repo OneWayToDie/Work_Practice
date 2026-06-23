@@ -1,58 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using Work_Practice.Models;
+﻿//========================================================= Библиотеки ================================================================//
+using System;                         // Базовые типы (T, Node<T>)
+using System.Collections.Generic;      // Коллекции (List<T>)
+using Work_Practice.Models;            // Модель узла (Node<T>)
 
 namespace Work_Practice.Services
 {
+	//========================================================= Класс односвязного списка (обобщённый) ================================================================//
 	public class SinglyLinkedList<T>
 	{
-		public Node<T> Head { get; private set; }
+		//========================================================= Поля и свойства ================================================================//
+		public Node<T> Head { get; private set; }              // Головной узел списка (первый элемент)
 
+		//========================================================= Добавление элемента в конец списка ================================================================//
 		public void Add(T data)
 		{
-			Node<T> newNode = new Node<T>(data);
-			if (Head == null)
+			Node<T> newNode = new Node<T>(data);               // Создаём новый узел с переданными данными
+			if (Head == null)                                  // Если список пуст
 			{
-				Head = newNode;
+				Head = newNode;                                // Новый узел становится головой
 				return;
 			}
-			Node<T> current = Head;
-			while (current.Next != null)
-				current = current.Next;
-			current.Next = newNode;
+			Node<T> current = Head;                            // Начинаем обход с головы
+			while (current.Next != null)                       // Пока есть следующий узел
+				current = current.Next;                        // Переходим к следующему
+			current.Next = newNode;                            // Присоединяем новый узел в конец
 		}
 
+		//========================================================= Перенос третьего элемента в начало ================================================================//
 		public bool MoveThirdToFront()
 		{
-			if (Head?.Next?.Next == null)
-				return false;
+			if (Head?.Next?.Next == null)                      // Если меньше 3 узлов – операция невозможна
+				return false;                                  // Возвращаем false
 
-			Node<T> first = Head;
-			Node<T> second = Head.Next;
-			Node<T> third = Head.Next.Next;
+			Node<T> first = Head;                              // Первый узел
+			Node<T> second = Head.Next;                        // Второй узел
+			Node<T> third = Head.Next.Next;                    // Третий узел
 
+			// Перестановка ссылок: второй указывает на четвёртый (или null)
 			second.Next = third.Next;
+			// Третий указывает на первый
 			third.Next = first;
+			// Третий становится головой
 			Head = third;
 
-			return true;
+			return true;                                       // Операция выполнена успешно
 		}
 
+		//========================================================= Преобразование списка в List<T> ================================================================//
 		public List<T> ToList()
 		{
-			List<T> result = new List<T>();
-			Node<T> current = Head;
-			while (current != null)
+			List<T> result = new List<T>();                    // Создаём пустой список
+			Node<T> current = Head;                            // Начинаем с головы
+			while (current != null)                            // Пока есть узлы
 			{
-				result.Add(current.Data);
-				current = current.Next;
+				result.Add(current.Data);                      // Добавляем данные текущего узла в результат
+				current = current.Next;                        // Переходим к следующему
 			}
-			return result;
+			return result;                                     // Возвращаем список
 		}
 
+		//========================================================= Очистка списка ================================================================//
 		public void Clear()
 		{
-			Head = null;
+			Head = null;                                       // Удаляем ссылку на голову – список становится пустым
 		}
 	}
 }
