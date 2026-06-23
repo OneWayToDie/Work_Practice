@@ -1,37 +1,41 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Input;
-using Microsoft.Win32;
-using Work_Practice.Commands;
-using Work_Practice.Models;
-using Work_Practice.Services;
-using Work_Practice.Views;
+//========================================================= Библиотеки ================================================================//
+using System;                        // Базовые типы (decimal, int, string)
+using System.Collections.Generic;     // Коллекции (List<T>)
+using System.Collections.ObjectModel; // ObservableCollection<T>
+using System.ComponentModel;          // INotifyPropertyChanged
+using System.Linq;                    // LINQ-запросы (Where, ToList)
+using System.Runtime.CompilerServices; // CallerMemberName
+using System.Windows;                 // MessageBox (заменён на AppDialog)
+using System.Windows.Input;           // ICommand
+using Microsoft.Win32;                // OpenFileDialog (диалог выбора файла)
+using Work_Practice.Commands;         // DelegateCommand
+using Work_Practice.Models;           // Product
+using Work_Practice.Services;         // ProductDataService
+using Work_Practice.Views;            // AppDialog
 
 namespace Work_Practice.ViewModels
 {
+	//========================================================= ViewModel для задания 2 (товары, файл, сортировка) ================================================================//
 	public class Task2ViewModel : INotifyPropertyChanged
 	{
-		private ObservableCollection<Product> products;
-		private ObservableCollection<Product> filteredProducts;
-		private readonly ProductDataService dataService;
-		private string currentFilePath = "products.xml";
-		private string currentFileName = "products.xml";
+		//========================================================= Поля ================================================================//
+		private ObservableCollection<Product> products;                   // Основная коллекция товаров (все)
+		private ObservableCollection<Product> filteredProducts;           // Отфильтрованная и отсортированная коллекция
+		private readonly ProductDataService dataService;                 // Сервис для работы с XML-файлом
+		private string currentFilePath = "products.xml";                // Полный путь к текущему файлу (используется, но не активно в коде)
+		private string currentFileName = "products.xml";                // Имя текущего файла (для отображения)
 
-		// Поля для нового товара
+		// Поля для нового товара (привязка к полям ввода)
 		private string newName = "";
 		private string newManufacturer = "";
 		private int newShelfLife = 0;
 		private decimal newPrice = 0;
 		private int newStockQuantity = 0;
 
-		// Поле для фильтра
+		// Поле для фильтра по количеству на складе
 		private int minStockQuantity = 0;
 
+		//========================================================= Публичные свойства ================================================================//
 		public ObservableCollection<Product> Products
 		{
 			get => products;
@@ -62,31 +66,32 @@ namespace Work_Practice.ViewModels
 			set { currentFileName = value; OnPropertyChanged(); }
 		}
 
-		public ICommand SaveToFileCommand { get; }
-		public ICommand LoadFromFileCommand { get; }
-		public ICommand LoadSampleDataCommand { get; }
-		public ICommand AddProductCommand { get; }
-		public ICommand ClearDatabaseCommand { get; }
-		public ICommand SortAndFilterCommand { get; }
+		//========================================================= Команды ================================================================//
+		public ICommand SaveToFileCommand { get; }          // Сохранить в XML
+		public ICommand LoadFromFileCommand { get; }        // Загрузить из XML
+		public ICommand LoadSampleDataCommand { get; }     // Загрузить демо-данные (15 товаров)
+		public ICommand AddProductCommand { get; }          // Добавить товар
+		public ICommand ClearDatabaseCommand { get; }      // Очистить БД
+		public ICommand SortAndFilterCommand { get; }      // Применить фильтр и сортировку
 
-		// Конструктор — загрузка данных и привязка команд
+		//========================================================= Конструктор ================================================================//
 		public Task2ViewModel()
 		{
-			dataService = new ProductDataService();
+			dataService = new ProductDataService();                        // Инициализируем сервис
 
-			List<Product> loaded = dataService.LoadFromXml();
-			if (loaded != null && loaded.Count > 0)
+			List<Product> loaded = dataService.LoadFromXml();             // Пытаемся загрузить из XML
+			if (loaded != null && loaded.Count > 0)                       // Если есть данные
 			{
 				Products = new ObservableCollection<Product>(loaded);
 			}
 			else
 			{
-				Products = new ObservableCollection<Product>();
+				Products = new ObservableCollection<Product>();          // Иначе пустая коллекция
 			}
 
-			FilteredProducts = new ObservableCollection<Product>(Products);
+			FilteredProducts = new ObservableCollection<Product>(Products); // Инициализация отфильтрованной коллекции
 
-			SaveToFileCommand = new DelegateCommand(SaveToFile);
+			SaveToFileCommand = new DelegateCommand(SaveToFile);         // Привязка команд
 			LoadFromFileCommand = new DelegateCommand(LoadFromFile);
 			LoadSampleDataCommand = new DelegateCommand(LoadSampleData);
 			AddProductCommand = new DelegateCommand(AddProduct);
@@ -94,22 +99,22 @@ namespace Work_Practice.ViewModels
 			SortAndFilterCommand = new DelegateCommand(SortAndFilter);
 		}
 
-		// Сохранение БД в текущий XML файл
+		//========================================================= Сохранение БД в XML ================================================================//
 		private void SaveToFile()
 		{
-			bool success = dataService.SaveToXml(new List<Product>(Products));
+			bool success = dataService.SaveToXml(new List<Product>(Products)); // Сохраняем текущий список
 			if (success)
 				AppDialog.ShowInfo($"Данные сохранены в файл {currentFileName}");
 			else
 				AppDialog.ShowError("Ошибка при сохранении. Проверьте, что файл не заблокирован.");
 		}
 
-		// Загрузка демо-данных (15 товаров)
+		//========================================================= Загрузка демо-данных ================================================================//
 		private void LoadSampleData()
 		{
-			Products.Clear();
-			List<Product> samples = new List<Product>
-			{
+			Products.Clear();                                             // Очищаем основную коллекцию
+			List<Product> samples = new List<Product>                     // Создаём список 15 примеров
+            {
 				new Product { Name = "Молоко", Manufacturer = "Простоквашино", ShelfLife = 7, Price = 80m, StockQuantity = 50 },
 				new Product { Name = "Хлеб", Manufacturer = "Дарницкий", ShelfLife = 3, Price = 45m, StockQuantity = 120 },
 				new Product { Name = "Сыр", Manufacturer = "Hochland", ShelfLife = 30, Price = 350m, StockQuantity = 30 },
@@ -126,83 +131,77 @@ namespace Work_Practice.ViewModels
 				new Product { Name = "Чай", Manufacturer = "Lipton", ShelfLife = 720, Price = 250m, StockQuantity = 70 },
 				new Product { Name = "Конфеты", Manufacturer = "Красный Октябрь", ShelfLife = 180, Price = 200m, StockQuantity = 90 }
 			};
-			// Добавление каждого примера в коллекцию
 			foreach (Product p in samples)
-				Products.Add(p);
-			FilterProductsAndSort();
+				Products.Add(p);                                          // Добавляем каждый товар
+			FilterProductsAndSort();                                      // Применяем сортировку/фильтр (по умолчанию)
 			AppDialog.ShowInfo("Загружены примеры (15 товаров).");
 		}
 
-		// Загрузка БД из выбранного XML файла
+		//========================================================= Загрузка из выбранного XML-файла ================================================================//
 		private void LoadFromFile()
 		{
-			OpenFileDialog dialog = new OpenFileDialog
+			OpenFileDialog dialog = new OpenFileDialog                  // Диалог выбора файла
 			{
 				Filter = "XML файлы (*.xml)|*.xml|Все файлы (*.*)|*.*",
 				Title = "Выберите файл для загрузки"
 			};
-			if (dialog.ShowDialog() != true)
+			if (dialog.ShowDialog() != true)                            // Если пользователь отменил
 				return;
 
-			List<Product> loaded = dataService.LoadFromXml(dialog.FileName);
-			if (loaded != null && loaded.Count > 0)
+			List<Product> loaded = dataService.LoadFromXml(dialog.FileName); // Загружаем из указанного файла
+			if (loaded != null && loaded.Count > 0)                     // Если загрузка успешна
 			{
-				currentFilePath = dialog.FileName;
-				currentFileName = System.IO.Path.GetFileName(dialog.FileName);
-				dataService.FilePath = dialog.FileName;
-				OnPropertyChanged(nameof(CurrentFileName));
-				Products.Clear();
-				// Копирование загруженных товаров
+				currentFilePath = dialog.FileName;                      // Сохраняем полный путь
+				currentFileName = System.IO.Path.GetFileName(dialog.FileName); // Извлекаем имя
+				dataService.FilePath = dialog.FileName;                 // Обновляем путь в сервисе
+				OnPropertyChanged(nameof(CurrentFileName));            // Уведомляем UI
+				Products.Clear();                                       // Очищаем основную коллекцию
 				foreach (Product p in loaded)
-					Products.Add(p);
-				FilterProductsAndSort();
+					Products.Add(p);                                    // Добавляем загруженные товары
+				FilterProductsAndSort();                                // Применяем фильтр/сортировку
 				AppDialog.ShowInfo($"Данные загружены из файла: {currentFileName}");
 			}
-			else if (loaded != null)
+			else if (loaded != null)                                    // Если файл пустой
 			{
 				AppDialog.ShowWarning("Файл пуст. Данные не загружены.");
 			}
-			else
+			else                                                       // Ошибка загрузки
 			{
 				AppDialog.ShowError("Не удалось загрузить файл. Проверьте формат.");
 			}
 		}
 
-		// Добавление нового товара с валидацией
+		//========================================================= Добавление нового товара с валидацией ================================================================//
 		private void AddProduct()
 		{
-			// Проверка наименования
+			// Валидация полей
 			if (string.IsNullOrWhiteSpace(NewName))
 			{
 				AppDialog.ShowError("Наименование товара не может быть пустым.");
 				return;
 			}
-			// Проверка фирмы
 			if (string.IsNullOrWhiteSpace(NewManufacturer))
 			{
 				AppDialog.ShowError("Фирма-изготовитель не может быть пустой.");
 				return;
 			}
-			// Проверка цены
 			if (NewPrice <= 0)
 			{
 				AppDialog.ShowError("Цена должна быть больше 0.");
 				return;
 			}
-			// Проверка срока хранения
 			if (NewShelfLife <= 0)
 			{
 				AppDialog.ShowError("Срок хранения должен быть больше 0 дней.");
 				return;
 			}
-			// Проверка количества на складе
 			if (NewStockQuantity < 0)
 			{
 				AppDialog.ShowError("Количество на складе не может быть отрицательным.");
 				return;
 			}
 
-			Product newProduct = new Product
+			Product newProduct = new Product                           // Создаём новый товар
 			{
 				Name = NewName.Trim(),
 				Manufacturer = NewManufacturer.Trim(),
@@ -210,10 +209,10 @@ namespace Work_Practice.ViewModels
 				Price = NewPrice,
 				StockQuantity = NewStockQuantity
 			};
-			Products.Add(newProduct);
-			FilterProductsAndSort();
+			Products.Add(newProduct);                                  // Добавляем в коллекцию
+			FilterProductsAndSort();                                   // Обновляем отфильтрованный список
 
-			// Очистка полей
+			// Очистка полей ввода
 			NewName = "";
 			NewManufacturer = "";
 			NewShelfLife = 0;
@@ -223,39 +222,38 @@ namespace Work_Practice.ViewModels
 			AppDialog.ShowInfo("Товар добавлен.");
 		}
 
-		// Очистка всей базы данных
+		//========================================================= Очистка всей базы данных ================================================================//
 		private void ClearDatabase()
 		{
-			Products.Clear();
-			FilteredProducts.Clear();
-			bool success = dataService.SaveToXml(new List<Product>());
+			Products.Clear();                                           // Очищаем основную коллекцию
+			FilteredProducts.Clear();                                   // Очищаем отфильтрованную
+			bool success = dataService.SaveToXml(new List<Product>());  // Сохраняем пустой список (файл становится пустым)
 			if (success)
 				AppDialog.ShowInfo("База данных очищена.");
 			else
 				AppDialog.ShowWarning("БД очищена из памяти, но не удалось сохранить в файл.");
 		}
 
-		// Применение сортировки и фильтра
+		//========================================================= Применение сортировки и фильтра ================================================================//
 		private void SortAndFilter()
 		{
-			FilterProductsAndSort();
+			FilterProductsAndSort();                                   // Повторно применяем фильтр и сортировку
 		}
 
-		// Фильтрация и сортировка пузырьком
+		//========================================================= Фильтрация и сортировка (пузырьком) ================================================================//
 		private void FilterProductsAndSort()
 		{
-			// Фильтр по остатку
+			// 1. Фильтрация по количеству на складе
 			List<Product> filtered = Products.Where(p => p.StockQuantity >= MinStockQuantity).ToList();
 
-			// Сортировка пузырьком по сроку хранения (по возрастанию)
-			// Сортировка пузырьком по сроку хранения
+			// 2. Сортировка пузырьком по сроку хранения (по возрастанию)
 			for (int i = 0; i < filtered.Count - 1; i++)
 			{
-				// Сравнение соседних элементов
 				for (int j = 0; j < filtered.Count - i - 1; j++)
 				{
 					if (filtered[j].ShelfLife > filtered[j + 1].ShelfLife)
 					{
+						// Обмен элементов
 						Product temp = filtered[j];
 						filtered[j] = filtered[j + 1];
 						filtered[j + 1] = temp;
@@ -263,8 +261,8 @@ namespace Work_Practice.ViewModels
 				}
 			}
 
+			// 3. Обновление отфильтрованной коллекции (создаём новые объекты, чтобы избежать проблем с привязкой)
 			FilteredProducts.Clear();
-			// Копирование отфильтрованных товаров
 			foreach (Product p in filtered)
 			{
 				FilteredProducts.Add(new Product
@@ -278,8 +276,9 @@ namespace Work_Practice.ViewModels
 			}
 		}
 
+		//========================================================= Реализация INotifyPropertyChanged ================================================================//
 		public event PropertyChangedEventHandler PropertyChanged;
-		// Уведомление об изменении свойства
+
 		protected void OnPropertyChanged([CallerMemberName] string name = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

@@ -1,13 +1,16 @@
-﻿using System.Windows;
+﻿//========================================================= Библиотеки ================================================================//
+using System.Windows;              // Базовые WPF-классы (Window)
 
-namespace Work_Practice.Views
+namespace Work_Practice.Views       // Пространство имён для окон
 {
+	//========================================================= Окно задания 1 ================================================================//
 	public partial class Task1Window : Window
 	{
+		//========================================================= Конструктор ================================================================//
 		public Task1Window()
 		{
-			InitializeComponent();
-			this.Loaded += (s, e) => Helpers.WindowButtonHelper.Attach(this);
+			InitializeComponent();                              // Загружаем XAML-разметку
+			this.Loaded += (s, e) => Helpers.WindowButtonHelper.Attach(this); // Подключаем кастомные кнопки управления (свернуть/развернуть/закрыть)
 		}
 	}
 }

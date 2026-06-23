@@ -1,29 +1,30 @@
-﻿using System.Windows.Input;
-using Work_Practice.Views;
-using Work_Practice.Commands;
+﻿//========================================================= Библиотеки ================================================================//
+using System.Windows.Input;   // Интерфейс ICommand и базовые типы команд
+using Work_Practice.Views;    // Окна заданий (Task1Window, Task2Window, Task3Window)
+using Work_Practice.Commands; // Реализация команд (DelegateCommand)
 
-namespace Work_Practice.ViewModels
+namespace Work_Practice.ViewModels   // Пространство имён для ViewModel
 {
-	// ViewModel главного окна — навигация по заданиям
+	//========================================================= Класс ViewModel главного окна – навигация по заданиям ================================================================//
 	public class MainViewModel
 	{
-		public ICommand OpenTask1Command { get; }
-		public ICommand OpenTask2Command { get; }
-		public ICommand OpenTask3Command { get; }
+		//========================================================= Свойства команд ================================================================//
+		public ICommand OpenTask1Command { get; }    // Команда открытия окна задания 1
+		public ICommand OpenTask2Command { get; }    // Команда открытия окна задания 2
+		public ICommand OpenTask3Command { get; }    // Команда открытия окна задания 3
 
-		// Конструктор — привязка команд открытия окон
+		//========================================================= Конструктор ================================================================//
 		public MainViewModel()
 		{
-			OpenTask1Command = new DelegateCommand(OpenTask1);
-			OpenTask2Command = new DelegateCommand(OpenTask2);
-			OpenTask3Command = new DelegateCommand(OpenTask3);
+			// Инициализация команд с привязкой методов открытия окон
+			OpenTask1Command = new DelegateCommand(OpenTask1); // Привязка к OpenTask1
+			OpenTask2Command = new DelegateCommand(OpenTask2); // Привязка к OpenTask2
+			OpenTask3Command = new DelegateCommand(OpenTask3); // Привязка к OpenTask3
 		}
 
-		// Открытие окна задания 1
-		private void OpenTask1() => new Task1Window().ShowDialog();
-		// Открытие окна задания 2
-		private void OpenTask2() => new Task2Window().ShowDialog();
-		// Открытие окна задания 3
-		private void OpenTask3() => new Task3Window().ShowDialog();
+		//========================================================= Методы открытия окон заданий ================================================================//
+		private void OpenTask1() => new Task1Window().ShowDialog(); // Открытие окна задания 1 (модально)
+		private void OpenTask2() => new Task2Window().ShowDialog(); // Открытие окна задания 2 (модально)
+		private void OpenTask3() => new Task3Window().ShowDialog(); // Открытие окна задания 3 (модально)
 	}
 }
