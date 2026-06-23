@@ -252,9 +252,6 @@ namespace WorkPracticeLauncher.Tasks
 			}
 		}
 
-		// Вывод информации о товаре
-		
-
 		// Добавление новых товаров в БД
 		private static void AddProducts()
 		{
