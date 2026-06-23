@@ -65,18 +65,21 @@ namespace WorkPracticeLauncher
 			{
 				if (Console.WindowWidth != lastWidth || Console.WindowHeight != lastHeight)
 				{
+					try
+					{
 					lastWidth = Console.WindowWidth;
 					lastHeight = Console.WindowHeight;
-					// Полная перерисовка без изменения буфера
 					RedrawScreen(cat);
 					ResetCursorState();
-					// Для Windows Terminal дополнительная перерисовка для затирания артефактов
-			if (supportsEmoji)
+					if (supportsEmoji)
 					{
 						Thread.Sleep(30);
 						RedrawScreen(cat);
 						ResetCursorState();
 					}
+					}
+					catch (System.IO.IOException) { }
+					catch (ArgumentOutOfRangeException) { }
 				}
 
 				cat.UpdateSleep();
@@ -278,6 +281,8 @@ namespace WorkPracticeLauncher
 		// Вывод предупреждения и брендинга в подвале окна
 		private static void PrintFooter()
 		{
+			try
+			{
 			int w = Console.WindowWidth;
 			int row = Console.WindowHeight - 1;
 			if (row < 0) row = 0;
@@ -301,6 +306,9 @@ namespace WorkPracticeLauncher
 				Console.Write(msg);
 				Console.ResetColor();
 			}
+			}
+			catch (System.IO.IOException) { }
+			catch (ArgumentOutOfRangeException) { }
 		}
 
 		// Центрирование текста по ширине
@@ -317,6 +325,8 @@ namespace WorkPracticeLauncher
 		// Отрисовка мигающего курсора ввода
 		private static void DrawCursor()
 		{
+			try
+			{
 			int row = inputRow;
 			int col = inputCol;
 			int len = inputBuffer.Length;
@@ -340,11 +350,16 @@ namespace WorkPracticeLauncher
 				lastCursorToggle = DateTime.Now;
 			}
 			Console.Write(showCursorState ? '_' : ' ');
+			}
+			catch (System.IO.IOException) { }
+			catch (ArgumentOutOfRangeException) { }
 		}
 
 		// Установка позиции курсора на поле ввода
 		private static void SetCursorToInput()
 		{
+			try
+			{
 			int offset = inputBuffer.Length;
 			int col = inputCol + offset;
 			int row = inputRow;
@@ -353,6 +368,9 @@ namespace WorkPracticeLauncher
 			if (col < 0) col = 0;
 			if (row < 0) row = 0;
 			Console.SetCursorPosition(col, row);
+			}
+			catch (System.IO.IOException) { }
+			catch (ArgumentOutOfRangeException) { }
 		}
 
 		// Сброс состояния курсора
@@ -368,8 +386,13 @@ namespace WorkPracticeLauncher
 		// Полная перерисовка главного экрана
 		static void RedrawScreen(CatAnimation cat)
 		{
-			Console.Clear();
-			Console.SetCursorPosition(0, 0);
+			try
+			{
+				Console.Clear();
+				Console.SetCursorPosition(0, 0);
+			}
+			catch (System.IO.IOException) { }
+			catch (ArgumentOutOfRangeException) { }
 			PrintMenu();
 			cat.ShowSleepFrame();
 			PrintFooter();
