@@ -1,6 +1,6 @@
 //========================================================= Класс анимации кота ================================================================//
-using System;
-using System.Threading;
+using System;           // Базовые типы (DateTime, Console, Thread.Sleep)
+using System.Threading; // Потоки (Thread, Thread.Sleep)
 
 public class CatAnimation
 {

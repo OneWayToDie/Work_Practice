@@ -1,11 +1,11 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
-using System.IO.Compression;
-using System.Text;
-using System.Threading;
-using WorkPracticeLauncher.Tasks;
+using System;					  // Базовые типы и консольный ввод-вывод
+using System.Diagnostics;		  // Запуск процессов (Process.Start)
+using System.IO;				  // Работа с файлами и путями (File, Path)
+using System.Net.Http;			  // HTTP-запросы (HttpClient, скачивание)
+using System.IO.Compression;	  // Работа с ZIP-архивами (ZipArchive)
+using System.Text;				  // Работа с кодировками (Encoding.UTF8)
+using System.Threading;			  // Потоки (Thread, Thread.Sleep)
+using WorkPracticeLauncher.Tasks; // Пространство имён с решением заданий (Task1Solver и др.)
 
 namespace WorkPracticeLauncher
 {
