@@ -19,6 +19,8 @@ namespace Work_Practice.ViewModels
 		private ObservableCollection<Product> products;
 		private ObservableCollection<Product> filteredProducts;
 		private readonly ProductDataService dataService;
+		private string currentFilePath = "products.xml";
+		private string currentFileName = "products.xml";
 
 		// Поля для нового товара
 		private string newName = "";
@@ -54,6 +56,12 @@ namespace Work_Practice.ViewModels
 			set { minStockQuantity = value; OnPropertyChanged(); }
 		}
 
+		public string CurrentFileName
+		{
+			get => currentFileName;
+			set { currentFileName = value; OnPropertyChanged(); }
+		}
+
 		public ICommand SaveToFileCommand { get; }
 		public ICommand LoadFromFileCommand { get; }
 		public ICommand LoadSampleDataCommand { get; }
@@ -86,12 +94,12 @@ namespace Work_Practice.ViewModels
 			SortAndFilterCommand = new DelegateCommand(SortAndFilter);
 		}
 
-		// Сохранение БД в XML файл
+		// Сохранение БД в текущий XML файл
 		private void SaveToFile()
 		{
 			bool success = dataService.SaveToXml(new List<Product>(Products));
 			if (success)
-				AppDialog.ShowInfo("Данные сохранены в файл products.xml");
+				AppDialog.ShowInfo($"Данные сохранены в файл {currentFileName}");
 			else
 				AppDialog.ShowError("Ошибка при сохранении. Проверьте, что файл не заблокирован.");
 		}
@@ -139,12 +147,16 @@ namespace Work_Practice.ViewModels
 			List<Product> loaded = dataService.LoadFromXml(dialog.FileName);
 			if (loaded != null && loaded.Count > 0)
 			{
+				currentFilePath = dialog.FileName;
+				currentFileName = System.IO.Path.GetFileName(dialog.FileName);
+				dataService.FilePath = dialog.FileName;
+				OnPropertyChanged(nameof(CurrentFileName));
 				Products.Clear();
 				// Копирование загруженных товаров
 				foreach (Product p in loaded)
 					Products.Add(p);
 				FilterProductsAndSort();
-				AppDialog.ShowInfo($"Данные загружены из файла: {System.IO.Path.GetFileName(dialog.FileName)}");
+				AppDialog.ShowInfo($"Данные загружены из файла: {currentFileName}");
 			}
 			else if (loaded != null)
 			{

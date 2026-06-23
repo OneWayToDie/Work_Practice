@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 using Work_Practice.Models;
@@ -7,7 +7,13 @@ namespace Work_Practice.Services
 {
 	public class ProductDataService
 	{
-		private readonly string filePath;
+		private string filePath;
+
+		public string FilePath
+		{
+			get => filePath;
+			set => filePath = value;
+		}
 
 		public ProductDataService(string filePath = "products.xml")
 		{
