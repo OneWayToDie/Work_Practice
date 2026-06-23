@@ -275,24 +275,30 @@ namespace WorkPracticeLauncher
 			}
 		}
 
-		// Вывод предупреждения в подвале окна
+		// Вывод предупреждения и брендинга в подвале окна
 		private static void PrintFooter()
 		{
+			int w = Console.WindowWidth;
+			int row = Console.WindowHeight - 1;
+			if (row < 0) row = 0;
+
+			// Брендинг в левом нижнем углу
+			string brand = supportsEmoji ? "elki-igolki company\U0001F384" : "elki-igolki company";
+			Console.SetCursorPosition(0, row);
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.Write(brand);
+			Console.ResetColor();
+
+			// Предупреждение в правом нижнем углу (только для обычной консоли)
 			if (!supportsEmoji)
 			{
-				int w = Console.WindowWidth;
 				string msg = "[!] Для корректной работы рекомендуется использовать Windows Terminal!";
 				if (msg.Length > w - 2) msg = msg.Substring(0, w - 2);
-				int row = Console.WindowHeight - 1;
-				if (row < 0) row = 0;
 				int left = w - msg.Length - 1;
 				if (left < 0) left = 0;
 				Console.SetCursorPosition(left, row);
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Write(msg);
-				int remaining = w - left - msg.Length;
-				if (remaining > 0)
-					Console.Write(new string(' ', remaining));
 				Console.ResetColor();
 			}
 		}

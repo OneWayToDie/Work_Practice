@@ -804,7 +804,25 @@ namespace WorkPracticeLauncher.Tasks
 					}
 				}
 
-				List<Product> toSave = append ? existing.Concat(products).ToList() : products;
+				List<Product> toSave;
+				if (append)
+				{
+					List<Product> newOnly = products.Where(p => !existing.Any(e =>
+						e.Name == p.Name &&
+						e.Manufacturer == p.Manufacturer &&
+						e.ShelfLife == p.ShelfLife &&
+						e.Price == p.Price &&
+						e.StockQuantity == p.StockQuantity)).ToList();
+					toSave = existing.Concat(newOnly).ToList();
+					if (newOnly.Count < products.Count)
+					{
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						Console.WriteLine($"Пропущено дубликатов: {products.Count - newOnly.Count}");
+						Console.ResetColor();
+					}
+				}
+				else
+					toSave = products;
 
 				if (format == FileFormat.Xml)
 				{

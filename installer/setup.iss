@@ -1,4 +1,4 @@
-﻿; Inno Setup Script
+; Inno Setup Script
 ; Work_Practice - Учебная практика
 
 #define MyAppName "Work_Practice"
@@ -12,7 +12,7 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\Work_Practice
 DefaultGroupName={#MyAppName}
-OutputDir=C:\проверка связи\Work_Practice\installer
+OutputDir=C:\Users\Danila\source\repos\Work_Practice\installer
 OutputBaseFilename=setup
 Compression=lzma2/ultra64
 SolidCompression=yes
@@ -28,28 +28,28 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; === Корень: exe и конфиги ===
-Source: "C:\проверка связи\Work_Practice\WorkPracticeLauncher\bin\Release\WorkPracticeLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\WorkPracticeLauncher\bin\Release\WorkPracticeLauncher.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\Work_Practice.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\Work_Practice.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\WorkPracticeLauncher\bin\Release\WorkPracticeLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\WorkPracticeLauncher\bin\Release\WorkPracticeLauncher.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\Work_Practice.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\Work_Practice.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 
 ; === lib: библиотеки ===
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\System.Buffers.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\System.ComponentModel.Annotations.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\System.Memory.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\System.Numerics.Vectors.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\System.Runtime.CompilerServices.Unsafe.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\bin\Release\System.Threading.Tasks.Extensions.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\System.Buffers.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\System.ComponentModel.Annotations.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\System.Memory.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\System.Numerics.Vectors.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\System.Runtime.CompilerServices.Unsafe.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\bin\Release\System.Threading.Tasks.Extensions.dll"; DestDir: "{app}\lib"; Flags: ignoreversion
 
 ; === icons: иконки ===
-Source: "C:\проверка связи\Work_Practice\Work_Practice\Resources\Images\Boxes.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\Resources\Images\calculator.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\Resources\Images\list.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\Resources\Images\rocketMonitor.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\Resources\Images\university.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\Work_Practice\Resources\Images\warning.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
-Source: "C:\проверка связи\Work_Practice\WorkPracticeLauncher\terminal.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\Resources\Images\Boxes.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\Resources\Images\calculator.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\Resources\Images\list.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\Resources\Images\rocketMonitor.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\Resources\Images\university.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\Work_Practice\Resources\Images\warning.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
+Source: "C:\Users\Danila\source\repos\Work_Practice\WorkPracticeLauncher\terminal.ico"; DestDir: "{app}\icons"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Work_Practice (WPF)"; Filename: "{app}\Work_Practice.exe"
