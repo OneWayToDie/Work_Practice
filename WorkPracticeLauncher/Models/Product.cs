@@ -1,12 +1,13 @@
-﻿namespace WorkPracticeLauncher.Models
+﻿//================================================================== Модель товара для консольного задания 2 ===================================================================================//
+namespace WorkPracticeLauncher.Models
 {
-	// Модель товара для консольного задания 2
 	public class Product
 	{
-		public string Name { get; set; }
-		public string Manufacturer { get; set; }
-		public int ShelfLife { get; set; }
-		public decimal Price { get; set; }
-		public int StockQuantity { get; set; }
+		//===================================================================== Свойства =======================================================================================================//
+		public string Name { get; set; }                // Наименование товара
+		public string Manufacturer { get; set; }        // Фирма-изготовитель
+		public int ShelfLife { get; set; }              // Срок хранения в днях
+		public decimal Price { get; set; }              // Цена товара
+		public int StockQuantity { get; set; }          // Количество на складе
 	}
 }
