@@ -5,7 +5,6 @@ using System.Collections.ObjectModel; // ObservableCollection<T>
 using System.ComponentModel;          // INotifyPropertyChanged
 using System.Linq;                    // LINQ-запросы (Where, ToList)
 using System.Runtime.CompilerServices; // CallerMemberName
-using System.Windows;                 // MessageBox (заменён на AppDialog)
 using System.Windows.Input;           // ICommand
 using Microsoft.Win32;                // OpenFileDialog (диалог выбора файла)
 using Work_Practice.Commands;         // DelegateCommand
@@ -22,7 +21,7 @@ namespace Work_Practice.ViewModels
 		private ObservableCollection<Product> products;                   // Основная коллекция товаров (все)
 		private ObservableCollection<Product> filteredProducts;           // Отфильтрованная и отсортированная коллекция
 		private readonly ProductDataService dataService;                 // Сервис для работы с XML-файлом
-		private string currentFilePath = "products.xml";                // Полный путь к текущему файлу (используется, но не активно в коде)
+		private string currentFilePath = "products.xml";                // Полный путь к текущему файлу (для сохранения/загрузки)
 		private string currentFileName = "products.xml";                // Имя текущего файла (для отображения)
 
 		// Поля для нового товара (привязка к полям ввода)

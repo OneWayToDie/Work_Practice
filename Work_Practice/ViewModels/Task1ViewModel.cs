@@ -202,12 +202,12 @@ namespace Work_Practice.ViewModels
 			if (SelectedVariant == "Proc")
 			{
 				CodeExampleText =
-					"void GetDigitsInfoProc(long number, out int count, out int minDigit)\n" +
+					"void GetDigitsInfoProc(long number, out int count, out int? minDigit)\n" +
 					"{\n" +
 					"    if (number <= 0)\n" +
 					"    {\n" +
 					"        count = 0;\n" +
-					"        minDigit = -1;\n" +
+					"        minDigit = null;\n" +
 					"        return;\n" +
 					"    }\n" +
 					"    long temp = number;\n" +
@@ -225,11 +225,12 @@ namespace Work_Practice.ViewModels
 			else
 			{
 				CodeExampleText =
-					"(int count, int minDigit) GetDigitsInfoFunc(long number)\n" +
+					"(int count, int? minDigit) GetDigitsInfoFunc(long number)\n" +
 					"{\n" +
+					"    if (number <= 0) return (0, null);\n" +
 					"    long temp = number;\n" +
 					"    int count = 0;\n" +
-					"    int minDigit = 9;\n" +
+					"    int? minDigit = 9;\n" +
 					"    while (temp > 0)\n" +
 					"    {\n" +
 					"        int digit = (int)(temp % 10);\n" +

@@ -10,7 +10,7 @@ AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-DefaultDirName={autopf}\Work_Practice
+DefaultDirName=C:\Work_Practice
 DefaultGroupName={#MyAppName}
 OutputDir=C:\Users\Danila\source\repos\Work_Practice\installer
 OutputBaseFilename=setup
@@ -18,7 +18,6 @@ Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayIcon={app}\WorkPracticeLauncher.exe
-PrivilegesRequired=lowest
 
 [Languages]
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"

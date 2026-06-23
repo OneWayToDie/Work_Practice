@@ -5,11 +5,10 @@ using System.Collections.ObjectModel;   // ObservableCollection<T>
 using System.ComponentModel;            // INotifyPropertyChanged
 using System.Linq;                      // LINQ (Enumerable.Range, Select, ToArray)
 using System.Runtime.CompilerServices; // CallerMemberName
-using System.Windows;                   // MessageBox (заменён на AppDialog)
 using System.Windows.Input;             // ICommand
 using Work_Practice.Commands;           // DelegateCommand
 using Work_Practice.Models;             // TypeOfNumber, SinglyLinkedList
-using Work_Practice.Services;           // (если есть, но здесь нет явного использования)
+using Work_Practice.Services;           // Сервисы (ProductDataService и др.)
 using Work_Practice.Views;              // AppDialog
 
 namespace Work_Practice.ViewModels
