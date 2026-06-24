@@ -21,7 +21,7 @@ namespace WorkPracticeLauncher
 	public static class FeedbackManager
 	{
 		// Конфигурация GitHub API
-		private const string GITHUB_TOKEN = "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";   // Токен доступа
+		private const string GITHUB_TOKEN = "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";   // Токен доступа
 		private const string REPO_OWNER = "OneWayToDie";                                    // Владелец репозитория
 		private const string REPO_NAME = "Work_Practice";                                   // Имя репозитория
 		private const string FILE_PATH = "WorkPracticeLauncher/reviews.json";               // Путь к файлу в репозитории
