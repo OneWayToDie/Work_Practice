@@ -1,8 +1,10 @@
 //============================================================================= Библиотеки ================================================================================================//
 using System;                     // Базовые типы (DateTime, string, Console)
 using System.Collections.Generic; // Коллекции (List<T>)
-using System.IO;                  // Работа с файлами (File, Path)
-using System.Linq;                
+using System.IO;                  // Работа с файлами (Path)
+using System.Linq;                // Linq-расширения
+using System.Net.Http;            // HTTP-запросы к GitHub API
+using System.Text;                // Encoding для Base64
 
 namespace WorkPracticeLauncher
 {
@@ -15,15 +17,25 @@ namespace WorkPracticeLauncher
 		public string Text { get; set; }     // Текст отзыва
 	}
 
-	//=========================================================== Класс для управления отзывами (сохранение, загрузка, UI) ================================================================//
+	//=========================================================== Класс для управления отзывами (GitHub API) ================================================================================//
 	public static class FeedbackManager
 	{
-		// Путь к файлу отзывов (JSON) в папке с программой
-		private static string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "reviews.json");
+		// Конфигурация GitHub API
+		private const string GITHUB_TOKEN = "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";   // Токен доступа
+		private const string REPO_OWNER = "OneWayToDie";                                    // Владелец репозитория
+		private const string REPO_NAME = "Work_Practice";                                   // Имя репозитория
+		private const string FILE_PATH = "WorkPracticeLauncher/reviews.json";               // Путь к файлу в репозитории
+		private static readonly HttpClient httpClient = new HttpClient();                   // HTTP-клиент
+		private static string cachedSha = "";                                               // Кэш SHA файла (для обновлений)
 
 		//========================================================= Главное меню раздела "Отзывы и предложения" ===========================================================================//
 		public static void Run()
 		{
+			httpClient.DefaultRequestHeaders.Authorization =           // Устанавливаем токен авторизации
+				new System.Net.Http.Headers.AuthenticationHeaderValue("token", GITHUB_TOKEN);
+			httpClient.DefaultRequestHeaders.UserAgent.Add(            // GitHub API требует User-Agent
+				new System.Net.Http.Headers.ProductInfoHeaderValue("WorkPractice", "1.0"));
+
 			while (true)                                               // Бесконечный цикл до выхода
 			{
 				Console.Clear();                                       // Очищаем экран
@@ -138,11 +150,23 @@ namespace WorkPracticeLauncher
 				Text = text
 			};
 
-			SaveReview(review);                                        // Сохраняем
-
 			Console.WriteLine();
-			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный успех
-			Console.WriteLine("Отзыв сохранён! Спасибо за обратную связь.");
+			Console.ForegroundColor = ConsoleColor.DarkGray;           // Серый для статуса
+			Console.WriteLine("Сохранение в облако...");
+			Console.ResetColor();
+
+			bool saved = SaveReview(review);                           // Сохраняем в GitHub
+
+			if (saved)
+			{
+				Console.ForegroundColor = ConsoleColor.Green;          // Зелёный успех
+				Console.WriteLine("Отзыв сохранён! Спасибо за обратную связь.");
+			}
+			else
+			{
+				Console.ForegroundColor = ConsoleColor.Red;            // Красный при ошибке
+				Console.WriteLine("Ошибка сохранения. Проверьте интернет.");
+			}
 			Console.ResetColor();
 			Console.WriteLine("Нажмите любую клавишу...");
 			Console.ReadKey(true);
@@ -152,7 +176,12 @@ namespace WorkPracticeLauncher
 		private static void ShowReviews()
 		{
 			Console.Clear();                                           // Очищаем экран
-			List<Review> reviews = LoadReviews();                      // Загружаем список из файла
+
+			Console.ForegroundColor = ConsoleColor.DarkGray;           // Серый для статуса
+			Console.WriteLine("Загрузка отзывов...");
+			Console.ResetColor();
+
+			List<Review> reviews = LoadReviews();                      // Загружаем из GitHub
 
 			Console.ForegroundColor = ConsoleColor.Cyan;               // Голубой заголовок
 			Console.WriteLine($"=== ВСЕ ОТЗЫВЫ ({reviews.Count} шт.) ===");
@@ -196,35 +225,76 @@ namespace WorkPracticeLauncher
 			Console.ReadKey(true);
 		}
 
-		//====================================================================== Загрузка отзывов из JSON-файла ===========================================================================//
+		//====================================================================== Загрузка отзывов из GitHub ===============================================================================//
 		private static List<Review> LoadReviews()
 		{
-			if (!File.Exists(filePath))                                // Если файла нет
-				return new List<Review>();                             // Возвращаем пустой список
-
 			try
 			{
-				string json = File.ReadAllText(filePath);              // Читаем весь файл
-				return ParseReviews(json);                             // Парсим JSON в список
+				string url = $"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}";
+				HttpResponseMessage response = httpClient.GetAsync(url).Result;  // GET-запрос
+				string responseBody = response.Content.ReadAsStringAsync().Result;
+
+				if (!response.IsSuccessStatusCode)                             // Если ошибка
+					return new List<Review>();
+
+				// GitHub возвращает JSON с полем "content" (Base64)
+				int contentStart = responseBody.IndexOf("\"content\":\"");       // Ищем начало content
+				if (contentStart < 0) return new List<Review>();
+				contentStart += "\"content\":\"".Length;
+				int contentEnd = responseBody.IndexOf("\"", contentStart);      // Ищем конец
+				string base64Content = responseBody.Substring(contentStart, contentEnd - contentStart);
+
+				// Извлекаем SHA (нужен для обновления файла)
+				int shaStart = responseBody.IndexOf("\"sha\":\"");              // Ищем SHA
+				if (shaStart >= 0)
+				{
+					shaStart += "\"sha\":\"".Length;
+					int shaEnd = responseBody.IndexOf("\"", shaStart);
+					cachedSha = responseBody.Substring(shaStart, shaEnd - shaStart);
+				}
+
+				string json = Encoding.UTF8.GetString(Convert.FromBase64String(base64Content));  // Декодируем Base64
+				return ParseReviews(json);                                     // Парсим JSON
 			}
-			catch                                                      // Если ошибка чтения или парсинга
+			catch                                                              // Если ошибка сети или парсинга
 			{
-				return new List<Review>();                             // Возвращаем пустой список
+				return new List<Review>();                                     // Возвращаем пустой список
 			}
 		}
 
-		//====================================================================== Сохранение отзыва в JSON-файл ============================================================================//
-		private static void SaveReview(Review review)
+		//====================================================================== Сохранение отзыва в GitHub ===============================================================================//
+		private static bool SaveReview(Review review)
 		{
-			List<Review> reviews = LoadReviews();                      // Загружаем существующие
-			reviews.Add(review);                                       // Добавляем новый
-
 			try
 			{
-				string json = SerializeReviews(reviews);               // Сериализуем в JSON
-				File.WriteAllText(filePath, json);                    // Записываем в файл
+				// Шаг 1: Загружаем текущие отзывы
+				List<Review> reviews = LoadReviews();
+				reviews.Add(review);                                           // Добавляем новый отзыв
+
+				// Шаг 2: Сериализуем в JSON
+				string json = SerializeReviews(reviews);
+				string base64Content = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));  // Кодируем в Base64
+
+				// Шаг 3: Отправляем PUT-запрос в GitHub
+				string url = $"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}";
+				string commitMessage = $"Добавлен отзыв от {review.Author} ({review.Date})";
+
+				// Формируем тело запроса
+				string requestBody = "{" +
+					$"\"message\":\"{EscapeJson(commitMessage)}\"," +
+					$"\"content\":\"{base64Content}\"," +
+					$"\"sha\":\"{cachedSha}\"" +
+					"}";
+
+				var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+				HttpResponseMessage response = httpClient.PutAsync(url, content).Result;  // PUT-запрос
+
+				return response.IsSuccessStatusCode;                           // Возвращаем результат
 			}
-			catch { }                                                  // Игнорируем ошибки записи
+			catch                                                              // Если ошибка
+			{
+				return false;
+			}
 		}
 
 		//============================================================ Ручной парсинг JSON (без внешних библиотек) ========================================================================//

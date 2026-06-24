@@ -109,7 +109,7 @@ namespace WorkPracticeLauncher.Tasks
 			// Выбор варианта (процедура или функция)
 			CheckResizeAndRedraw();																						// Проверяем размер окна
 			Console.ForegroundColor = ConsoleColor.Green;																// Зелёный цвет для подсказки
-			Console.WriteLine("▶ Выберите вариант:");																	// Заголовок выбора
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")} Выберите вариант:");																	// Заголовок выбора
 			Console.ResetColor();																						// Сброс цвета
 			Console.WriteLine("  1 – Процедура");																		// Пункт 1
 			Console.WriteLine("  2 – Функция");																			// Пункт 2

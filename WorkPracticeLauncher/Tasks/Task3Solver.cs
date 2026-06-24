@@ -59,7 +59,7 @@ namespace WorkPracticeLauncher.Tasks
 
 			CheckResizeAndRedraw();                          // Проверка размера перед выбором реализации
 			Console.ForegroundColor = ConsoleColor.Green;   // Зелёный цвет для заголовка выбора
-			Console.WriteLine("▶ Выберите реализацию:");    // Заголовок
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")} Выберите реализацию:");    // Заголовок
 			Console.ResetColor();                            // Сброс цвета
 			Console.WriteLine("  1 – Собственная реализация"); // Пункт 1
 			Console.WriteLine("  2 – LinkedList<T>");        // Пункт 2

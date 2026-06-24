@@ -150,7 +150,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();                                        // Сброс цвета
 			Console.WriteLine($"Текущий каталог: {currentDataDirectory}"); // Вывод текущего пути
 			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный цвет для подсказки
-			Console.WriteLine("▶ Выберите способ указания пути:");      // Заголовок выбора
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите способ указания пути:");      // Заголовок выбора
 			Console.ResetColor();                                        // Сброс цвета
 			Console.WriteLine("  1 – Ввести путь вручную");             // Пункт 1
 			Console.WriteLine("  2 – Выбрать через проводник");         // Пункт 2
@@ -607,7 +607,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine($"Текущий каталог: {currentDataDirectory}"); // Путь
 			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный подзаголовок
-			Console.WriteLine("▶ Выберите действие:");
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите действие:");
 			Console.ResetColor();
 			Console.WriteLine("  1 – Сохранить в новый файл");
 			if (allFiles.Count > 0)                                      // Если есть файлы
@@ -635,7 +635,7 @@ namespace WorkPracticeLauncher.Tasks
 			if (choice == 1)                                             // Сохранить в новый файл
 			{
 				Console.ForegroundColor = ConsoleColor.Green;          // Зелёный
-				Console.WriteLine("▶ Выберите формат файла:");
+				Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите формат файла:");
 				Console.ResetColor();
 				Console.WriteLine("  1 – XML (совместим с WPF-приложением)");
 				Console.WriteLine("  2 – TXT (текстовый, для ручного просмотра)");
@@ -656,7 +656,7 @@ namespace WorkPracticeLauncher.Tasks
 				}
 
 				Console.ForegroundColor = ConsoleColor.Green;          // Зелёный
-				Console.WriteLine("▶ Выберите способ указания имени и пути:");
+				Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите способ указания имени и пути:");
 				Console.ResetColor();
 				Console.WriteLine("  1 – Ввести имя файла (сохранится в текущий каталог)");
 				Console.WriteLine("  2 – Выбрать каталог и имя файла через проводник");
@@ -738,7 +738,7 @@ namespace WorkPracticeLauncher.Tasks
 			}
 
 			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный
-			Console.WriteLine("▶ Доступные файлы:");
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Доступные файлы:");
 			Console.ResetColor();
 			for (int i = 0; i < allFiles.Count; i++)                    // Вывод списка файлов
 				Console.WriteLine($"  {i + 1} – {allFiles[i]}");
@@ -869,7 +869,7 @@ namespace WorkPracticeLauncher.Tasks
 		private static string RequestSavePath(FileFormat format)
 		{
 			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный
-			Console.WriteLine("▶ Выберите способ указания пути:");
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите способ указания пути:");
 			Console.ResetColor();
 			Console.WriteLine("  1 – Ввести путь вручную");
 			Console.WriteLine("  2 – Выбрать через проводник");
@@ -985,7 +985,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine($"Текущий каталог: {currentDataDirectory}"); // Вывод текущего пути
 			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный подзаголовок
-			Console.WriteLine("▶ Выберите способ указания каталога:");
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите способ указания каталога:");
 			Console.ResetColor();
 			Console.WriteLine("  1 – Использовать текущий каталог");
 			Console.WriteLine("  2 – Выбрать другой каталог");
@@ -1010,7 +1010,7 @@ namespace WorkPracticeLauncher.Tasks
 			else if (choice == "2")                                      // Выбрать другой каталог
 			{
 				Console.ForegroundColor = ConsoleColor.Green;          // Зелёный
-				Console.WriteLine("▶ Выберите способ указания пути:");
+				Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Выберите способ указания пути:");
 				Console.ResetColor();
 				Console.WriteLine("  1 – Ввести путь вручную");
 				Console.WriteLine("  2 – Выбрать через проводник");
@@ -1076,7 +1076,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ResetColor();
 			Console.WriteLine($"Текущий каталог: {selectedDirectory}");
 			Console.ForegroundColor = ConsoleColor.Green;              // Зелёный
-			Console.WriteLine("▶ Список доступных файлов:");
+			Console.WriteLine($"{(Program.SupportsEmoji ? "▶ " : " ")}Список доступных файлов:");
 			Console.ResetColor();
 			for (int i = 0; i < files.Count; i++)                        // Вывод списка
 				Console.WriteLine($"  {i + 1} – {files[i]}");
@@ -1118,9 +1118,22 @@ namespace WorkPracticeLauncher.Tasks
 				}
 
 				int before = products.Count;                             // Количество до загрузки
-				products.AddRange(loaded);                               // Добавляем загруженные товары
+				List<Product> newOnly = loaded.Where(p => !products.Any(e =>
+					e.Name == p.Name &&
+					e.Manufacturer == p.Manufacturer &&
+					e.ShelfLife == p.ShelfLife &&
+					e.Price == p.Price &&
+					e.StockQuantity == p.StockQuantity)).ToList();   // Только новые (без дубликатов)
+				products.AddRange(newOnly);                            // Добавляем только новые
 				Console.ForegroundColor = ConsoleColor.Green;            // Зелёный успех
-				Console.WriteLine($"Загружено {loaded.Count} товаров из файла.");
+				Console.WriteLine($"Загружено {newOnly.Count} новых товаров из файла.");
+				if (loaded.Count - newOnly.Count > 0)
+				{
+					Console.ForegroundColor = ConsoleColor.Yellow;      // Жёлтый
+					Console.WriteLine($"Пропущено дубликатов: {loaded.Count - newOnly.Count}");
+					Console.ResetColor();
+				}
+				Console.ForegroundColor = ConsoleColor.Green;            // Зелёный
 				Console.WriteLine($"Всего товаров в БД: {products.Count} (было {before})");
 				Console.ResetColor();
 			}
