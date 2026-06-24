@@ -2,7 +2,7 @@
 using System;                     // Базовые типы (DateTime, string, Console)
 using System.Collections.Generic; // Коллекции (List<T>)
 using System.IO;                  // Работа с файлами (Path)
-using System.Linq;                // Linq-расширения
+using System.Configuration;            // ConfigurationManager для чтения токена
 using System.Net.Http;            // HTTP-запросы к GitHub API
 using System.Text;                // Encoding для Base64
 
@@ -21,7 +21,7 @@ namespace WorkPracticeLauncher
 	public static class FeedbackManager
 	{
 		// Конфигурация GitHub API
-		private const string GITHUB_TOKEN = "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";   // Токен доступа
+		private static string GITHUB_TOKEN = ConfigurationManager.AppSettings["GitHubToken"]; // Токен из App.config
 		private const string REPO_OWNER = "OneWayToDie";                                    // Владелец репозитория
 		private const string REPO_NAME = "Work_Practice";                                   // Имя репозитория
 		private const string FILE_PATH = "WorkPracticeLauncher/reviews.json";               // Путь к файлу в репозитории
