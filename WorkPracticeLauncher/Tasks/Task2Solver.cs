@@ -229,6 +229,7 @@ namespace WorkPracticeLauncher.Tasks
 			Console.ReadKey();                                           // Ожидание
 		}
 
+
 		//========================================================= Выбор папки через проводник Windows ================================================================//
 		private static string SelectFolderViaDialog()
 		{
