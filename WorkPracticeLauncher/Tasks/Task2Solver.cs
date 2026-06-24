@@ -1119,14 +1119,14 @@ namespace WorkPracticeLauncher.Tasks
 
 				int before = products.Count;                             // Количество до загрузки
 				products.AddRange(loaded);                               // Добавляем загруженные товары
-				Console.ForegroundColor = ConsoleColor.Green;          // Зелёный успех
+				Console.ForegroundColor = ConsoleColor.Green;            // Зелёный успех
 				Console.WriteLine($"Загружено {loaded.Count} товаров из файла.");
 				Console.WriteLine($"Всего товаров в БД: {products.Count} (было {before})");
 				Console.ResetColor();
 			}
 			catch (Exception ex)                                          // Ошибка загрузки
 			{
-				Console.ForegroundColor = ConsoleColor.Red;            // Красный
+				Console.ForegroundColor = ConsoleColor.Red;              // Красный
 				Console.WriteLine($"Ошибка при загрузке: {ex.Message}");
 				Console.WriteLine("Файл не подходит или повреждён.");
 				Console.ResetColor();
